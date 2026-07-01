@@ -1,7 +1,0 @@
-TEAM_ID=
-
-PRODUCT_NAME=ArmenianLearningAssistant-KMP
-PRODUCT_BUNDLE_IDENTIFIER=com.blbulyandavbulyan.larm.kmp.ArmenianLearningAssistant-KMP$(TEAM_ID)
-
-CURRENT_PROJECT_VERSION=1
-MARKETING_VERSION=1.0
