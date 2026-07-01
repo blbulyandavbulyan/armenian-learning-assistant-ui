@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # This tells Dependabot to scan your build.gradle.kts and gradle/libs.versions.toml
+  - package-ecosystem: "gradle"
+    directory: "/" 
+    schedule:
+      interval: "weekly"
+    # Optional: Group all Gradle updates into a single PR to reduce noise
+    groups:
+      gradle-dependencies:
+        patterns:
+          - "*"
+
+  # This keeps the GitHub Actions in your .github/workflows/ directory up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
