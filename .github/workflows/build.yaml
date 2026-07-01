@@ -29,6 +29,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Run the main build task which compiles everything and runs all tests
-      - name: Build and run tests
-        run: ./gradlew build
+      # Compile the application code (without running tests)
+      - name: Compile Application
+        run: ./gradlew assemble
+
+      # Run the test suites
+      - name: Run Tests
+        run: ./gradlew check
