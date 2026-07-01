@@ -1,0 +1,47 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    
+    # Required permissions to upload the scanning results to GitHub Security tab
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'zulu'
+
+    # Initializes the CodeQL tools for vulnerability scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: java-kotlin
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    # CodeQL requires the project to be built while it traces the compilation
+    - name: Build project
+      run: ./gradlew assemble
+
+    # Performs the actual analysis and uploads the results
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:java-kotlin"
