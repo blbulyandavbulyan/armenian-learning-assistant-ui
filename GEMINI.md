@@ -10,3 +10,6 @@ This is the frontend UI project for the **Armenian Learning Assistant** applicat
 ## Backend and API Specs
 - The OpenAPI specs for the backend can be found in the root directory: `backend-api-docs.json`. This should be used to understand the available API endpoints and data models.
 - The backend repository is located at: [armenian-learning-assistant-be](https://github.com/blbulyandavbulyan/armenian-learning-assistant-be).
+ 
+ ## Testing Guidelines
+- **Assertions**: Always use Kotest assertions (e.g., `import io.kotest.matchers.shouldBe`, `variable shouldBe expected`) instead of standard JUnit or kotlin.test assertions (`assertTrue`, `assertEquals`) for better readability and consistent style.

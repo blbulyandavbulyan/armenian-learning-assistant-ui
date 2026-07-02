@@ -5,23 +5,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.*
+import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
-import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 
 @Composable
 fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
@@ -77,7 +77,12 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            InputMessageField(value = prompt, fontFamily = notoArmenian, onValueChange = { prompt = it }) {
+            InputMessageField(
+                value = prompt, 
+                fontFamily = notoArmenian, 
+                modifier = Modifier.weight(1f),
+                onValueChange = { prompt = it }
+            ) {
                 triggerGeneration()
             }
 
@@ -91,11 +96,18 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
 }
 
 @Composable
-private fun RowScope.InputMessageField(value: String, fontFamily: FontFamily, onValueChange: (String) -> Unit, onSend: () -> Unit) {
+internal fun InputMessageField(
+    value: String, 
+    fontFamily: FontFamily, 
+    modifier: Modifier = Modifier,
+    onValueChange: (String) -> Unit, 
+    onSend: () -> Unit
+) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = Modifier.weight(1f)
+        modifier = modifier
+            .testTag("inputMessageField")
             .onPreviewKeyEvent { keyEvent ->
                 // If they press Enter without Shift, send the message
                 if ((keyEvent.key == Key.Enter || keyEvent.key == Key.NumPadEnter) && !keyEvent.isShiftPressed) {
