@@ -10,6 +10,9 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
 import androidx.compose.ui.text.font.FontFamily
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlin.test.Test
 import io.kotest.matchers.shouldBe
 
@@ -17,9 +20,9 @@ class InputMessageFieldTest {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun typingAndPressingEnter_triggersOnSend() = runComposeUiTest {
+    fun typingAndPressingEnter() = runComposeUiTest {
         var sendTriggered = false
-        var currentPrompt = ""
+        var currentPrompt by mutableStateOf("")
 
         setContent {
             ArmenianLearningTheme {
@@ -44,9 +47,9 @@ class InputMessageFieldTest {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun typingAndPressingShiftEnter_doesNotTriggerOnSend() = runComposeUiTest {
+    fun typingAndPressingShiftEnter() = runComposeUiTest {
         var sendTriggered = false
-        var currentPrompt = ""
+        var currentPrompt by mutableStateOf("")
 
         setContent {
             ArmenianLearningTheme {
