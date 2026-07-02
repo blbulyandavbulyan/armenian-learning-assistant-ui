@@ -22,17 +22,30 @@ import armenianlearningassistant_kmp.shared.generated.resources.*
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
+import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
 
 @Composable
 fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
-    var prompt by remember { mutableStateOf("") }
     val conversation by viewModel.conversation.collectAsStateWithLifecycle()
+    DialogueGeneratorScreen(
+        conversation = conversation,
+        onGenerateDialogue = viewModel::generateDialogue
+    )
+}
+
+@Composable
+fun DialogueGeneratorScreen(
+    conversation: List<ConversationItem>,
+    onGenerateDialogue: (String) -> Unit
+) {
+    var prompt by remember { mutableStateOf("") }
 
     val notoArmenian = FontFamily(Font(Res.font.noto_sans_armenian))
 
     fun triggerGeneration() {
         if (prompt.isNotBlank()) {
-            viewModel.generateDialogue(prompt)
+            onGenerateDialogue(prompt)
             prompt = ""
         }
     }
@@ -50,6 +63,7 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
             .fillMaxSize()
             .background(gradientBackground)
             .padding(16.dp)
+            .testTag("dialogueGeneratorScreen")
     ) {
         // Header
         Header()
@@ -201,7 +215,8 @@ private fun SendButton(onClick: () -> Unit) {
             contentColor = MaterialTheme.colorScheme.onPrimary
         ),
         shape = RoundedCornerShape(16.dp),
-        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+        modifier = Modifier.testTag("sendButton")
     ) {
         Text(stringResource(Res.string.action_send), fontWeight = FontWeight.Bold)
     }

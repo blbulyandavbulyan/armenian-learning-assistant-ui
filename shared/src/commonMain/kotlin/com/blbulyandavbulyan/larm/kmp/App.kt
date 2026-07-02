@@ -7,7 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.blbulyandavbulyan.larm.kmp.network.ApiClient
 import com.blbulyandavbulyan.larm.kmp.network.NetworkDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.ui.DialogueGeneratorScreen
-import com.blbulyandavbulyan.larm.kmp.ui.DialogueViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
 
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 

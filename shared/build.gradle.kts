@@ -20,7 +20,7 @@ kotlin {
     js {
         browser {
             testTask {
-                filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.ui.InputMessageFieldTest")
+                filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.ui.*")
             }
         }
     }
