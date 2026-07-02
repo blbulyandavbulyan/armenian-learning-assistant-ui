@@ -31,6 +31,13 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
 
     val notoArmenian = FontFamily(Font(Res.font.noto_sans_armenian))
 
+    fun triggerGeneration() {
+        if (prompt.isNotBlank()) {
+            viewModel.generateDialogue(prompt)
+            prompt = ""
+        }
+    }
+
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF1A1A2E),
@@ -70,53 +77,54 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            OutlinedTextField(
-                value = prompt,
-                onValueChange = { prompt = it },
-                modifier = Modifier.weight(1f)
-                    .onPreviewKeyEvent { keyEvent ->
-                        // If they press Enter without Shift, send the message
-                        if ((keyEvent.key == Key.Enter || keyEvent.key == Key.NumPadEnter) && !keyEvent.isShiftPressed) {
-                            if (keyEvent.type == KeyEventType.KeyDown) {
-                                if (prompt.isNotBlank()) {
-                                    viewModel.generateDialogue(prompt)
-                                    prompt = ""
-                                }
-                                return@onPreviewKeyEvent true
-                            } else if (keyEvent.type == KeyEventType.KeyUp) {
-                                return@onPreviewKeyEvent true
-                            }
-                        }
-                        false
-                    },
-                placeholder = {
-                    Text(
-                        "E.g., I want to go to the grocery store... (Enter to send, Shift+Enter for new line)",
-                        color = Color.Gray
-                    )
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFE94560),
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    cursorColor = Color(0xFFE94560)
-                ),
-                shape = RoundedCornerShape(24.dp),
-                maxLines = 3,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = notoArmenian)
-            )
+            InputMessageField(value = prompt, fontFamily = notoArmenian, onValueChange = { prompt = it }) {
+                triggerGeneration()
+            }
 
             Spacer(modifier = Modifier.width(12.dp))
 
             SendButton {
-                if (prompt.isNotBlank()) {
-                    viewModel.generateDialogue(prompt)
-                    prompt = ""
-                }
+                triggerGeneration()
             }
         }
     }
+}
+
+@Composable
+private fun RowScope.InputMessageField(value: String, fontFamily: FontFamily, onValueChange: (String) -> Unit, onSend: () -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier.weight(1f)
+            .onPreviewKeyEvent { keyEvent ->
+                // If they press Enter without Shift, send the message
+                if ((keyEvent.key == Key.Enter || keyEvent.key == Key.NumPadEnter) && !keyEvent.isShiftPressed) {
+                    if (keyEvent.type == KeyEventType.KeyDown) {
+                        onSend()
+                        return@onPreviewKeyEvent true
+                    } else if (keyEvent.type == KeyEventType.KeyUp) {
+                        return@onPreviewKeyEvent true
+                    }
+                }
+                false
+            },
+        placeholder = {
+            Text(
+                "E.g., I want to go to the grocery store... (Enter to send, Shift+Enter for new line)",
+                color = Color.Gray
+            )
+        },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFFE94560),
+            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            cursorColor = Color(0xFFE94560)
+        ),
+        shape = RoundedCornerShape(24.dp),
+        maxLines = 3,
+        textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = fontFamily)
+    )
 }
 
 @Composable
