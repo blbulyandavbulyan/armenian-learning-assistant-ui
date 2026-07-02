@@ -18,6 +18,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
 import org.jetbrains.compose.resources.stringResource
+import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 
 @Composable
 fun DialogueView(dialogue: DialogueChatResponse, fontFamily: FontFamily) {
@@ -47,7 +48,10 @@ private fun SaveButton(onClick: () -> Unit) {
         Button(
             onClick = onClick,
             modifier = Modifier.height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F3460)),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AppTheme.colors.saveButton,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
             shape = RoundedCornerShape(24.dp)
         ) {
             Text(stringResource(Res.string.action_save_dialogue), fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -75,7 +79,7 @@ private fun DialoguePhrasesContent(
                     bottomStart = 4.dp
                 ),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF0F3460).copy(alpha = 0.8f)
+                    containerColor = AppTheme.colors.saveButton.copy(alpha = 0.8f)
                 ),
                 modifier = Modifier.fillMaxWidth(0.9f)
             ) {
@@ -88,7 +92,7 @@ private fun DialoguePhrasesContent(
                     Text(
                         text = speakerText,
                         style = MaterialTheme.typography.labelMedium.copy(
-                            color = Color(0xFFE94560),
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             fontFamily = fontFamily
                         ),
@@ -97,7 +101,7 @@ private fun DialoguePhrasesContent(
                     Text(
                         text = phraseObj.phrase.phrase,
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 18.sp,
                             fontFamily = fontFamily
                         )
@@ -105,7 +109,8 @@ private fun DialoguePhrasesContent(
                     Text(
                         text = phraseObj.phrase.transcription,
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color(0xFFA0A0B0),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontStyle = FontStyle.Italic
                         )
                     )
@@ -116,7 +121,8 @@ private fun DialoguePhrasesContent(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = phraseTranslations,
-                            style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFF888899))
+                            fontSize = 14.sp,
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
@@ -144,13 +150,13 @@ private fun DialogueInfoContent(
                 text = titleText,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontFamily = fontFamily
                 )
             )
             Text(
                 text = dialogue.info.transcription,
-                style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFFA0A0B0))
+                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
             )
         }
     }
@@ -170,7 +176,7 @@ private fun AiMessageBubble(
                 bottomStart = 4.dp
             ),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.1f)
+                containerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
             ),
             modifier = Modifier.fillMaxWidth(0.85f).padding(bottom = 16.dp)
         ) {
@@ -178,7 +184,7 @@ private fun AiMessageBubble(
                 text = message,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontFamily = fontFamily
                 )
             )

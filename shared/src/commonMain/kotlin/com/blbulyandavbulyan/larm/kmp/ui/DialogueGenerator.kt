@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.*
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
+import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 
 @Composable
 fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
@@ -36,10 +37,11 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
         }
     }
 
+    val appColors = AppTheme.colors
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF1A1A2E),
-            Color(0xFF16213E)
+            appColors.gradientTop,
+            appColors.gradientBottom
         )
     )
 
@@ -58,7 +60,7 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
                 .weight(1f)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(24.dp))
-                .background(Color.White.copy(alpha = 0.05f))
+                .background(appColors.innerBoxBackground)
                 .padding(16.dp)
         ) {
             if (conversation.isEmpty()) {
@@ -109,15 +111,15 @@ private fun RowScope.InputMessageField(value: String, fontFamily: FontFamily, on
         placeholder = {
             Text(
                 stringResource(Res.string.input_placeholder),
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFFE94560),
-            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            cursorColor = Color(0xFFE94560)
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = AppTheme.colors.unfocusedBorder,
+            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         shape = RoundedCornerShape(24.dp),
         maxLines = 3,
@@ -130,7 +132,7 @@ private fun BoxScope.EmptyConversationScreen() {
     Text(
         text = stringResource(Res.string.empty_conversation_message),
         style = MaterialTheme.typography.bodyLarge,
-        color = Color.White.copy(alpha = 0.5f),
+        color = AppTheme.colors.emptyMessage,
         modifier = Modifier.align(Alignment.Center)
     )
 }
@@ -157,7 +159,7 @@ private fun ConversationScreen(
                             modifier = Modifier.fillMaxWidth().padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(color = Color(0xFFE94560))
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         }
                     }
 
@@ -183,8 +185,8 @@ private fun SendButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFE94560),
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ),
         shape = RoundedCornerShape(16.dp),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
@@ -199,13 +201,13 @@ private fun Header() {
         text = stringResource(Res.string.app_name),
         style = MaterialTheme.typography.headlineMedium.copy(
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         ),
         modifier = Modifier.padding(bottom = 8.dp)
     )
     Text(
         text = stringResource(Res.string.header_subtitle),
-        style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFFA0A0B0)),
+        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
         modifier = Modifier.padding(bottom = 24.dp)
     )
 }
@@ -221,7 +223,7 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
                 bottomStart = 16.dp
             ),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFE94560).copy(alpha = 0.8f)
+                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
             ),
             modifier = Modifier.fillMaxWidth(0.85f)
         ) {
@@ -229,7 +231,7 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
                 text = text,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = fontFamily
                 )
             )

@@ -9,10 +9,12 @@ import com.blbulyandavbulyan.larm.kmp.network.NetworkDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.ui.DialogueGeneratorScreen
 import com.blbulyandavbulyan.larm.kmp.ui.DialogueViewModel
 
+import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
+
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    ArmenianLearningTheme {
         val apiClient = remember { ApiClient(BuildKonfig.BASE_URL) }
         val repository = remember { NetworkDialogueRepository(apiClient) }
         val viewModel = remember { DialogueViewModel(repository) }
