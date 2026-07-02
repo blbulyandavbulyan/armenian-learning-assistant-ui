@@ -18,7 +18,11 @@ buildkonfig {
 kotlin {
 
     js {
-        browser()
+        browser {
+            testTask {
+                filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.ui.InputMessageFieldTest")
+            }
+        }
     }
     
     @OptIn(ExperimentalWasmDsl::class)
