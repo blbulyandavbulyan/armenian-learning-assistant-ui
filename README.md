@@ -1,8 +1,8 @@
 # Armenian Learning Assistant Frontend
 
-This is a Kotlin Multiplatform project currently focused exclusively on the **Web** target (WASM and JS).
+This is a Kotlin Multiplatform project currently focused on the **Web** (WASM and JS) and **Desktop** (JVM) targets.
 
-> **Note**: Android and iOS targets have been temporarily removed from the project structure as the current focus is on the Web application. They can be restored from the git history in the future when needed.
+> **Note**: Android and iOS targets have been temporarily removed from the project structure as the current focus is on the Web and Desktop applications. They can be restored from the git history in the future when needed.
 
 This is the frontend UI for the Armenian Language Learning app.
 The backend is located here: [armenian-learning-assistant-be](https://github.com/blbulyandavbulyan/armenian-learning-assistant-be).
@@ -21,6 +21,8 @@ Use the run configurations provided by the run widget in your IDE's toolbar. You
 - Web app:
   - Wasm target (faster, modern browsers): `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
   - JS target (slower, supports older browsers): `./gradlew :webApp:jsBrowserDevelopmentRun`
+- Desktop app:
+  - Standard run: `./gradlew :desktopApp:run`
 
 ### Running tests
 
@@ -29,6 +31,9 @@ Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:
 - Web tests:
   - Wasm target: `./gradlew :shared:wasmJsTest`
   - JS target: `./gradlew :shared:jsTest`
+- Desktop tests & Coverage:
+  - Run JVM tests: `./gradlew :shared:jvmTest`
+  - Run JVM tests and generate coverage report (viewable at `shared/build/reports/kover/html/index.html`): `./gradlew :shared:jvmTest koverHtmlReport`
 
 ---
 

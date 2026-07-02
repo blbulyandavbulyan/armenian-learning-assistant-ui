@@ -6,16 +6,20 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.kover)
 }
 
 buildkonfig {
     packageName = "com.blbulyandavbulyan.larm.kmp"
     defaultConfigs {
-        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "BASE_URL", "")
+        val baseUrl = project.findProperty("baseUrl")?.toString() ?: "http://localhost:8080"
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "BASE_URL", baseUrl)
     }
 }
 
 kotlin {
+
+    jvm()
 
     js {
         browser {
@@ -55,6 +59,10 @@ kotlin {
         }
         jsMain.dependencies {
             implementation(libs.wrappers.browser)
+        }
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.ktor.client.okhttp)
         }
     }
 }
