@@ -180,11 +180,14 @@ private fun ConversationScreen(
 
 @Composable
 private fun SendButton(onClick: () -> Unit) {
-    FloatingActionButton(
+    Button(
         onClick = onClick,
-        containerColor = Color(0xFFE94560),
-        contentColor = Color.White,
-        shape = RoundedCornerShape(16.dp)
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFE94560),
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
     ) {
         Text(stringResource(Res.string.action_send), fontWeight = FontWeight.Bold)
     }
