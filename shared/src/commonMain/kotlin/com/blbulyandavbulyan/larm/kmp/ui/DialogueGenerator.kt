@@ -15,13 +15,10 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.*
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import org.jetbrains.compose.resources.Font
 
 @Composable
@@ -232,143 +229,6 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
                     fontFamily = fontFamily
                 )
             )
-        }
-    }
-}
-
-@Composable
-fun DialogueView(dialogue: DialogueChatResponse, fontFamily: FontFamily) {
-    val speakersMap = dialogue.speakers.associateBy { it.id }
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        // AI's message bubble
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-            Card(
-                shape = RoundedCornerShape(
-                    topStart = 16.dp, 
-                    topEnd = 16.dp, 
-                    bottomEnd = 16.dp, 
-                    bottomStart = 4.dp
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
-                ),
-                modifier = Modifier.fillMaxWidth(0.85f).padding(bottom = 16.dp)
-            ) {
-                Text(
-                    text = dialogue.message,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = Color.White,
-                        fontFamily = fontFamily
-                    )
-                )
-            }
-        }
-
-        // Dialogue structured content
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                val titleTranslations = dialogue.info.translations.joinToString(" | ") { it.translationText }
-                val titleText = if (titleTranslations.isNotEmpty()) "${dialogue.info.title} | $titleTranslations" else dialogue.info.title
-
-                Text(
-                    text = titleText,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        fontFamily = fontFamily
-                    )
-                )
-                Text(
-                    text = dialogue.info.transcription,
-                    style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFFA0A0B0))
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            dialogue.dialoguePhrases.forEach { phraseObj ->
-                val speaker = speakersMap[phraseObj.speakerId]
-                Card(
-                    shape = RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomEnd = 16.dp,
-                        bottomStart = 4.dp
-                    ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF0F3460).copy(alpha = 0.8f)
-                    ),
-                    modifier = Modifier.fillMaxWidth(0.9f)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        val speakerText = speaker?.let { spk ->
-                            val translations = spk.translations.joinToString(" | ") { it.translationText }
-                            if (translations.isNotEmpty()) "${spk.title} | $translations" else spk.title
-                        } ?: "Unknown"
-
-                        Text(
-                            text = speakerText,
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                color = Color(0xFFE94560),
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = fontFamily
-                            ),
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-                        Text(
-                            text = phraseObj.phrase.phrase,
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontFamily = fontFamily
-                            )
-                        )
-                        Text(
-                            text = phraseObj.phrase.transcription,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = Color(0xFFA0A0B0),
-                                fontStyle = FontStyle.Italic
-                            )
-                        )
-
-                        val phraseTranslations = phraseObj.phrase.translations.joinToString(" | ") { it.translationText }
-                        if (phraseTranslations.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = phraseTranslations,
-                                style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFF888899))
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Button(
-                onClick = { /* TODO: Save functionality for later branch */ },
-                modifier = Modifier.fillMaxWidth(0.6f).height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F3460)),
-                shape = RoundedCornerShape(24.dp)
-            ) {
-                Text("Save Dialogue", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            }
         }
     }
 }
