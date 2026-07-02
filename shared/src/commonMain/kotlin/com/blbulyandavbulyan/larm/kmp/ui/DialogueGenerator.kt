@@ -75,18 +75,16 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
                 onValueChange = { prompt = it },
                 modifier = Modifier.weight(1f)
                     .onPreviewKeyEvent { keyEvent ->
-                        if (keyEvent.key == Key.Enter || keyEvent.key == Key.NumPadEnter) {
-                            // If they press Enter without Shift, send the message
-                            if (!keyEvent.isShiftPressed) {
-                                if (keyEvent.type == KeyEventType.KeyDown) {
-                                    if (prompt.isNotBlank()) {
-                                        viewModel.generateDialogue(prompt)
-                                        prompt = ""
-                                    }
-                                    return@onPreviewKeyEvent true
-                                } else if (keyEvent.type == KeyEventType.KeyUp) {
-                                    return@onPreviewKeyEvent true
+                        // If they press Enter without Shift, send the message
+                        if ((keyEvent.key == Key.Enter || keyEvent.key == Key.NumPadEnter) && !keyEvent.isShiftPressed) {
+                            if (keyEvent.type == KeyEventType.KeyDown) {
+                                if (prompt.isNotBlank()) {
+                                    viewModel.generateDialogue(prompt)
+                                    prompt = ""
                                 }
+                                return@onPreviewKeyEvent true
+                            } else if (keyEvent.type == KeyEventType.KeyUp) {
+                                return@onPreviewKeyEvent true
                             }
                         }
                         false
