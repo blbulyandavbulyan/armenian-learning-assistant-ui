@@ -63,7 +63,7 @@ import androidx.compose.ui.input.key.Key
         }
         
         onNodeWithTag("emptyConversationText").assertIsDisplayed()
-        // TODO we should also assert here that opposite is not displayed here, like ConversationScreen is not displayed
+        onNodeWithTag("conversationScreen").assertDoesNotExist()
     }
 
     @Test
@@ -159,6 +159,14 @@ Modify `UserMessageView` to attach a tag to the user message text:
             )
 ```
 
+Also add a tag to `ConversationScreen` inside `DialogueGenerator.kt`:
+```kotlin
+    SelectionContainer {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().testTag("conversationScreen"),
+            // ...
+```
+
 - [ ] **Step 2: Write tests for these conversation states**
 
 In `DialogueGeneratorScreenTest.kt`:
@@ -206,8 +214,8 @@ import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
                 )
             }
         }
-        //TODO we should also assert that this element has proper text which is in the erorr
         onNodeWithTag("errorMessage").assertIsDisplayed()
+        onNode(androidx.compose.ui.test.hasText("Network failure", substring = true)).assertIsDisplayed()
     }
 ```
 
@@ -259,19 +267,19 @@ import com.blbulyandavbulyan.larm.kmp.data.*
         val mockAiResponse = DialogueChatResponse(
             message = "Here is your dialogue",
             info = DialogueInfo(
-                title = "At the Cafe",
+                title = "Սրճարանում",
                 transcription = "Srcharanum",
                 translations = listOf(TranslationResponse("en", "At the Cafe"))
             ),
             speakers = listOf(
-                SpeakerResponse("s1", "Waiter", listOf(TranslationResponse("en", "Waiter"))),
-                SpeakerResponse("s2", "Customer", listOf(TranslationResponse("en", "Customer")))
+                SpeakerResponse("s1", "Մատուցող", listOf(TranslationResponse("en", "Waiter"))),
+                SpeakerResponse("s2", "Հաճախորդ", listOf(TranslationResponse("en", "Customer")))
             ),
             dialoguePhrases = listOf(
                 DialoguePhraseObj(
                     speakerId = "s1",
                     phrase = DialoguePhrase(
-                        phrase = "Barev Dzez",
+                        phrase = "Բարև Ձեզ",
                         transcription = "Barev Dzez",
                         translations = listOf(TranslationResponse("en", "Hello"))
                     )
@@ -279,7 +287,7 @@ import com.blbulyandavbulyan.larm.kmp.data.*
                 DialoguePhraseObj(
                     speakerId = "s2",
                     phrase = DialoguePhrase(
-                        phrase = "Barev",
+                        phrase = "Բարև",
                         transcription = "Barev",
                         translations = listOf(TranslationResponse("en", "Hi"))
                     )
@@ -296,24 +304,26 @@ import com.blbulyandavbulyan.larm.kmp.data.*
             }
         }
         
-        // Assert AI's initial conversational message is displayed
-        // TODO we should also check that it has the text which is in the message from mockAiResponse
+        // Assert AI's initial conversational message is displayed and has correct text
         onNodeWithTag("aiMessageText").assertIsDisplayed()
+        onNode(hasText("Here is your dialogue")).assertIsDisplayed()
         
         // Assert Dialogue Info is displayed
-        // TODO title supposed to be in Armenian
-        onNode(hasText("At the Cafe | At the Cafe")).assertIsDisplayed() // Title + Translation
+        onNode(hasText("Սրճարանում | At the Cafe")).assertIsDisplayed() // Title + Translation
         onNode(hasText("Srcharanum")).assertIsDisplayed() // Transcription
         
-        // TODO same as previous todo
         // Assert Speakers are correctly mapped and displayed
-        onNode(hasText("Waiter | Waiter")).assertIsDisplayed()
-        onNode(hasText("Customer | Customer")).assertIsDisplayed()
+        onNode(hasText("Մատուցող | Waiter")).assertIsDisplayed()
+        onNode(hasText("Հաճախորդ | Customer")).assertIsDisplayed()
 
-        // Assert Phrases are displayed
-        // TODO phrases also have transcription and translations, we should assert them here too
+        // Assert Phrases are displayed with transcriptions and translations
+        onNode(hasText("Բարև Ձեզ")).assertIsDisplayed()
         onNode(hasText("Barev Dzez")).assertIsDisplayed()
+        onNode(hasText("Hello")).assertIsDisplayed()
+        
+        onNode(hasText("Բարև")).assertIsDisplayed()
         onNode(hasText("Barev")).assertIsDisplayed()
+        onNode(hasText("Hi")).assertIsDisplayed()
     }
 ```
 
