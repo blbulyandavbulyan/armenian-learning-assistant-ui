@@ -45,19 +45,7 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
             .padding(16.dp)
     ) {
         // Header
-        Text(
-            text = "Dialogue Generator",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            ),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Text(
-            text = "Generate premium Armenian dialogues using AI",
-            style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFFA0A0B0)),
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+        Header()
 
         // Main content area
         Box(
@@ -69,49 +57,9 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
                 .padding(16.dp)
         ) {
             if (conversation.isEmpty()) {
-                Text(
-                    text = "No dialogue generated yet. Ask me to create one!",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White.copy(alpha = 0.5f),
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                EmptyConversationScreen()
             } else {
-                SelectionContainer {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(conversation) { item ->
-                            when (item) {
-                                is ConversationItem.UserMessage -> {
-                                    UserMessageView(item.text, notoArmenian)
-                                }
-
-                                is ConversationItem.Loading -> {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator(color = Color(0xFFE94560))
-                                    }
-                                }
-
-                                is ConversationItem.Error -> {
-                                    Text(
-                                        text = "Error: ${item.message}",
-                                        color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.fillMaxWidth().padding(16.dp)
-                                    )
-                                }
-
-                                is ConversationItem.AiResponse -> {
-                                    DialogueView(item.response, notoArmenian)
-                                }
-                            }
-                        }
-                    }
-                }
+                ConversationScreen(conversation, notoArmenian)
             }
         }
 
@@ -126,17 +74,17 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
                 value = prompt,
                 onValueChange = { prompt = it },
                 modifier = Modifier.weight(1f)
-                    .onPreviewKeyEvent {
-                        if (it.key == Key.Enter || it.key == Key.NumPadEnter) {
+                    .onPreviewKeyEvent { keyEvent ->
+                        if (keyEvent.key == Key.Enter || keyEvent.key == Key.NumPadEnter) {
                             // If they press Enter without Shift, send the message
-                            if (!it.isShiftPressed) {
-                                if (it.type == KeyEventType.KeyDown) {
+                            if (!keyEvent.isShiftPressed) {
+                                if (keyEvent.type == KeyEventType.KeyDown) {
                                     if (prompt.isNotBlank()) {
                                         viewModel.generateDialogue(prompt)
                                         prompt = ""
                                     }
                                     return@onPreviewKeyEvent true
-                                } else if (it.type == KeyEventType.KeyUp) {
+                                } else if (keyEvent.type == KeyEventType.KeyUp) {
                                     return@onPreviewKeyEvent true
                                 }
                             }
@@ -163,21 +111,96 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            FloatingActionButton(
-                onClick = {
-                    if (prompt.isNotBlank()) {
-                        viewModel.generateDialogue(prompt)
-                        prompt = ""
-                    }
-                },
-                containerColor = Color(0xFFE94560),
-                contentColor = Color.White,
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Text("Send", fontWeight = FontWeight.Bold)
+            SendButton {
+                if (prompt.isNotBlank()) {
+                    viewModel.generateDialogue(prompt)
+                    prompt = ""
+                }
             }
         }
     }
+}
+
+@Composable
+private fun BoxScope.EmptyConversationScreen() {
+    Text(
+        text = "No dialogue generated yet. Ask me to create one!",
+        style = MaterialTheme.typography.bodyLarge,
+        color = Color.White.copy(alpha = 0.5f),
+        modifier = Modifier.align(Alignment.Center)
+    )
+}
+
+@Composable
+private fun ConversationScreen(
+    conversation: List<ConversationItem>,
+    notoArmenian: FontFamily
+) {
+    SelectionContainer {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(conversation) { item ->
+                when (item) {
+                    is ConversationItem.UserMessage -> {
+                        UserMessageView(item.text, notoArmenian)
+                    }
+
+                    is ConversationItem.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Color(0xFFE94560))
+                        }
+                    }
+
+                    is ConversationItem.Error -> {
+                        Text(
+                            text = "Error: ${item.message}",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.fillMaxWidth().padding(16.dp)
+                        )
+                    }
+
+                    is ConversationItem.AiResponse -> {
+                        DialogueView(item.response, notoArmenian)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SendButton(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = Color(0xFFE94560),
+        contentColor = Color.White,
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Text("Send", fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun Header() {
+    Text(
+        text = "Dialogue Generator",
+        style = MaterialTheme.typography.headlineMedium.copy(
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        ),
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
+    Text(
+        text = "Generate Armenian dialogues using AI",
+        style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFFA0A0B0)),
+        modifier = Modifier.padding(bottom = 24.dp)
+    )
 }
 
 @Composable
