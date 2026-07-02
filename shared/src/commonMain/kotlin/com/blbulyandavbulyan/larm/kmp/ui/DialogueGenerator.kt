@@ -159,7 +159,7 @@ private fun BoxScope.EmptyConversationScreen() {
         text = stringResource(Res.string.empty_conversation_message),
         style = MaterialTheme.typography.bodyLarge,
         color = AppTheme.colors.emptyMessage,
-        modifier = Modifier.align(Alignment.Center)
+        modifier = Modifier.align(Alignment.Center).testTag("emptyConversationText")
     )
 }
 
@@ -170,7 +170,7 @@ private fun ConversationScreen(
 ) {
     SelectionContainer {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("conversationScreen"),
             contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -182,7 +182,7 @@ private fun ConversationScreen(
 
                     is ConversationItem.Loading -> {
                         Box(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("loadingIndicator"),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -193,7 +193,7 @@ private fun ConversationScreen(
                         Text(
                             text = "${stringResource(Res.string.error_prefix)} ${item.message}",
                             color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.fillMaxWidth().padding(16.dp)
+                            modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("errorMessage")
                         )
                     }
 
@@ -256,7 +256,7 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
         ) {
             Text(
                 text = text,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(16.dp).testTag("userMessageText"),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = fontFamily

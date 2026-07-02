@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -96,7 +97,7 @@ private fun DialoguePhrasesContent(
                             fontWeight = FontWeight.Bold,
                             fontFamily = fontFamily
                         ),
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        modifier = Modifier.padding(bottom = 4.dp).testTag("dialogueSpeaker")
                     )
                     Text(
                         text = phraseObj.phrase.phrase,
@@ -104,7 +105,8 @@ private fun DialoguePhrasesContent(
                             color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 18.sp,
                             fontFamily = fontFamily
-                        )
+                        ),
+                        modifier = Modifier.testTag("dialoguePhraseText")
                     )
                     Text(
                         text = phraseObj.phrase.transcription,
@@ -182,7 +184,7 @@ private fun AiMessageBubble(
         ) {
             Text(
                 text = message,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(16.dp).testTag("aiMessageText"),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onBackground,
                     fontFamily = fontFamily

@@ -187,7 +187,7 @@ import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
         }
         
         onNodeWithTag("userMessageText").assertIsDisplayed()
-        onNode(hasText("Hello user message")).assertIsDisplayed()
+            .assertTextEquals("Hello user message")
     }
 
     @Test
@@ -240,7 +240,7 @@ git commit -m "test: add ui tests for UserMessage, Loading, and Error conversati
 **Interfaces:**
 - Consumes: `DialogueChatResponse`, `DialogueInfo`, `DialoguePhrase`, `SpeakerResponse`
 
-- [ ] **Step 1: Add a testTag to the AI response text bubble**
+- [ ] **Step 1: Add a testTag to the AI response elements**
 
 Modify `AiMessageBubble` in `DialogueView.kt` to attach a tag to the message text:
 
@@ -248,11 +248,21 @@ Modify `AiMessageBubble` in `DialogueView.kt` to attach a tag to the message tex
             Text(
                 text = message,
                 modifier = Modifier.padding(16.dp).testTag("aiMessageText"),
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontFamily = fontFamily
-                )
-            )
+                //...
+```
+
+Modify `DialoguePhrasesContent` in `DialogueView.kt` to attach tags to speakers and phrases:
+```kotlin
+                    Text(
+                        text = speakerText,
+                        modifier = Modifier.padding(bottom = 4.dp).testTag("dialogueSpeaker"),
+                        //...
+                    )
+                    Text(
+                        text = phraseObj.phrase.phrase,
+                        modifier = Modifier.testTag("dialoguePhraseText"),
+                        //...
+                    )
 ```
 
 - [ ] **Step 2: Write test for AI Response rendering**
@@ -313,15 +323,15 @@ import com.blbulyandavbulyan.larm.kmp.data.*
         onNode(hasText("Srcharanum")).assertIsDisplayed() // Transcription
         
         // Assert Speakers are correctly mapped and displayed
-        onNode(hasText("Մատուցող | Waiter")).assertIsDisplayed()
-        onNode(hasText("Հաճախորդ | Customer")).assertIsDisplayed()
+        onAllNodesWithTag("dialogueSpeaker")[0].assertTextEquals("Մատուցող | Waiter")
+        onAllNodesWithTag("dialogueSpeaker")[1].assertTextEquals("Հաճախորդ | Customer")
 
         // Assert Phrases are displayed with transcriptions and translations
-        onNode(hasText("Բարև Ձեզ")).assertIsDisplayed()
+        onAllNodesWithTag("dialoguePhraseText")[0].assertTextEquals("Բարև Ձեզ")
         onNode(hasText("Barev Dzez")).assertIsDisplayed()
         onNode(hasText("Hello")).assertIsDisplayed()
         
-        onNode(hasText("Բարև")).assertIsDisplayed()
+        onAllNodesWithTag("dialoguePhraseText")[1].assertTextEquals("Բարև")
         onNode(hasText("Barev")).assertIsDisplayed()
         onNode(hasText("Hi")).assertIsDisplayed()
     }
