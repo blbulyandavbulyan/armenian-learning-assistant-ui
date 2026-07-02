@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.*
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
@@ -107,7 +108,7 @@ private fun RowScope.InputMessageField(value: String, fontFamily: FontFamily, on
             },
         placeholder = {
             Text(
-                "E.g., I want to go to the grocery store... (Enter to send, Shift+Enter for new line)",
+                stringResource(Res.string.input_placeholder),
                 color = Color.Gray
             )
         },
@@ -127,7 +128,7 @@ private fun RowScope.InputMessageField(value: String, fontFamily: FontFamily, on
 @Composable
 private fun BoxScope.EmptyConversationScreen() {
     Text(
-        text = "No dialogue generated yet. Ask me to create one!",
+        text = stringResource(Res.string.empty_conversation_message),
         style = MaterialTheme.typography.bodyLarge,
         color = Color.White.copy(alpha = 0.5f),
         modifier = Modifier.align(Alignment.Center)
@@ -162,7 +163,7 @@ private fun ConversationScreen(
 
                     is ConversationItem.Error -> {
                         Text(
-                            text = "Error: ${item.message}",
+                            text = "${stringResource(Res.string.error_prefix)} ${item.message}",
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.fillMaxWidth().padding(16.dp)
                         )
@@ -185,14 +186,14 @@ private fun SendButton(onClick: () -> Unit) {
         contentColor = Color.White,
         shape = RoundedCornerShape(16.dp)
     ) {
-        Text("Send", fontWeight = FontWeight.Bold)
+        Text(stringResource(Res.string.action_send), fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
 private fun Header() {
     Text(
-        text = "Dialogue Generator",
+        text = stringResource(Res.string.app_name),
         style = MaterialTheme.typography.headlineMedium.copy(
             fontWeight = FontWeight.Bold,
             color = Color.White
@@ -200,7 +201,7 @@ private fun Header() {
         modifier = Modifier.padding(bottom = 8.dp)
     )
     Text(
-        text = "Generate Armenian dialogues using AI",
+        text = stringResource(Res.string.header_subtitle),
         style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFFA0A0B0)),
         modifier = Modifier.padding(bottom = 24.dp)
     )
@@ -232,3 +233,4 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
         }
     }
 }
+

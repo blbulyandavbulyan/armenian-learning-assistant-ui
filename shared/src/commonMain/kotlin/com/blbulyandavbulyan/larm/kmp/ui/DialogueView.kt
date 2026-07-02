@@ -1,19 +1,8 @@
 package com.blbulyandavbulyan.larm.kmp.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +12,12 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import armenianlearningassistant_kmp.shared.generated.resources.Res
+import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
+import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DialogueView(dialogue: DialogueChatResponse, fontFamily: FontFamily) {
@@ -53,11 +46,11 @@ private fun SaveButton(onClick: () -> Unit) {
     ) {
         Button(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth(0.6f).height(48.dp),
+            modifier = Modifier.height(48.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F3460)),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
+            shape = RoundedCornerShape(24.dp)
         ) {
-            Text("Save Dialogue", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(stringResource(Res.string.action_save_dialogue), fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
     }
 }
@@ -90,7 +83,7 @@ private fun DialoguePhrasesContent(
                     val speakerText = speaker?.let { spk ->
                         val translations = spk.translations.joinToString(" | ") { it.translationText }
                         if (translations.isNotEmpty()) "${spk.title} | $translations" else spk.title
-                    } ?: "Unknown"
+                    } ?: stringResource(Res.string.unknown_speaker)
 
                     Text(
                         text = speakerText,
