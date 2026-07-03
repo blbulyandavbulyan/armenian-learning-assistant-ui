@@ -47,7 +47,7 @@ class FakeDialogueRepository : DialogueRepository {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DialogueViewModelTest {
-    
+
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var fakeRepository: FakeDialogueRepository
     private lateinit var viewModel: DialogueViewModel
@@ -56,7 +56,7 @@ class DialogueViewModelTest {
     fun setup() {
         // Required for viewModelScope coroutines in unit tests
         Dispatchers.setMain(testDispatcher)
-        
+
         fakeRepository = FakeDialogueRepository()
         viewModel = DialogueViewModel(fakeRepository)
     }
@@ -87,7 +87,7 @@ class DialogueViewModelTest {
             finalState.size shouldBe 2
             finalState[0].shouldBeInstanceOf<ConversationItem.UserMessage>()
             finalState[1].shouldBeInstanceOf<ConversationItem.AiResponse>().response.message shouldBe "Here is your dialogue"
-            
+
             // Wait for coroutines to finish and ensure no more events are emitted
             testScheduler.advanceUntilIdle()
             expectNoEvents()
@@ -97,7 +97,7 @@ class DialogueViewModelTest {
     @Test
     fun `generateDialogue adds UserMessage, shows Loading, and ends with Error on failure`() = runTest {
         fakeRepository.shouldFail = true
-        
+
         viewModel.conversation.test {
             awaitItem() shouldBe emptyList()
 
@@ -111,12 +111,12 @@ class DialogueViewModelTest {
             val finalState = awaitItem()
             finalState.size shouldBe 2
             finalState[1].shouldBeInstanceOf<ConversationItem.Error>().message shouldBe "Fake Network Error"
-            
+
             testScheduler.advanceUntilIdle()
             expectNoEvents()
         }
     }
-    
+
     @Test
     fun `generateDialogue does nothing when prompt is blank`() = runTest {
         viewModel.conversation.test {
@@ -125,6 +125,33 @@ class DialogueViewModelTest {
             viewModel.generateDialogue("   ")
 
             // Wait for coroutines to ensure no events are emitted
+            testScheduler.advanceUntilIdle()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `saveDialogue adds Error to conversation on failure`() = runTest {
+        // Setup initial conversation with a generated dialogue
+        val dialogue = DialogueChatResponse(
+            message = "Test",
+            info = DialogueTitleResponse("T", "T", emptyList()),
+            speakers = emptyList(),
+            dialoguePhrases = emptyList()
+        )
+        // Set fake to fail on save
+        fakeRepository.shouldFail = true
+
+        viewModel.conversation.test {
+            awaitItem() shouldBe emptyList()
+
+            viewModel.saveDialogue(dialogue)
+
+            // The next state should append the Error
+            val stateWithError = awaitItem()
+            stateWithError.size shouldBe 1
+            stateWithError[0].shouldBeInstanceOf<ConversationItem.Error>().message shouldBe "Fake Network Error"
+
             testScheduler.advanceUntilIdle()
             expectNoEvents()
         }

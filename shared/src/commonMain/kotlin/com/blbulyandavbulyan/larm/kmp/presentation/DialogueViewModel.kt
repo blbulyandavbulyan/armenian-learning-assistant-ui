@@ -52,8 +52,9 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
             try {
                 repository.saveDialogue(dialogue)
             } catch (e: Exception) {
-                // TODO "log or handle error", YOU HANDLE ERROR !!!
-                // Log or handle error
+                val currentConv = _conversation.value.toMutableList()
+                currentConv.add(ConversationItem.Error(e.message ?: "Failed to save dialogue"))
+                _conversation.value = currentConv
             }
         }
     }
