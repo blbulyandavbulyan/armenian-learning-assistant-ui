@@ -1,3 +1,4 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -13,7 +14,15 @@ buildkonfig {
     packageName = "com.blbulyandavbulyan.larm.kmp"
     defaultConfigs {
         val baseUrl = project.findProperty("baseUrl")?.toString() ?: "http://localhost:8080"
-        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "BASE_URL", baseUrl)
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", baseUrl)
+    }
+    targetConfigs {
+        create("js") {
+            buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "")
+        }
+        create("wasmJs") {
+            buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "")
+        }
     }
 }
 
