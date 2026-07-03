@@ -37,6 +37,7 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
 @Composable
 fun DialogueGeneratorScreen(
     conversation: List<ConversationItem>,
+    emptyMessage: String = stringResource(Res.string.empty_conversation_message),
     onGenerateDialogue: (String) -> Unit
 ) {
     var prompt by remember { mutableStateOf("") }
@@ -78,7 +79,7 @@ fun DialogueGeneratorScreen(
                 .padding(16.dp)
         ) {
             if (conversation.isEmpty()) {
-                EmptyConversationScreen()
+                EmptyConversationScreen(emptyMessage)
             } else {
                 ConversationScreen(conversation, notoArmenian)
             }
@@ -154,9 +155,9 @@ internal fun InputMessageField(
 }
 
 @Composable
-private fun BoxScope.EmptyConversationScreen() {
+private fun BoxScope.EmptyConversationScreen(message: String) {
     Text(
-        text = stringResource(Res.string.empty_conversation_message),
+        text = message,
         style = MaterialTheme.typography.bodyLarge,
         color = AppTheme.colors.emptyMessage,
         modifier = Modifier.align(Alignment.Center).testTag("emptyConversationText")

@@ -67,6 +67,7 @@ class DialogueGeneratorScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
+                    emptyMessage = "No conversation yet",
                     onGenerateDialogue = { }
                 )
             }
