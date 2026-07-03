@@ -1,11 +1,12 @@
 package com.blbulyandavbulyan.larm.kmp.ui
 
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,11 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.*
+import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
+import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
-import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
-import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
 
 @Composable
 fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
@@ -169,40 +170,52 @@ private fun ConversationScreen(
     conversation: List<ConversationItem>,
     notoArmenian: FontFamily
 ) {
+    val scrollState = rememberScrollState()
+
     SelectionContainer {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().testTag("conversationScreen"),
-            contentPadding = PaddingValues(bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(conversation) { item ->
-                when (item) {
-                    is ConversationItem.UserMessage -> {
-                        UserMessageView(item.text, notoArmenian)
-                    }
-
-                    is ConversationItem.Loading -> {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("loadingIndicator"),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("conversationScreen")
+                    .verticalScroll(scrollState)
+                    .padding(bottom = 16.dp, end = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                for (item in conversation) {
+                    when (item) {
+                        is ConversationItem.UserMessage -> {
+                            UserMessageView(item.text, notoArmenian)
                         }
-                    }
 
-                    is ConversationItem.Error -> {
-                        Text(
-                            text = "${stringResource(Res.string.error_prefix)} ${item.message}",
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("errorMessage")
-                        )
-                    }
+                        is ConversationItem.Loading -> {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("loadingIndicator"),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
 
-                    is ConversationItem.AiResponse -> {
-                        DialogueView(item.response, notoArmenian)
+                        is ConversationItem.Error -> {
+                            Text(
+                                text = "${stringResource(Res.string.error_prefix)} ${item.message}",
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("errorMessage")
+                            )
+                        }
+
+                        is ConversationItem.AiResponse -> {
+                            DialogueView(item.response, notoArmenian)
+                        }
                     }
                 }
             }
+
+            VerticalScrollbar(
+                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                adapter = androidx.compose.foundation.rememberScrollbarAdapter(scrollState = scrollState)
+            )
         }
     }
 }
