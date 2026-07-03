@@ -89,7 +89,7 @@ private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit)
                                             Color.Transparent
                                         )
                                     ),
-                                    radius = size.minDimension
+                                    radius = size.width
                                 )
                             }
                         }
