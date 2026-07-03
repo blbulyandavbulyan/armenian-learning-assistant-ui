@@ -46,4 +46,15 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
             }
         }
     }
+
+    fun saveDialogue(dialogue: DialogueChatResponse) {
+        viewModelScope.launch {
+            try {
+                repository.saveDialogue(dialogue)
+            } catch (e: Exception) {
+                // TODO "log or handle error", YOU HANDLE ERROR !!!
+                // Log or handle error
+            }
+        }
+    }
 }

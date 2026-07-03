@@ -17,4 +17,13 @@ class ApiClient(private val client: HttpClient) {
         }
         return response.body()
     }
+
+    suspend fun saveDialogue(request: com.blbulyandavbulyan.larm.kmp.data.SaveDialogueRequest): String {
+        val response = client.post("/dialogues") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+        val saveResponse: com.blbulyandavbulyan.larm.kmp.data.SaveDialogueResponse = response.body()
+        return saveResponse.id
+    }
 }

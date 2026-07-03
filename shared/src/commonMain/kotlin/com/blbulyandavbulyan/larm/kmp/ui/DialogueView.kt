@@ -22,7 +22,11 @@ import org.jetbrains.compose.resources.stringResource
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 
 @Composable
-fun DialogueView(dialogue: DialogueChatResponse, fontFamily: FontFamily) {
+fun DialogueView(
+    dialogue: DialogueChatResponse,
+    fontFamily: FontFamily,
+    onSaveClick: () -> Unit = {}
+) {
     val speakersMap = dialogue.speakers.associateBy { it.id }
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -36,7 +40,7 @@ fun DialogueView(dialogue: DialogueChatResponse, fontFamily: FontFamily) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        SaveButton { /* TODO: Save functionality for later branch */ }
+        SaveButton(onClick = onSaveClick)
     }
 }
 

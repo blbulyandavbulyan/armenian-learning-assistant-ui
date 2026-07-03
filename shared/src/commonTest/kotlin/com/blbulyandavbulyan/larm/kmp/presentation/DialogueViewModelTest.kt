@@ -36,6 +36,13 @@ class FakeDialogueRepository : DialogueRepository {
             dialoguePhrases = emptyList()
         )
     }
+
+    override suspend fun saveDialogue(dialogue: DialogueChatResponse): String {
+        if (shouldFail) {
+            throw Exception("Fake Network Error")
+        }
+        return "fake-uuid-1234"
+    }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
