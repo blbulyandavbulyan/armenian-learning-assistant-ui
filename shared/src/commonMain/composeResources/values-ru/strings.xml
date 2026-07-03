@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Генератор Диалогов</string>
+    <string name="header_subtitle">Создавайте армянские диалоги с помощью ИИ</string>
+    <string name="empty_conversation_message">Диалог еще не сгенерирован. Попросите меня создать его!</string>
+    <string name="input_placeholder">Напр., Я хочу пойти в продуктовый магазин... (Enter для отправки, Shift+Enter для новой строки)</string>
+    <string name="action_send">Отправить</string>
+    <string name="action_save_dialogue">Сохранить Диалог</string>
+    <string name="error_prefix">Ошибка:</string>
+    <string name="unknown_speaker">Неизвестно</string>
+</resources>

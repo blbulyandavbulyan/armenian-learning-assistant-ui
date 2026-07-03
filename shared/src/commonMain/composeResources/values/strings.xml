@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Dialogue Generator</string>
+    <string name="header_subtitle">Generate Armenian dialogues using AI</string>
+    <string name="empty_conversation_message">No dialogue generated yet. Ask me to create one!</string>
+    <string name="input_placeholder">E.g., I want to go to the grocery store... (Enter to send, Shift+Enter for new line)</string>
+    <string name="action_send">Send</string>
+    <string name="action_save_dialogue">Save Dialogue</string>
+    <string name="error_prefix">Error:</string>
+    <string name="unknown_speaker">Unknown</string>
+</resources>
