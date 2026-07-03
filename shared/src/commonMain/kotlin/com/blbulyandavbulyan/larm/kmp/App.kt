@@ -11,11 +11,33 @@ import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
 
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 
+import io.ktor.client.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
+
 @Composable
 @Preview
 fun App() {
     ArmenianLearningTheme {
-        val apiClient = remember { ApiClient(BuildKonfig.BASE_URL) }
+        val httpClient = remember {
+            HttpClient {
+                install(ContentNegotiation) {
+                    json(Json {
+                        ignoreUnknownKeys = true
+                        prettyPrint = true
+                    })
+                }
+                defaultRequest {
+                    val baseUrl = BuildKonfig.BASE_URL
+                    if (baseUrl.isNotBlank()) {
+                        url(baseUrl)
+                    }
+                }
+            }
+        }
+        val apiClient = remember { ApiClient(httpClient) }
         val repository = remember { NetworkDialogueRepository(apiClient) }
         val viewModel = remember { DialogueViewModel(repository) }
         
