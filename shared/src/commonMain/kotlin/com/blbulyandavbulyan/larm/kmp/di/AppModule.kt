@@ -19,7 +19,7 @@ object AppModule {
                 })
             }
             defaultRequest {
-                val baseUrl = BuildKonfig.BASE_URL
+                val baseUrl = BuildKonfig.API_URL
                 if (baseUrl.isNotBlank()) {
                     url(baseUrl)
                 }

@@ -13,16 +13,8 @@ plugins {
 buildkonfig {
     packageName = "com.blbulyandavbulyan.larm.kmp"
     defaultConfigs {
-        val baseUrl = project.findProperty("baseUrl")?.toString() ?: "http://localhost:8080"
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", baseUrl)
-    }
-    targetConfigs {
-        create("js") {
-            buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "")
-        }
-        create("wasmJs") {
-            buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "")
-        }
+        val baseUrl = project.findProperty("apiUrl")?.toString() ?: "http://localhost:8080"
+        buildConfigField(FieldSpec.Type.STRING, "API_URL", baseUrl)
     }
 }
 
