@@ -5,7 +5,7 @@
 **Goal:** Implement unit tests for the `network` package (`ApiClient` and `NetworkDialogueRepository`) by injecting Ktor's `MockEngine`.
 
 **Architecture:** 
-1. `ApiClient` will be refactored to accept an optional `HttpClientEngine` parameter to enable dependency injection.
+1. `ApiClient` will be refactored to accept a pre-configured `HttpClient` parameter to enable pure dependency injection, avoiding internal configurations.
 2. We will add `ktor-client-mock` as a `commonTest` dependency.
 3. Tests will define `MockEngine` responses in-memory to verify JSON serialization/deserialization and endpoint accuracy across all KMP platforms.
 
@@ -67,11 +67,12 @@ git commit -m "test: add ktor-client-mock dependency"
 
 **Files:**
 - Modify: `shared/src/commonMain/kotlin/com/blbulyandavbulyan/larm/kmp/network/ApiClient.kt`
+- Modify: `shared/src/commonMain/kotlin/com/blbulyandavbulyan/larm/kmp/App.kt`
 
 **Interfaces:**
-- Produces: `ApiClient` now accepts an `HttpClientEngine?` parameter that defaults to `null`.
+- Produces: `ApiClient` now accepts a pre-configured `HttpClient` directly via its constructor.
 
-- [ ] **Step 1: Update ApiClient Constructor and instantiation**
+- [ ] **Step 1: Update ApiClient Constructor and logic**
 
 ```kotlin
 // In ApiClient.kt
@@ -81,34 +82,10 @@ import com.blbulyandavbulyan.larm.kmp.data.ChatRequest
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.engine.*
 
-class ApiClient(private val baseUrl: String, engine: HttpClientEngine? = null) {
-    private val client = if (engine != null) {
-        HttpClient(engine) { configure() }
-    } else {
-        HttpClient { configure() }
-    }
-
-    private fun HttpClientConfig<*>.configure() {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-            })
-        }
-        defaultRequest {
-            if (baseUrl.isNotBlank()) {
-                url(baseUrl)
-            }
-        }
-    }
+class ApiClient(private val client: HttpClient) {
 
     suspend fun generateDialogue(message: String, chatId: String): DialogueChatResponse {
         val requestBody = ChatRequest(message, chatId)
@@ -121,14 +98,46 @@ class ApiClient(private val baseUrl: String, engine: HttpClientEngine? = null) {
 }
 ```
 
-- [ ] **Step 2: Verify Compilation**
+- [ ] **Step 2: Configure Client in App.kt**
+
+```kotlin
+// In shared/src/commonMain/kotlin/com/blbulyandavbulyan/larm/kmp/App.kt
+
+// Add these imports at the top
+import io.ktor.client.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
+
+// Update the apiClient instantiation to build and inject the HttpClient
+        val httpClient = remember {
+            HttpClient {
+                install(ContentNegotiation) {
+                    json(Json {
+                        ignoreUnknownKeys = true
+                        prettyPrint = true
+                    })
+                }
+                defaultRequest {
+                    val baseUrl = BuildKonfig.BASE_URL
+                    if (baseUrl.isNotBlank()) {
+                        url(baseUrl)
+                    }
+                }
+            }
+        }
+        val apiClient = remember { ApiClient(httpClient) }
+```
+
+- [ ] **Step 3: Verify Compilation**
 Run `./gradlew :shared:compileCommonMainKotlinMetadata`
 Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 ```bash
-git add shared/src/commonMain/kotlin/com/blbulyandavbulyan/larm/kmp/network/ApiClient.kt
-git commit -m "refactor: allow engine injection in ApiClient"
+git add shared/src/commonMain/kotlin/com/blbulyandavbulyan/larm/kmp/network/ApiClient.kt shared/src/commonMain/kotlin/com/blbulyandavbulyan/larm/kmp/App.kt
+git commit -m "refactor: use dependency injection for ApiClient HttpClient"
 ```
 
 ---
@@ -150,8 +159,12 @@ package com.blbulyandavbulyan.larm.kmp.network
 
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import io.kotest.matchers.shouldBe
+import io.ktor.client.*
 import io.ktor.client.engine.mock.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -171,7 +184,12 @@ class ApiClientTest {
             )
         }
 
-        val apiClient = ApiClient(baseUrl = "http://localhost", engine = mockEngine)
+        val mockClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val apiClient = ApiClient(client = mockClient)
         
         val response = apiClient.generateDialogue(message = "Hello", chatId = "123")
         
@@ -209,8 +227,12 @@ package com.blbulyandavbulyan.larm.kmp.network
 
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import io.kotest.matchers.shouldBe
+import io.ktor.client.*
 import io.ktor.client.engine.mock.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -226,7 +248,12 @@ class NetworkDialogueRepositoryTest {
             )
         }
 
-        val apiClient = ApiClient(baseUrl = "http://localhost", engine = mockEngine)
+        val mockClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val apiClient = ApiClient(client = mockClient)
         val repository = NetworkDialogueRepository(apiClient)
         
         val response = repository.generateDialogue(prompt = "Test prompt", chatId = "chat456")
