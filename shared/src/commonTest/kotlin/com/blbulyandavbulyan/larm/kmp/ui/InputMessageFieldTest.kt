@@ -47,6 +47,34 @@ class InputMessageFieldTest {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
+    fun typingAndPressingNumpadEnter() = runComposeUiTest {
+        var sendTriggered = false
+        var currentPrompt by mutableStateOf("")
+
+        setContent {
+            ArmenianLearningTheme {
+                InputMessageField(
+                    value = currentPrompt,
+                    fontFamily = FontFamily.Default,
+                    onValueChange = { currentPrompt = it },
+                    onSend = { sendTriggered = true }
+                )
+            }
+        }
+
+        onNodeWithTag("inputMessageField").performTextInput("Barev!")
+
+        onNodeWithTag("inputMessageField").performKeyInput {
+            pressKey(Key.NumPadEnter)
+        }
+
+        sendTriggered shouldBe true
+        currentPrompt shouldBe "Barev!"
+    }
+
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
     fun typingAndPressingShiftEnter() = runComposeUiTest {
         var sendTriggered = false
         var currentPrompt by mutableStateOf("")
@@ -73,4 +101,34 @@ class InputMessageFieldTest {
         sendTriggered shouldBe false
         currentPrompt shouldBe "Barev!\n"
     }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun typingAndPressingShiftNumpadEnter() = runComposeUiTest {
+        var sendTriggered = false
+        var currentPrompt by mutableStateOf("")
+
+        setContent {
+            ArmenianLearningTheme {
+                InputMessageField(
+                    value = currentPrompt,
+                    fontFamily = FontFamily.Default,
+                    onValueChange = { currentPrompt = it },
+                    onSend = { sendTriggered = true }
+                )
+            }
+        }
+
+        onNodeWithTag("inputMessageField").performTextInput("Barev!")
+
+        onNodeWithTag("inputMessageField").performKeyInput {
+            withKeyDown(Key.ShiftLeft) {
+                pressKey(Key.NumPadEnter)
+            }
+        }
+
+        sendTriggered shouldBe false
+        currentPrompt shouldBe "Barev!\n"
+    }
+
 }
