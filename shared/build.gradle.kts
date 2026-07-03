@@ -56,6 +56,7 @@ kotlin {
             implementation(libs.kotest.assertions.core)
             implementation(libs.turbine)
             implementation(libs.compose.uiTest)
+            implementation(libs.ktor.client.mock)
         }
         jsMain.dependencies {
             implementation(libs.wrappers.browser)
