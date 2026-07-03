@@ -61,7 +61,9 @@ private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit)
         
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.height(52.dp)
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .height(56.dp)
         ) {
             if (isSaving) {
                 val transition = rememberInfiniteTransition()
@@ -100,7 +102,7 @@ private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit)
                 onClick = onClick,
                 enabled = !isSaving && !isSaved,
                 modifier = Modifier
-                    .fillMaxHeight()
+                    .fillMaxSize()
                     .padding(if (isSaving) 3.dp else 2.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AppTheme.colors.saveButton,
