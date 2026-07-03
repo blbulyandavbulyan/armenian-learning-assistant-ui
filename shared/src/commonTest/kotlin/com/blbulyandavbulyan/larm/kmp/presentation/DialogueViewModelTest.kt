@@ -109,4 +109,17 @@ class DialogueViewModelTest {
             expectNoEvents()
         }
     }
+    
+    @Test
+    fun `generateDialogue does nothing when prompt is blank`() = runTest {
+        viewModel.conversation.test {
+            awaitItem() shouldBe emptyList()
+
+            viewModel.generateDialogue("   ")
+
+            // Wait for coroutines to ensure no events are emitted
+            testScheduler.advanceUntilIdle()
+            expectNoEvents()
+        }
+    }
 }
