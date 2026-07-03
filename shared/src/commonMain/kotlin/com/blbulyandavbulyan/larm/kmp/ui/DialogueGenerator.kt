@@ -213,6 +213,8 @@ private fun ConversationScreen(
                             DialogueView(
                                 dialogue = item.response,
                                 fontFamily = notoArmenian,
+                                isSaving = item.isSaving,
+                                isSaved = item.isSaved,
                                 onSaveClick = { onSaveDialogue(item.response) }
                             )
                         }

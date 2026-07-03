@@ -13,7 +13,11 @@ import kotlin.uuid.Uuid
 
 sealed class ConversationItem {
     data class UserMessage(val text: String) : ConversationItem()
-    data class AiResponse(val response: DialogueChatResponse) : ConversationItem()
+    data class AiResponse(
+        val response: DialogueChatResponse,
+        val isSaving: Boolean = false,
+        val isSaved: Boolean = false
+    ) : ConversationItem()
     data class Error(val message: String) : ConversationItem()
     data object Loading : ConversationItem()
 }
@@ -48,11 +52,26 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
     }
 
     fun saveDialogue(dialogue: DialogueChatResponse) {
+        _conversation.value = _conversation.value.map {
+            if (it is ConversationItem.AiResponse && it.response === dialogue) {
+                it.copy(isSaving = true)
+            } else it
+        }
+
         viewModelScope.launch {
             try {
                 repository.saveDialogue(dialogue)
+                _conversation.value = _conversation.value.map {
+                    if (it is ConversationItem.AiResponse && it.response === dialogue) {
+                        it.copy(isSaving = false, isSaved = true)
+                    } else it
+                }
             } catch (e: Exception) {
-                val currentConv = _conversation.value.toMutableList()
+                val currentConv = _conversation.value.map {
+                    if (it is ConversationItem.AiResponse && it.response === dialogue) {
+                        it.copy(isSaving = false)
+                    } else it
+                }.toMutableList()
                 currentConv.add(ConversationItem.Error(e.message ?: "Failed to save dialogue"))
                 _conversation.value = currentConv
             }

@@ -13,6 +13,11 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.getValue
+import androidx.compose.animation.core.*
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.rotate
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
@@ -25,6 +30,8 @@ import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 fun DialogueView(
     dialogue: DialogueChatResponse,
     fontFamily: FontFamily,
+    isSaving: Boolean = false,
+    isSaved: Boolean = false,
     onSaveClick: () -> Unit = {}
 ) {
     val speakersMap = dialogue.speakers.associateBy { it.id }
@@ -40,26 +47,72 @@ fun DialogueView(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        SaveButton(onClick = onSaveClick)
+        SaveButton(isSaving = isSaving, isSaved = isSaved, onClick = onSaveClick)
     }
 }
 
 @Composable
-private fun SaveButton(onClick: () -> Unit) {
+private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        Button(
-            onClick = onClick,
-            modifier = Modifier.height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AppTheme.colors.saveButton,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            shape = RoundedCornerShape(24.dp)
+        val buttonShape = RoundedCornerShape(24.dp)
+        
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.height(52.dp)
         ) {
-            Text(stringResource(Res.string.action_save_dialogue), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            if (isSaving) {
+                val transition = rememberInfiniteTransition()
+                val angle by transition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 360f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Restart
+                    )
+                )
+
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clip(buttonShape)
+                        .drawBehind {
+                            rotate(angle) {
+                                drawCircle(
+                                    brush = Brush.sweepGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            Color.White.copy(alpha = 0.8f),
+                                            Color.White,
+                                            Color.Transparent
+                                        )
+                                    ),
+                                    radius = size.minDimension
+                                )
+                            }
+                        }
+                )
+            }
+            
+            Button(
+                onClick = onClick,
+                enabled = !isSaving && !isSaved,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(if (isSaving) 3.dp else 2.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AppTheme.colors.saveButton,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = if (isSaved) AppTheme.colors.saveButton.copy(alpha = 0.5f) else AppTheme.colors.saveButton,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                ),
+                shape = buttonShape
+            ) {
+                val text = if (isSaved) "Saved!" else stringResource(Res.string.action_save_dialogue)
+                Text(text, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            }
         }
     }
 }
