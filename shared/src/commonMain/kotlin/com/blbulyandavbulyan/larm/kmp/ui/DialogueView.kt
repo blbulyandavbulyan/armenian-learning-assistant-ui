@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.rotate
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
+import armenianlearningassistant_kmp.shared.generated.resources.action_saved_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
@@ -112,7 +113,7 @@ private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit)
                 ),
                 shape = buttonShape
             ) {
-                val text = if (isSaved) "Saved!" else stringResource(Res.string.action_save_dialogue)
+                val text = if (isSaved) stringResource(Res.string.action_saved_dialogue) else stringResource(Res.string.action_save_dialogue)
                 Text(text, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }

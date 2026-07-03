@@ -21,3 +21,6 @@ We follow a Clean Architecture / MVVM separation style. Code should be separated
 - **`...ui`**: This package contains all Composable functions (screens, components, layouts) and Compose-specific resources. 
 
 *Rule of thumb:* If it draws pixels on the screen (Composables), it goes in `ui`. If it manages state and talks to repositories (ViewModels), it goes in `presentation`.
+
+## UI Guidelines
+- **No Hardcoded Strings**: Never hardcode UI display strings directly in Kotlin/Compose code. Always use Compose Multiplatform resources defined in `shared/src/commonMain/composeResources/values/strings.xml` (and appropriate localized files like `values-ru/strings.xml`) and reference them via `stringResource(Res.string.your_string_name)`.

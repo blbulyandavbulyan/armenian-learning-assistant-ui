@@ -8,4 +8,7 @@
     <string name="action_save_dialogue">Сохранить Диалог</string>
     <string name="error_prefix">Ошибка:</string>
     <string name="unknown_speaker">Неизвестно</string>
+    <string name="action_saved_dialogue">Сохранено!</string>
+    <string name="error_failed_to_save">Не удалось сохранить диалог</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
 </resources>
