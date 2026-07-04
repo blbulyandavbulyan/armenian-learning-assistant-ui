@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.getValue
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -113,8 +114,10 @@ private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit)
                 ),
                 shape = buttonShape
             ) {
-                val text = if (isSaved) stringResource(Res.string.action_saved_dialogue) else stringResource(Res.string.action_save_dialogue)
-                Text(text, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                DisableSelection {
+                    val text = if (isSaved) stringResource(Res.string.action_saved_dialogue) else stringResource(Res.string.action_save_dialogue)
+                    Text(text, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                }
             }
         }
     }
