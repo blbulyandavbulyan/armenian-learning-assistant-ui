@@ -30,6 +30,7 @@ Create `shared/src/commonTest/kotlin/com/blbulyandavbulyan/larm/kmp/data/Dialogu
 package com.blbulyandavbulyan.larm.kmp.data
 
 object DialogueChatResponseMother {
+    // TODO check out what is actually used in the response, from /dialogues/chat, and stop hallucinating, there is already proper classes created in DialogueModels, USE THEM, don't reinvent the wheel in the mother
     val FULL_DIALOGUE_1 = DialogueChatResponse(
         message = "Here is a dialogue:",
         info = DialogueTitleResponse(
@@ -49,14 +50,20 @@ object DialogueChatResponseMother {
                     transcription = "Barev Dzez",
                     translations = listOf(TranslationResponse("Hello", "en"))
                 )
+            ),
+            DialoguePhraseResponse(
+                speakerId = "2",
+                phrase = PhraseResponse(
+                    armenian = "Ողջույն",
+                    transcription = "Voghjuyn",
+                    translations = listOf(TranslationResponse("Greetings", "en"))
+                )
             )
-            // TODO missing response for the second speaker
-            // don't use the exact same phrase as response here
         )
     )
     
     val FULL_DIALOGUE_2 = DialogueChatResponse(
-        // TODO dialogue with one speaker and withempty phrases is NOT VALID !!!
+        // TODO check out what is actually used in the response, from /dialogues/chat, and stop hallucinating, there is already proper classes created in DialogueModels, USE THEM, don't reinvent the wheel in the mother
         message = "Another dialogue:",
         info = DialogueTitleResponse(
             title = "Ռեստորանում",
@@ -64,9 +71,19 @@ object DialogueChatResponseMother {
             translations = listOf(TranslationResponse("In the restaurant", "en"))
         ),
         speakers = listOf(
-            SpeakerResponse("1", "Մատուցող", listOf(TranslationResponse("Waiter", "en")))
+            SpeakerResponse("1", "Մատուցող", listOf(TranslationResponse("Waiter", "en"))),
+            SpeakerResponse("2", "Հաճախորդ", listOf(TranslationResponse("Customer", "en")))
         ),
-        dialoguePhrases = emptyList()
+        dialoguePhrases = listOf(
+            DialoguePhraseResponse(
+                speakerId = "1",
+                phrase = PhraseResponse(//TODO hallucination too most probably
+                    armenian = "Ի՞նչ կպատվիրեք", // TODO hallucination
+                    transcription = "Inch kpatvirek",
+                    translations = listOf(TranslationResponse("What will you order?", "en"))
+                )
+            )
+        )
     )
 }
 ```
@@ -224,7 +241,10 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
         // Verify semantics on the saving button (second item)
         onAllNodesWithTag("saveButton")[1]
             .assert(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
-        // TODO on another button it should not be 'intermediate', why don't we assert it here as well?
+            
+        // Verify that the other button does not have the indeterminate loading semantics
+        onAllNodesWithTag("saveButton")[0]
+            .assert(!hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
 
         // Click the first button
         onAllNodesWithTag("saveButton")[0].performClick()
