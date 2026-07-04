@@ -6,22 +6,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.progressBarRangeInfo
-import androidx.compose.ui.semantics.ProgressBarRangeInfo
-import androidx.compose.runtime.getValue
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.text.selection.DisableSelection
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.rotate
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.action_saved_dialogue
@@ -52,83 +42,13 @@ fun DialogueView(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        SaveButton(isSaving = isSaving, isSaved = isSaved, onClick = onSaveClick)
-    }
-}
-
-@Composable
-private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        val buttonShape = RoundedCornerShape(24.dp)
-        
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth(0.85f)
-                .height(56.dp)
-        ) {
-            if (isSaving) {
-                val transition = rememberInfiniteTransition()
-                val angle by transition.animateFloat(
-                    initialValue = 0f,
-                    targetValue = 360f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(1500, easing = LinearEasing),
-                        repeatMode = RepeatMode.Restart
-                    )
-                )
-
-                val ringColor = AppTheme.colors.saveButtonLoadingRing
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .clip(buttonShape)
-                        .drawBehind {
-                            rotate(angle) {
-                                drawCircle(
-                                    brush = Brush.sweepGradient(
-                                        colors = listOf(
-                                            Color.Transparent,
-                                            ringColor.copy(alpha = 0.8f),
-                                            ringColor,
-                                            Color.Transparent
-                                        )
-                                    ),
-                                    radius = size.width
-                                )
-                            }
-                        }
-                )
-            }
-            
-            Button(
-                onClick = onClick,
-                enabled = !isSaving && !isSaved,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(if (isSaving) 3.dp else 2.dp)
-                    .semantics {
-                        if (isSaving) {
-                            progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
-                        }
-                    }.testTag("saveButton"),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppTheme.colors.saveButton,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    disabledContainerColor = if (isSaved) AppTheme.colors.saveButton.copy(alpha = 0.5f) else AppTheme.colors.saveButton,
-                    disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
-                ),
-                shape = buttonShape
-            ) {
-                DisableSelection {
-                    val text = if (isSaved) stringResource(Res.string.action_saved_dialogue) else stringResource(Res.string.action_save_dialogue)
-                    Text(text, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                }
-            }
-        }
+        AnimatedSaveButton(
+            isSaving = isSaving,
+            isSaved = isSaved,
+            savedText = stringResource(Res.string.action_saved_dialogue),
+            saveText = stringResource(Res.string.action_save_dialogue),
+            onClick = onSaveClick
+        )
     }
 }
 
