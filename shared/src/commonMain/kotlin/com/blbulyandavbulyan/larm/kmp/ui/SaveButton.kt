@@ -59,7 +59,7 @@ internal fun AnimatedSaveButton(
                 .height(56.dp)
         ) {
             if (isSaving) {
-                animateSaving(buttonShape, AppTheme.colors.saveButtonLoadingRing)
+                SavingIndicatorRing(buttonShape, AppTheme.colors.saveButtonLoadingRing)
             }
 
             SaveStateAwareButton(
@@ -110,7 +110,7 @@ private fun SaveStateAwareButton(
 }
 
 @Composable
-private fun BoxScope.animateSaving(buttonShape: RoundedCornerShape, ringColor: Color) {
+private fun BoxScope.SavingIndicatorRing(buttonShape: RoundedCornerShape, ringColor: Color) {
     val transition = rememberInfiniteTransition()
     val angle by transition.animateFloat(
         initialValue = 0f,
