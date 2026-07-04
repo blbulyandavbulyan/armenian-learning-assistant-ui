@@ -15,6 +15,14 @@ import androidx.compose.ui.test.withKeyDown
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.test.hasText
+import com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.DialoguePhraseResponse
+import com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse
+import com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse
+import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
+import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
 
 @OptIn(ExperimentalTestApi::class)
 class DialogueGeneratorScreenTest {
@@ -122,7 +130,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem.UserMessage("Hello user message")),
+                    conversation = listOf(ConversationItem.UserMessage("Hello user message")),
                     onGenerateDialogue = { }
                 )
             }
@@ -137,7 +145,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem.Loading),
+                    conversation = listOf(ConversationItem.Loading),
                     onGenerateDialogue = { }
                 )
             }
@@ -151,46 +159,50 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem.Error("Network failure")),
+                    conversation = listOf(ConversationItem.Error("Network failure")),
                     onGenerateDialogue = { }
                 )
             }
         }
         
         onNodeWithTag("errorMessage").assertIsDisplayed()
-        onNode(androidx.compose.ui.test.hasText("Network failure", substring = true)).assertIsDisplayed()
+        onNode(hasText("Network failure", substring = true)).assertIsDisplayed()
     }
 
     @Test
     fun aiResponse_displaysFullDialogueDataCorrectly() = runComposeUiTest {
-        val mockAiResponse = com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse(
+        val mockAiResponse = DialogueChatResponse(
             message = "Here is your dialogue",
-            info = com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse(
+            info = DialogueTitleResponse(
                 title = "Սրճարանում",
                 transcription = "Srcharanum",
-                translations = listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("At the Cafe", "en"))
+                translations = listOf(ChatTranslationResponse("At the Cafe", "en"))
             ),
             speakers = listOf(
-                com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse("s1", "Մատուցող", "Matutsogh", listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("Waiter", "en"))),
-                com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse("s2", "Հաճախորդ", "Hachakhord", listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("Customer", "en")))
+                SpeakerResponse("s1", "Մատուցող", "Matutsogh", listOf(
+                    ChatTranslationResponse("Waiter", "en")
+                )),
+                SpeakerResponse("s2", "Հաճախորդ", "Hachakhord", listOf(
+                    ChatTranslationResponse("Customer", "en")
+                ))
             ),
             dialoguePhrases = listOf(
-                com.blbulyandavbulyan.larm.kmp.data.DialoguePhraseResponse(
+                DialoguePhraseResponse(
                     speakerId = "s1",
-                    phrase = com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse(
+                    phrase = DraftPhrasesResponse(
                         phrase = "Բարև Ձեզ",
                         isoLanguageCode = "hy",
                         transcription = "Barev Dzez",
-                        translations = listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("Hello", "en"))
+                        translations = listOf(ChatTranslationResponse("Hello", "en"))
                     )
                 ),
-                com.blbulyandavbulyan.larm.kmp.data.DialoguePhraseResponse(
+                DialoguePhraseResponse(
                     speakerId = "s2",
-                    phrase = com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse(
+                    phrase = DraftPhrasesResponse(
                         phrase = "Բարև",
                         isoLanguageCode = "hy",
                         transcription = "Barev",
-                        translations = listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("Hi", "en"))
+                        translations = listOf(ChatTranslationResponse("Hi", "en"))
                     )
                 )
             )
@@ -199,7 +211,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem.AiResponse(mockAiResponse)),
+                    conversation = listOf(ConversationItem.AiResponse(mockAiResponse)),
                     onGenerateDialogue = { }
                 )
             }
@@ -207,11 +219,11 @@ class DialogueGeneratorScreenTest {
         
         // Assert AI's initial conversational message is displayed and has correct text
         onNodeWithTag("aiMessageText").assertIsDisplayed()
-        onNode(androidx.compose.ui.test.hasText("Here is your dialogue")).assertIsDisplayed()
+        onNode(hasText("Here is your dialogue")).assertIsDisplayed()
         
         // Assert Dialogue Info is displayed
-        onNode(androidx.compose.ui.test.hasText("Սրճարանում | At the Cafe")).assertIsDisplayed() // Title + Translation
-        onNode(androidx.compose.ui.test.hasText("Srcharanum")).assertIsDisplayed() // Transcription
+        onNode(hasText("Սրճարանում | At the Cafe")).assertIsDisplayed() // Title + Translation
+        onNode(hasText("Srcharanum")).assertIsDisplayed() // Transcription
         
         // Assert Speakers are correctly mapped and displayed
         onAllNodesWithTag("dialogueSpeaker")[0].assertTextEquals("Մատուցող | Waiter")
@@ -219,11 +231,11 @@ class DialogueGeneratorScreenTest {
 
         // Assert Phrases are displayed with transcriptions and translations
         onAllNodesWithTag("dialoguePhraseText")[0].assertTextEquals("Բարև Ձեզ")
-        onNode(androidx.compose.ui.test.hasText("Barev Dzez")).assertIsDisplayed()
-        onNode(androidx.compose.ui.test.hasText("Hello")).assertIsDisplayed()
+        onNode(hasText("Barev Dzez")).assertIsDisplayed()
+        onNode(hasText("Hello")).assertIsDisplayed()
         
         onAllNodesWithTag("dialoguePhraseText")[1].assertTextEquals("Բարև")
-        onNode(androidx.compose.ui.test.hasText("Barev")).assertIsDisplayed()
-        onNode(androidx.compose.ui.test.hasText("Hi")).assertIsDisplayed()
+        onNode(hasText("Barev")).assertIsDisplayed()
+        onNode(hasText("Hi")).assertIsDisplayed()
     }
 }
