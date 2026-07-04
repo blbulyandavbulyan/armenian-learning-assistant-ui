@@ -54,8 +54,16 @@ object DialogueChatResponseMother {
                     transcription = "Inch kpatvirek",
                     translations = listOf(ChatTranslationResponse("What will you order?", "en"))
                 )
+            ),
+            DialoguePhraseResponse(
+                speakerId = "2",
+                phrase = DraftPhrasesResponse(
+                    phrase = "Ես կցանկանայի մեկ սուրճ",
+                    isoLanguageCode = "hy",
+                    transcription = "Es ktsankanayi mek surch",
+                    translations = listOf(ChatTranslationResponse("I would like a coffee", "en"))
+                )
             )
-            // TODO dialogue with phrases from only one speaker DOES NOT MAKE SENSE
         )
     )
 }
