@@ -2,6 +2,8 @@ package com.blbulyandavbulyan.larm.kmp.network
 
 import com.blbulyandavbulyan.larm.kmp.data.ChatRequest
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueRequest
+import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -18,12 +20,12 @@ class ApiClient(private val client: HttpClient) {
         return response.body()
     }
 
-    suspend fun saveDialogue(request: com.blbulyandavbulyan.larm.kmp.data.SaveDialogueRequest): String {
+    suspend fun saveDialogue(request: SaveDialogueRequest): String {
         val response = client.post("/dialogues") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
-        val saveResponse: com.blbulyandavbulyan.larm.kmp.data.SaveDialogueResponse = response.body()
+        val saveResponse: SaveDialogueResponse = response.body()
         return saveResponse.id
     }
 }
