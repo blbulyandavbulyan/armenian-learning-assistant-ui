@@ -238,4 +238,10 @@ class DialogueGeneratorScreenTest {
         onNode(hasText("Barev")).assertIsDisplayed()
         onNode(hasText("Hi")).assertIsDisplayed()
     }
+
+    // TODO we should assert that pressing 'save button' save the 'right' dialouge which is associated with that button,
+    //  and not some other random from the screen, because this is essential test, and essential feature, there should be more then one dialigues on the screen
+    //  and we most probably should press the buttons in some non standard order, like we press the last save button, then we press the first
+    //  and we assert that in the onSave was invoked with the correct item, it is for whole com.blbulyandavbulyan.larm.kmp.ui.DialogueGeneratorKt.DialogueGeneratorScreen(java.util.List<? extends com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem>, java.lang.String, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>, kotlin.jvm.functions.Function1<? super com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse,kotlin.Unit>)
+    //  then after the dialogue saved, we should assert that the save button is disabled
 }

@@ -19,6 +19,8 @@ class NetworkDialogueRepositoryTest {
         val mockEngine = MockEngine { request ->
             request.url.encodedPath shouldBe "/chat/dialogue"
             request.method shouldBe HttpMethod.Post
+            // TODO this test has to be imporved, so that speakers and dialoguePhrases, translations are non empty list
+            //  (including nested 'translations'
             respond(
                 content = """{
                     "message": "Mocked response",
@@ -53,4 +55,13 @@ class NetworkDialogueRepositoryTest {
         )
         response shouldBe expectedResponse
     }
+
+    // TODO where is the test for saveDialogue, should look the same as test above
+    //  (assuming that you fixed todo comment above before implementing new test for new method)
+    //  you can even reuse the 'DialogueChatResponse' which is 'expected there' as 'input' for this test,
+    //  you can create DialogueChatResponseMother interface or whatever fits better for the 'object mother pattern in kotlin'
+    //  in the same package as the DialogueChatResponse
+    //  and declare constnat there with the DialogueChatResponse defined in the previvious test
+    //  actually you may reuse DialogueChatResponse in these tests from com.blbulyandavbulyan.larm.kmp.ui.DialogueGeneratorScreenTest.aiResponse_displaysFullDialogueDataCorrectly
+    //  and move that to the mother
 }

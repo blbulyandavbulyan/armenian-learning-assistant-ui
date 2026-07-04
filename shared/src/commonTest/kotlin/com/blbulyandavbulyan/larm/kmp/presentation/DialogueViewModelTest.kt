@@ -129,6 +129,11 @@ class DialogueViewModelTest {
             expectNoEvents()
         }
     }
+    // TODO the proper test for saveDialogue has to be written,
+    //  asserting the state when error ocurred for saving some of the dialogues, and some of them suceed,
+    //  must assert isSaving, isSaved properly
+    //  assuming that conversation has more then one dialogue
+    // TODO the proper object must be send in the DialogueRepository which is associated with the
 
     @Test
     fun `saveDialogue adds Error to conversation on failure`() = runTest {
