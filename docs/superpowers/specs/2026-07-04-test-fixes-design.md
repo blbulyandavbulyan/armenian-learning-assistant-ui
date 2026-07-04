@@ -8,9 +8,8 @@ This document outlines the approach to resolving the test-related `TODO` comment
 
 **Design:**
 - Create an `object DialogueChatResponseMother`.
-- Extract the fully-populated mock response currently residing in `DialogueGeneratorScreenTest.kt` (`aiResponse_displaysFullDialogueDataCorrectly`) into a constant `val FULL_DIALOGUE`.
-// TODO, better to declare such objects in THE MOTHER, just as we declared the FULL_DIALOGUE, as constants !
-- Create a helper `fun create(message: String = "...", ...)` to allow generating distinct dialogues for tests that require multiple unique instances (e.g., UI tests and ViewModel concurrency tests).
+- Extract the fully-populated mock response currently residing in `DialogueGeneratorScreenTest.kt` (`aiResponse_displaysFullDialogueDataCorrectly`) into a constant `val FULL_DIALOGUE_1`.
+- Declare a second constant `val FULL_DIALOGUE_2` (with distinct values) directly in the Mother to be used in UI and ViewModel concurrency tests, avoiding the need for a dynamic `create()` helper.
 
 ## 2. Network Layer Tests (`ApiClientTest` & `NetworkDialogueRepositoryTest`)
 **Design:**
@@ -32,7 +31,11 @@ This document outlines the approach to resolving the test-related `TODO` comment
   4. Complete the deferred for B successfully, and throw an exception for A.
   5. Assert that the emitted state updates `B` to `isSaving = false, isSaved = true` and `A` to `isSaving = false, isSaved = false`, while also appending a `ConversationItem.Error` to the list.
   6. Assert that the objects passed into the Fake Repository match the exact `DialogueChatResponse` objects for A and B.
-// TODO one more test in this section 3, when user saves presses save on only one dialogue -> and the save operation succeeds -> and the repo is invoked with the right dialouge parameter
+- **Single Save Success Test**:
+  1. Pre-populate the ViewModel's state with two dialogues.
+  2. Call `saveDialogue` and complete it successfully.
+  3. Assert that the Fake Repository was invoked with the exact dialogue parameter.
+  4. Assert the final state updates to `isSaving = false` and `isSaved = true`.
 ## 4. UI Layer Tests (`DialogueGeneratorScreenTest`)
 **Design:**
 - **Initial Setup**: Inject a pre-filled `List<ConversationItem>` containing two `AiResponse` items into `DialogueGeneratorScreen`. Pass a capturing lambda for `onSaveDialogue`.
@@ -42,7 +45,9 @@ This document outlines the approach to resolving the test-related `TODO` comment
   - Verify that the captured list in the `onSaveDialogue` lambda has a size of 2.
   - Assert that `capturedList[0]` is exactly Dialogue 2, and `capturedList[1]` is Dialogue 1.
   - Mock the state change (simulating ViewModel updating `isSaved = true`) and assert that the `SaveButton` for the saved dialogues becomes disabled.
-// TODO, not a call to action, just a question, what about asserting that the button has 'spinning animation', or is this dumb? Cause it's the only one indicator that the stuff is loading and user needs to see that? Is there a way to assert that without asserting pixels on the screen, cause this might be dumb?
+  // TODO is there a native semantics in jetpack compose to indicate that 'stuff is in progress'?
+  - **Saving State (Semantics)**: Add a `semantics { stateDescription = "saving" }` modifier to the `SaveButton` when `isSaving` is true, and assert this semantic state exists during the save operation, ensuring the UI logically represents the loading/spinning state without brittle pixel tests.
+
 ## Self-Review Checklist
 - [x] Placeholder check: No vague TODOs left in this spec.
 - [x] Consistency check: The UI, Presentation, and Network layer tests all consistently rely on the new `DialogueChatResponseMother`.
