@@ -15,6 +15,18 @@ import androidx.compose.ui.test.withKeyDown
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.test.hasText
+import com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.DialoguePhraseResponse
+import com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse
+import com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse
+import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
+import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
+import androidx.compose.ui.test.hasProgressBarRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
+import androidx.compose.ui.test.assert
 
 @OptIn(ExperimentalTestApi::class)
 class DialogueGeneratorScreenTest {
@@ -122,7 +134,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem.UserMessage("Hello user message")),
+                    conversation = listOf(ConversationItem.UserMessage("Hello user message")),
                     onGenerateDialogue = { }
                 )
             }
@@ -137,7 +149,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem.Loading),
+                    conversation = listOf(ConversationItem.Loading),
                     onGenerateDialogue = { }
                 )
             }
@@ -151,55 +163,24 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem.Error("Network failure")),
+                    conversation = listOf(ConversationItem.Error("Network failure")),
                     onGenerateDialogue = { }
                 )
             }
         }
         
         onNodeWithTag("errorMessage").assertIsDisplayed()
-        onNode(androidx.compose.ui.test.hasText("Network failure", substring = true)).assertIsDisplayed()
+        onNode(hasText("Network failure", substring = true)).assertIsDisplayed()
     }
 
     @Test
     fun aiResponse_displaysFullDialogueDataCorrectly() = runComposeUiTest {
-        val mockAiResponse = com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse(
-            message = "Here is your dialogue",
-            info = com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse(
-                title = "Սրճարանում",
-                transcription = "Srcharanum",
-                translations = listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("At the Cafe", "en"))
-            ),
-            speakers = listOf(
-                com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse("s1", "Մատուցող", "Matutsogh", listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("Waiter", "en"))),
-                com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse("s2", "Հաճախորդ", "Hachakhord", listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("Customer", "en")))
-            ),
-            dialoguePhrases = listOf(
-                com.blbulyandavbulyan.larm.kmp.data.DialoguePhraseResponse(
-                    speakerId = "s1",
-                    phrase = com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse(
-                        phrase = "Բարև Ձեզ",
-                        isoLanguageCode = "hy",
-                        transcription = "Barev Dzez",
-                        translations = listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("Hello", "en"))
-                    )
-                ),
-                com.blbulyandavbulyan.larm.kmp.data.DialoguePhraseResponse(
-                    speakerId = "s2",
-                    phrase = com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse(
-                        phrase = "Բարև",
-                        isoLanguageCode = "hy",
-                        transcription = "Barev",
-                        translations = listOf(com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse("Hi", "en"))
-                    )
-                )
-            )
-        )
+        val mockAiResponse = DialogueChatResponseMother.FULL_DIALOGUE_1
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem.AiResponse(mockAiResponse)),
+                    conversation = listOf(ConversationItem.AiResponse(mockAiResponse)),
                     onGenerateDialogue = { }
                 )
             }
@@ -207,23 +188,56 @@ class DialogueGeneratorScreenTest {
         
         // Assert AI's initial conversational message is displayed and has correct text
         onNodeWithTag("aiMessageText").assertIsDisplayed()
-        onNode(androidx.compose.ui.test.hasText("Here is your dialogue")).assertIsDisplayed()
+        onNode(hasText("Here is a dialogue:")).assertIsDisplayed()
         
         // Assert Dialogue Info is displayed
-        onNode(androidx.compose.ui.test.hasText("Սրճարանում | At the Cafe")).assertIsDisplayed() // Title + Translation
-        onNode(androidx.compose.ui.test.hasText("Srcharanum")).assertIsDisplayed() // Transcription
+        onNode(hasText("Խանութում | In the shop")).assertIsDisplayed() // Title + Translation
+        onNode(hasText("Khanutum")).assertIsDisplayed() // Transcription
         
         // Assert Speakers are correctly mapped and displayed
-        onAllNodesWithTag("dialogueSpeaker")[0].assertTextEquals("Մատուցող | Waiter")
+        onAllNodesWithTag("dialogueSpeaker")[0].assertTextEquals("Վաճառող | Seller")
         onAllNodesWithTag("dialogueSpeaker")[1].assertTextEquals("Հաճախորդ | Customer")
 
         // Assert Phrases are displayed with transcriptions and translations
         onAllNodesWithTag("dialoguePhraseText")[0].assertTextEquals("Բարև Ձեզ")
-        onNode(androidx.compose.ui.test.hasText("Barev Dzez")).assertIsDisplayed()
-        onNode(androidx.compose.ui.test.hasText("Hello")).assertIsDisplayed()
+        onNode(hasText("Barev Dzez")).assertIsDisplayed()
+        onNode(hasText("Hello")).assertIsDisplayed()
         
-        onAllNodesWithTag("dialoguePhraseText")[1].assertTextEquals("Բարև")
-        onNode(androidx.compose.ui.test.hasText("Barev")).assertIsDisplayed()
-        onNode(androidx.compose.ui.test.hasText("Hi")).assertIsDisplayed()
+        onAllNodesWithTag("dialoguePhraseText")[1].assertTextEquals("Ողջույն")
+        onNode(hasText("Voghjuyn")).assertIsDisplayed()
+        onNode(hasText("Greetings")).assertIsDisplayed()
+    }
+
+    @Test
+    fun saveButton_triggersCallbackCorrectly_andShowsLoading() = runComposeUiTest {
+        val savedDialogues = mutableListOf<DialogueChatResponse>()
+        val conversation = listOf(
+            ConversationItem.AiResponse(DialogueChatResponseMother.FULL_DIALOGUE_1, isSaving = false, isSaved = false),
+            ConversationItem.AiResponse(DialogueChatResponseMother.FULL_DIALOGUE_2, isSaving = true, isSaved = false)
+        )
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueGeneratorScreen(
+                    conversation = conversation,
+                    onGenerateDialogue = {},
+                    onSaveDialogue = { savedDialogues.add(it) }
+                )
+            }
+        }
+
+        // Verify semantics on the saving button (second item)
+        onAllNodesWithTag("saveButton")[1]
+            .assert(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
+            
+        // Verify that the other button does not have the indeterminate loading semantics
+        onAllNodesWithTag("saveButton")[0]
+            .assert(!hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
+
+        // Click the first button
+        onAllNodesWithTag("saveButton")[0].performClick()
+        
+        savedDialogues.size shouldBe 1
+        savedDialogues[0] shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
     }
 }

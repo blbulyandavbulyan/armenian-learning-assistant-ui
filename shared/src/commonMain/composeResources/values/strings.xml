@@ -8,4 +8,7 @@
     <string name="action_save_dialogue">Save Dialogue</string>
     <string name="error_prefix">Error:</string>
     <string name="unknown_speaker">Unknown</string>
+    <string name="action_saved_dialogue">Saved!</string>
+    <string name="error_failed_to_save">Failed to save dialogue</string>
+    <string name="error_unknown">Unknown error</string>
 </resources>

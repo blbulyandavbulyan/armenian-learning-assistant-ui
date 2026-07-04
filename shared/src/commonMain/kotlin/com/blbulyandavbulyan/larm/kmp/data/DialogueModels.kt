@@ -50,3 +50,50 @@ data class DialogueChatResponse(
     val speakers: List<SpeakerResponse>,
     val dialoguePhrases: List<DialoguePhraseResponse>
 )
+
+@Serializable
+data class SaveDialogueRequest(
+    val info: SaveDialogueTitleRequest,
+    val speakers: List<SaveSpeakerRequest>,
+    val dialoguePhrases: List<SaveDialoguePhraseRequest>
+)
+
+@Serializable
+data class SaveDialogueTitleRequest(
+    val title: String,
+    val transcription: String,
+    val translations: List<SaveDialogueTranslationRequest>
+)
+
+@Serializable
+data class SaveDialogueTranslationRequest(
+    val translationText: String,
+    val isoLanguageCode: String
+)
+
+@Serializable
+data class SaveSpeakerRequest(
+    val id: String,
+    val title: String,
+    val transcription: String,
+    val translations: List<SaveDialogueTranslationRequest>
+)
+
+@Serializable
+data class SaveDialoguePhraseRequest(
+    val speakerId: String,
+    val phrase: SaveDialoguePhraseInnerRequest
+)
+
+@Serializable
+data class SaveDialoguePhraseInnerRequest(
+    val phrase: String,
+    val isoLanguageCode: String,
+    val transcription: String,
+    val translations: List<SaveDialogueTranslationRequest>
+)
+
+@Serializable
+data class SaveDialogueResponse(
+    val id: String
+)

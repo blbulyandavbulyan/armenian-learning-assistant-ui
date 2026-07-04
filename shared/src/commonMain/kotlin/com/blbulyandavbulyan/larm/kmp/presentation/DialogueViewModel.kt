@@ -10,10 +10,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import org.jetbrains.compose.resources.getString
+import armenianlearningassistant_kmp.shared.generated.resources.Res
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save
+import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
 
 sealed class ConversationItem {
     data class UserMessage(val text: String) : ConversationItem()
-    data class AiResponse(val response: DialogueChatResponse) : ConversationItem()
+    data class AiResponse(
+        val response: DialogueChatResponse,
+        val isSaving: Boolean = false,
+        val isSaved: Boolean = false
+    ) : ConversationItem()
     data class Error(val message: String) : ConversationItem()
     data object Loading : ConversationItem()
 }
@@ -41,8 +49,35 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
                 _conversation.value = newConv
             } catch (e: Exception) {
                 val newConv = _conversation.value.filter { it !is ConversationItem.Loading }.toMutableList()
-                newConv.add(ConversationItem.Error(e.message ?: "Unknown error"))
+                newConv.add(ConversationItem.Error(e.message ?: getString(Res.string.error_unknown)))
                 _conversation.value = newConv
+            }
+        }
+    }
+
+    fun saveDialogue(dialogue: DialogueChatResponse) {
+        _conversation.value = _conversation.value.map {
+            if (it is ConversationItem.AiResponse && it.response === dialogue) {
+                it.copy(isSaving = true)
+            } else it
+        }
+
+        viewModelScope.launch {
+            try {
+                repository.saveDialogue(dialogue)
+                _conversation.value = _conversation.value.map {
+                    if (it is ConversationItem.AiResponse && it.response === dialogue) {
+                        it.copy(isSaving = false, isSaved = true)
+                    } else it
+                }
+            } catch (e: Exception) {
+                val currentConv = _conversation.value.map {
+                    if (it is ConversationItem.AiResponse && it.response === dialogue) {
+                        it.copy(isSaving = false)
+                    } else it
+                }.toMutableList()
+                currentConv.add(ConversationItem.Error(e.message ?: getString(Res.string.error_failed_to_save)))
+                _conversation.value = currentConv
             }
         }
     }

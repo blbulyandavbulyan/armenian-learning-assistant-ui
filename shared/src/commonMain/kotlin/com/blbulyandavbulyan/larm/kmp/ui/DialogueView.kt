@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -15,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
+import armenianlearningassistant_kmp.shared.generated.resources.action_saved_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
@@ -22,7 +22,13 @@ import org.jetbrains.compose.resources.stringResource
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 
 @Composable
-fun DialogueView(dialogue: DialogueChatResponse, fontFamily: FontFamily) {
+fun DialogueView(
+    dialogue: DialogueChatResponse,
+    fontFamily: FontFamily,
+    isSaving: Boolean = false,
+    isSaved: Boolean = false,
+    onSaveClick: () -> Unit = {}
+) {
     val speakersMap = dialogue.speakers.associateBy { it.id }
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -36,27 +42,13 @@ fun DialogueView(dialogue: DialogueChatResponse, fontFamily: FontFamily) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        SaveButton { /* TODO: Save functionality for later branch */ }
-    }
-}
-
-@Composable
-private fun SaveButton(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Button(
-            onClick = onClick,
-            modifier = Modifier.height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AppTheme.colors.saveButton,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            shape = RoundedCornerShape(24.dp)
-        ) {
-            Text(stringResource(Res.string.action_save_dialogue), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        }
+        AnimatedSaveButton(
+            isSaving = isSaving,
+            isSaved = isSaved,
+            savedText = stringResource(Res.string.action_saved_dialogue),
+            saveText = stringResource(Res.string.action_save_dialogue),
+            onClick = onSaveClick
+        )
     }
 }
 

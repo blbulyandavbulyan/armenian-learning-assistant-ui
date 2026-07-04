@@ -23,6 +23,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.*
 import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 
@@ -31,7 +32,8 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
     val conversation by viewModel.conversation.collectAsStateWithLifecycle()
     DialogueGeneratorScreen(
         conversation = conversation,
-        onGenerateDialogue = viewModel::generateDialogue
+        onGenerateDialogue = viewModel::generateDialogue,
+        onSaveDialogue = viewModel::saveDialogue
     )
 }
 
@@ -39,7 +41,8 @@ fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
 fun DialogueGeneratorScreen(
     conversation: List<ConversationItem>,
     emptyMessage: String = stringResource(Res.string.empty_conversation_message),
-    onGenerateDialogue: (String) -> Unit
+    onGenerateDialogue: (String) -> Unit,
+    onSaveDialogue: (DialogueChatResponse) -> Unit = {}
 ) {
     var prompt by remember { mutableStateOf("") }
 
@@ -82,7 +85,7 @@ fun DialogueGeneratorScreen(
             if (conversation.isEmpty()) {
                 EmptyConversationScreen(emptyMessage)
             } else {
-                ConversationScreen(conversation, notoArmenian)
+                ConversationScreen(conversation, notoArmenian, onSaveDialogue)
             }
         }
 
@@ -168,7 +171,8 @@ private fun BoxScope.EmptyConversationScreen(message: String) {
 @Composable
 private fun ConversationScreen(
     conversation: List<ConversationItem>,
-    notoArmenian: FontFamily
+    notoArmenian: FontFamily,
+    onSaveDialogue: (DialogueChatResponse) -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -206,7 +210,13 @@ private fun ConversationScreen(
                         }
 
                         is ConversationItem.AiResponse -> {
-                            DialogueView(item.response, notoArmenian)
+                            DialogueView(
+                                dialogue = item.response,
+                                fontFamily = notoArmenian,
+                                isSaving = item.isSaving,
+                                isSaved = item.isSaved,
+                                onSaveClick = { onSaveDialogue(item.response) }
+                            )
                         }
                     }
                 }
