@@ -15,10 +15,10 @@ This document outlines the approach to resolving the test-related `TODO` comment
 **Design:**
 - **ApiClientTest**: 
   - Mock a `POST` request to `/dialogues`.
-  - Pass `DialogueChatResponseMother.FULL_DIALOGUE` to `saveDialogue`.
+  - Pass `DialogueChatResponseMother.FULL_DIALOGUE_1` to `saveDialogue`.
   - Assert that the correct JSON body is sent and the proper String response (ID) is returned.
 - **NetworkDialogueRepositoryTest**:
-  - Update the existing `generateDialogue` test to use `DialogueChatResponseMother.FULL_DIALOGUE` as the expected output.
+  - Update the existing `generateDialogue` test to use `DialogueChatResponseMother.FULL_DIALOGUE_1` as the expected output.
   - Implement a `saveDialogue` test mirroring the above, passing the Mother's dialogue and asserting the network path (`/dialogues`) and HTTP method (`POST`) are correct.
 
 ## 3. Presentation Layer Tests (`DialogueViewModelTest`)
@@ -45,8 +45,7 @@ This document outlines the approach to resolving the test-related `TODO` comment
   - Verify that the captured list in the `onSaveDialogue` lambda has a size of 2.
   - Assert that `capturedList[0]` is exactly Dialogue 2, and `capturedList[1]` is Dialogue 1.
   - Mock the state change (simulating ViewModel updating `isSaved = true`) and assert that the `SaveButton` for the saved dialogues becomes disabled.
-  // TODO is there a native semantics in jetpack compose to indicate that 'stuff is in progress'?
-  - **Saving State (Semantics)**: Add a `semantics { stateDescription = "saving" }` modifier to the `SaveButton` when `isSaving` is true, and assert this semantic state exists during the save operation, ensuring the UI logically represents the loading/spinning state without brittle pixel tests.
+  - **Saving State (Semantics)**: Jetpack Compose natively supports indicating progress via `semantics { progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate }`. We will add this modifier to the `SaveButton` when `isSaving` is true, and assert its presence using `hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)` in the test.
 
 ## Self-Review Checklist
 - [x] Placeholder check: No vague TODOs left in this spec.
