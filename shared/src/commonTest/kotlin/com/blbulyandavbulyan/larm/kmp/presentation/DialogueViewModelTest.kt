@@ -281,9 +281,14 @@ class DialogueViewModelTest {
             fakeRepository.shouldFail = false
             viewModel.saveDialogue(ai1.response)
             
+            // Force the test dispatcher to run the queued coroutine for ai1 so it reads shouldFail = false
+            // and safely suspends on saveCompletable?.await() before we flip the flag below.
+            testScheduler.runCurrent()
+
             val stateAfterSave1 = awaitItem()
             (stateAfterSave1[1] as ConversationItem.AiResponse).isSaving shouldBe true
             (stateAfterSave1[3] as ConversationItem.AiResponse).isSaving shouldBe false
+
             
             // 2. Save ai2 (immediate failure)
             fakeRepository.shouldFail = true
