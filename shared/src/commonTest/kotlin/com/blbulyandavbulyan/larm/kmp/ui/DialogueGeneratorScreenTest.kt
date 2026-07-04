@@ -23,6 +23,10 @@ import com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse
 import com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse
 import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
+import androidx.compose.ui.test.hasProgressBarRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
+import androidx.compose.ui.test.assert
 
 @OptIn(ExperimentalTestApi::class)
 class DialogueGeneratorScreenTest {
@@ -171,42 +175,7 @@ class DialogueGeneratorScreenTest {
 
     @Test
     fun aiResponse_displaysFullDialogueDataCorrectly() = runComposeUiTest {
-        val mockAiResponse = DialogueChatResponse(
-            message = "Here is your dialogue",
-            info = DialogueTitleResponse(
-                title = "Սրճարանում",
-                transcription = "Srcharanum",
-                translations = listOf(ChatTranslationResponse("At the Cafe", "en"))
-            ),
-            speakers = listOf(
-                SpeakerResponse("s1", "Մատուցող", "Matutsogh", listOf(
-                    ChatTranslationResponse("Waiter", "en")
-                )),
-                SpeakerResponse("s2", "Հաճախորդ", "Hachakhord", listOf(
-                    ChatTranslationResponse("Customer", "en")
-                ))
-            ),
-            dialoguePhrases = listOf(
-                DialoguePhraseResponse(
-                    speakerId = "s1",
-                    phrase = DraftPhrasesResponse(
-                        phrase = "Բարև Ձեզ",
-                        isoLanguageCode = "hy",
-                        transcription = "Barev Dzez",
-                        translations = listOf(ChatTranslationResponse("Hello", "en"))
-                    )
-                ),
-                DialoguePhraseResponse(
-                    speakerId = "s2",
-                    phrase = DraftPhrasesResponse(
-                        phrase = "Բարև",
-                        isoLanguageCode = "hy",
-                        transcription = "Barev",
-                        translations = listOf(ChatTranslationResponse("Hi", "en"))
-                    )
-                )
-            )
-        )
+        val mockAiResponse = DialogueChatResponseMother.FULL_DIALOGUE_1
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
@@ -219,14 +188,14 @@ class DialogueGeneratorScreenTest {
         
         // Assert AI's initial conversational message is displayed and has correct text
         onNodeWithTag("aiMessageText").assertIsDisplayed()
-        onNode(hasText("Here is your dialogue")).assertIsDisplayed()
+        onNode(hasText("Here is a dialogue:")).assertIsDisplayed()
         
         // Assert Dialogue Info is displayed
-        onNode(hasText("Սրճարանում | At the Cafe")).assertIsDisplayed() // Title + Translation
-        onNode(hasText("Srcharanum")).assertIsDisplayed() // Transcription
+        onNode(hasText("Խանութում | In the shop")).assertIsDisplayed() // Title + Translation
+        onNode(hasText("Khanutum")).assertIsDisplayed() // Transcription
         
         // Assert Speakers are correctly mapped and displayed
-        onAllNodesWithTag("dialogueSpeaker")[0].assertTextEquals("Մատուցող | Waiter")
+        onAllNodesWithTag("dialogueSpeaker")[0].assertTextEquals("Վաճառող | Seller")
         onAllNodesWithTag("dialogueSpeaker")[1].assertTextEquals("Հաճախորդ | Customer")
 
         // Assert Phrases are displayed with transcriptions and translations
@@ -234,14 +203,41 @@ class DialogueGeneratorScreenTest {
         onNode(hasText("Barev Dzez")).assertIsDisplayed()
         onNode(hasText("Hello")).assertIsDisplayed()
         
-        onAllNodesWithTag("dialoguePhraseText")[1].assertTextEquals("Բարև")
-        onNode(hasText("Barev")).assertIsDisplayed()
-        onNode(hasText("Hi")).assertIsDisplayed()
+        onAllNodesWithTag("dialoguePhraseText")[1].assertTextEquals("Ողջույն")
+        onNode(hasText("Voghjuyn")).assertIsDisplayed()
+        onNode(hasText("Greetings")).assertIsDisplayed()
     }
 
-    // TODO we should assert that pressing 'save button' save the 'right' dialouge which is associated with that button,
-    //  and not some other random from the screen, because this is essential test, and essential feature, there should be more then one dialigues on the screen
-    //  and we most probably should press the buttons in some non standard order, like we press the last save button, then we press the first
-    //  and we assert that in the onSave was invoked with the correct item, it is for whole com.blbulyandavbulyan.larm.kmp.ui.DialogueGeneratorKt.DialogueGeneratorScreen(java.util.List<? extends com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem>, java.lang.String, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>, kotlin.jvm.functions.Function1<? super com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse,kotlin.Unit>)
-    //  then after the dialogue saved, we should assert that the save button is disabled
+    @Test
+    fun saveButton_triggersCallbackCorrectly_andShowsLoading() = runComposeUiTest {
+        val savedDialogues = mutableListOf<DialogueChatResponse>()
+        val conversation = listOf(
+            ConversationItem.AiResponse(DialogueChatResponseMother.FULL_DIALOGUE_1, isSaving = false, isSaved = false),
+            ConversationItem.AiResponse(DialogueChatResponseMother.FULL_DIALOGUE_2, isSaving = true, isSaved = false)
+        )
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueGeneratorScreen(
+                    conversation = conversation,
+                    onGenerateDialogue = {},
+                    onSaveDialogue = { savedDialogues.add(it) }
+                )
+            }
+        }
+
+        // Verify semantics on the saving button (second item)
+        onAllNodesWithTag("saveButton")[1]
+            .assert(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
+            
+        // Verify that the other button does not have the indeterminate loading semantics
+        onAllNodesWithTag("saveButton")[0]
+            .assert(!hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
+
+        // Click the first button
+        onAllNodesWithTag("saveButton")[0].performClick()
+        
+        savedDialogues.size shouldBe 1
+        savedDialogues[0] shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
+    }
 }

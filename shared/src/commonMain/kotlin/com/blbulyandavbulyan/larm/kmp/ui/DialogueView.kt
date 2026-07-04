@@ -13,6 +13,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.runtime.getValue
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.text.selection.DisableSelection
@@ -105,7 +108,12 @@ private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit)
                 enabled = !isSaving && !isSaved,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(if (isSaving) 3.dp else 2.dp),
+                    .padding(if (isSaving) 3.dp else 2.dp)
+                    .semantics {
+                        if (isSaving) {
+                            progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
+                        }
+                    }.testTag("saveButton"),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AppTheme.colors.saveButton,
                     contentColor = MaterialTheme.colorScheme.onPrimary,

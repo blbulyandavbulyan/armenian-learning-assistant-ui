@@ -1,7 +1,5 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
@@ -11,6 +9,10 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
+import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueRequestMother
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.encodeToJsonElement
 
 class NetworkDialogueRepositoryTest {
 
@@ -19,19 +21,8 @@ class NetworkDialogueRepositoryTest {
         val mockEngine = MockEngine { request ->
             request.url.encodedPath shouldBe "/chat/dialogue"
             request.method shouldBe HttpMethod.Post
-            // TODO this test has to be imporved, so that speakers and dialoguePhrases, translations are non empty list
-            //  (including nested 'translations'
             respond(
-                content = """{
-                    "message": "Mocked response",
-                    "info": {
-                        "title": "Hello",
-                        "transcription": "Barev",
-                        "translations": []
-                    },
-                    "speakers": [],
-                    "dialoguePhrases": []
-                }""",
+                content = Json.encodeToString(DialogueChatResponseMother.FULL_DIALOGUE_1),
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -47,21 +38,36 @@ class NetworkDialogueRepositoryTest {
         
         val response = repository.generateDialogue(prompt = "Test prompt", chatId = "chat456")
         
-        val expectedResponse = DialogueChatResponse(
-            message = "Mocked response",
-            info = DialogueTitleResponse("Hello", "Barev", emptyList()),
-            speakers = emptyList(),
-            dialoguePhrases = emptyList()
-        )
-        response shouldBe expectedResponse
+        response shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
     }
 
-    // TODO where is the test for saveDialogue, should look the same as test above
-    //  (assuming that you fixed todo comment above before implementing new test for new method)
-    //  you can even reuse the 'DialogueChatResponse' which is 'expected there' as 'input' for this test,
-    //  you can create DialogueChatResponseMother interface or whatever fits better for the 'object mother pattern in kotlin'
-    //  in the same package as the DialogueChatResponse
-    //  and declare constnat there with the DialogueChatResponse defined in the previvious test
-    //  actually you may reuse DialogueChatResponse in these tests from com.blbulyandavbulyan.larm.kmp.ui.DialogueGeneratorScreenTest.aiResponse_displaysFullDialogueDataCorrectly
-    //  and move that to the mother
+    @Test
+    fun `saveDialogue delegates to ApiClient correctly`() = runTest {
+        val mockEngine = MockEngine { request ->
+            request.url.encodedPath shouldBe "/dialogues"
+            request.method shouldBe HttpMethod.Post
+            
+            val bodyBytes = request.body.toByteArray()
+            val bodyText = bodyBytes.decodeToString()
+            
+            val expectedJson = Json.encodeToJsonElement(SaveDialogueRequestMother.FULL_REQUEST_1)
+            val actualJson = Json.parseToJsonElement(bodyText)
+            actualJson shouldBe expectedJson
+            
+            respond(
+                content = """{"id": "fake-uuid-1234"}""",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val mockClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val apiClient = ApiClient(client = mockClient)
+        val repository = NetworkDialogueRepository(apiClient)
+        val response = repository.saveDialogue(DialogueChatResponseMother.FULL_DIALOGUE_1)
+        response shouldBe "fake-uuid-1234"
+    }
 }
