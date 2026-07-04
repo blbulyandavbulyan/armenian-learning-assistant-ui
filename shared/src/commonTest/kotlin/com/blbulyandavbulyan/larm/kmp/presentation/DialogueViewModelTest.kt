@@ -1,10 +1,12 @@
 package com.blbulyandavbulyan.larm.kmp.presentation
 
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -21,6 +23,9 @@ import app.cash.turbine.test
 class FakeDialogueRepository : DialogueRepository {
     var shouldFail = false
     var lastPrompt = ""
+    var saveCompletable: CompletableDeferred<String>? = null
+    var lastSavedDialogue: DialogueChatResponse? = null
+    var dialoguesToReturn = mutableListOf<DialogueChatResponse>()
 
     override suspend fun generateDialogue(prompt: String, chatId: String): DialogueChatResponse {
         lastPrompt = prompt
@@ -29,18 +34,24 @@ class FakeDialogueRepository : DialogueRepository {
         }
         
         // Return mock data
-        return DialogueChatResponse(
-            message = "Here is your dialogue",
-            info = DialogueTitleResponse("Title", "Transcription", emptyList()),
-            speakers = emptyList(),
-            dialoguePhrases = emptyList()
-        )
+        return if (dialoguesToReturn.isNotEmpty()) {
+            dialoguesToReturn.removeAt(0)
+        } else {
+            DialogueChatResponse(
+                message = "Here is your dialogue",
+                info = DialogueTitleResponse("Title", "Transcription", emptyList()),
+                speakers = emptyList(),
+                dialoguePhrases = emptyList()
+            )
+        }
     }
 
     override suspend fun saveDialogue(dialogue: DialogueChatResponse): String {
+        lastSavedDialogue = dialogue
         if (shouldFail) {
             throw Exception("Fake Network Error")
         }
+        saveCompletable?.await()
         return "fake-uuid-1234"
     }
 }
@@ -129,11 +140,6 @@ class DialogueViewModelTest {
             expectNoEvents()
         }
     }
-    // TODO the proper test for saveDialogue has to be written,
-    //  asserting the state when error ocurred for saving some of the dialogues, and some of them suceed,
-    //  must assert isSaving, isSaved properly
-    //  assuming that conversation has more then one dialogue
-    // TODO the proper object must be send in the DialogueRepository which is associated with the
 
     @Test
     fun `saveDialogue adds Error to conversation on failure`() = runTest {
@@ -161,4 +167,93 @@ class DialogueViewModelTest {
             expectNoEvents()
         }
     }
+
+    @Test
+    fun `saveDialogue updates state correctly on single success`() = runTest {
+        val fakeResponse = DialogueChatResponseMother.FULL_DIALOGUE_1
+        
+        fakeRepository.dialoguesToReturn.add(fakeResponse)
+        fakeRepository.saveCompletable = CompletableDeferred()
+        
+        viewModel.generateDialogue("prompt")
+        testScheduler.advanceUntilIdle() // Wait for it to finish generating
+        val generatedState = viewModel.conversation.value
+        val dialogue = (generatedState.last() as ConversationItem.AiResponse).response
+
+        viewModel.conversation.test {
+            awaitItem() // Skip current state
+
+            viewModel.saveDialogue(dialogue)
+            
+            val savingState = awaitItem()
+            val aiSaving = savingState.last() as ConversationItem.AiResponse
+            aiSaving.isSaving shouldBe true
+            aiSaving.isSaved shouldBe false
+
+            fakeRepository.saveCompletable?.complete("")
+
+            val finalState = awaitItem()
+            val aiSaved = finalState.last() as ConversationItem.AiResponse
+            aiSaved.isSaving shouldBe false
+            aiSaved.isSaved shouldBe true
+            
+            fakeRepository.lastSavedDialogue shouldBe dialogue
+        }
+    }
+
+    @Test
+    fun `saveDialogue multiple saves concurrent states`() = runTest {
+        val dialogue1 = DialogueChatResponseMother.FULL_DIALOGUE_1
+        val dialogue2 = DialogueChatResponseMother.FULL_DIALOGUE_2
+        
+        fakeRepository.dialoguesToReturn.add(dialogue1)
+        fakeRepository.dialoguesToReturn.add(dialogue2)
+        
+        viewModel.generateDialogue("p1")
+        testScheduler.advanceUntilIdle()
+        viewModel.generateDialogue("p2")
+        testScheduler.advanceUntilIdle()
+        
+        val state = viewModel.conversation.value
+        val ai1 = state[1] as ConversationItem.AiResponse
+        val ai2 = state[3] as ConversationItem.AiResponse
+        
+        fakeRepository.saveCompletable = CompletableDeferred()
+        
+        viewModel.conversation.test {
+            // The first awaitItem() consumes the current initial state of the StateFlow upon subscription.
+            awaitItem()
+
+            
+            viewModel.saveDialogue(ai1.response)
+            
+            val stateAfterSave1 = awaitItem()
+            (stateAfterSave1[1] as ConversationItem.AiResponse).isSaving shouldBe true
+            (stateAfterSave1[3] as ConversationItem.AiResponse).isSaving shouldBe false
+            
+            viewModel.saveDialogue(ai2.response)
+            
+            val stateAfterSave2 = awaitItem()
+            (stateAfterSave2[1] as ConversationItem.AiResponse).isSaving shouldBe true
+            (stateAfterSave2[3] as ConversationItem.AiResponse).isSaving shouldBe true
+            
+            fakeRepository.saveCompletable?.complete("")
+            
+            val stateAfterComplete1 = awaitItem() 
+            // Assert that the first dialogue save has completed in this intermediate state.
+            // Coroutines waiting on the same CompletableDeferred resume in the order they were suspended (FIFO).
+            // Since saveDialogue for ai1 was called first, it resumes and emits its saved state first.
+            val ai1Intermediate = stateAfterComplete1[1] as ConversationItem.AiResponse
+            val ai2Intermediate = stateAfterComplete1[3] as ConversationItem.AiResponse
+            ai1Intermediate.isSaved shouldBe true
+            ai2Intermediate.isSaved shouldBe false
+
+            val finalState = awaitItem()
+            (finalState[1] as ConversationItem.AiResponse).isSaving shouldBe false
+            (finalState[1] as ConversationItem.AiResponse).isSaved shouldBe true
+            (finalState[3] as ConversationItem.AiResponse).isSaving shouldBe false
+            (finalState[3] as ConversationItem.AiResponse).isSaved shouldBe true
+        }
+    }
+    // TODO where is the test for saveDialogue when one is saved and antoher caused error?
 }
