@@ -87,6 +87,40 @@ object DialogueChatResponseMother {
         )
     )
 }
+
+object SaveDialogueRequestMother {
+    val FULL_REQUEST_1 = SaveDialogueRequest(
+        info = SaveDialogueTitleRequest(
+            title = "Խանութում",
+            transcription = "Khanutum",
+            translations = listOf(SaveDialogueTranslationRequest("In the shop", "en"))
+        ),
+        speakers = listOf(
+            SaveSpeakerRequest("1", "Վաճառող", "Vacharogh", listOf(SaveDialogueTranslationRequest("Seller", "en"))),
+            SaveSpeakerRequest("2", "Հաճախորդ", "Hachakhord", listOf(SaveDialogueTranslationRequest("Customer", "en")))
+        ),
+        dialoguePhrases = listOf(
+            SaveDialoguePhraseRequest(
+                speakerId = "1",
+                phrase = SaveDialoguePhraseInnerRequest(
+                    phrase = "Բարև Ձեզ",
+                    isoLanguageCode = "hy",
+                    transcription = "Barev Dzez",
+                    translations = listOf(SaveDialogueTranslationRequest("Hello", "en"))
+                )
+            ),
+            SaveDialoguePhraseRequest(
+                speakerId = "2",
+                phrase = SaveDialoguePhraseInnerRequest(
+                    phrase = "Ողջույն",
+                    isoLanguageCode = "hy",
+                    transcription = "Voghjuyn",
+                    translations = listOf(SaveDialogueTranslationRequest("Greetings", "en"))
+                )
+            )
+        )
+    )
+}
 ```
 
 - [ ] **Step 2: Commit**
@@ -117,8 +151,10 @@ Add to `ApiClientTest.kt` and remove its `TODO`:
             
             val bodyBytes = request.body.toByteArray()
             val bodyText = bodyBytes.decodeToString()
-            // todo why here you decided to be lazy? (and in other place), you may put the json representation in the mother class too
-            bodyText shouldContain "Խանութում" // basic validation that the body is serialized correctly
+            
+            val expectedJson = Json.encodeToJsonElement(SaveDialogueRequestMother.FULL_REQUEST_1)
+            val actualJson = Json.parseToJsonElement(bodyText)
+            actualJson shouldBe expectedJson
 
             respond(
                 content = """{"id": "fake-uuid-1234"}""",
@@ -132,13 +168,7 @@ Add to `ApiClientTest.kt` and remove its `TODO`:
             }
         }
         val apiClient = ApiClient(client = mockClient)
-        // ApiClient expects SaveDialogueRequest, so we construct it manually for this test
-        val saveRequest = SaveDialogueRequest(
-            info = SaveDialogueTitleRequest("Խանութում", "Khanutum", emptyList()),
-            speakers = emptyList(),
-            dialoguePhrases = emptyList()
-        )
-        val result = apiClient.saveDialogue(saveRequest)
+        val result = apiClient.saveDialogue(SaveDialogueRequestMother.FULL_REQUEST_1)
         result shouldBe "fake-uuid-1234"
     }
 ```
@@ -152,11 +182,12 @@ Update `generateDialogue` in `NetworkDialogueRepositoryTest.kt` to use `FULL_DIA
             request.url.encodedPath shouldBe "/dialogues"
             request.method shouldBe HttpMethod.Post
             
-            // Validate the request body mapped from DialogueChatResponse
             val bodyBytes = request.body.toByteArray()
             val bodyText = bodyBytes.decodeToString()
-            bodyText shouldContain "Խանութում"
-            bodyText shouldContain "Khanutum"
+            
+            val expectedJson = Json.encodeToJsonElement(SaveDialogueRequestMother.FULL_REQUEST_1)
+            val actualJson = Json.parseToJsonElement(bodyText)
+            actualJson shouldBe expectedJson
             
             respond(
                 content = """{"id": "fake-uuid-1234"}""",
