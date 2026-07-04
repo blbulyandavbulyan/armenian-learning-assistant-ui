@@ -63,12 +63,12 @@ internal fun AnimatedSaveButton(
             }
 
             SaveStateAwareButton(
-                onClick = onClick,
                 isSaving = isSaving,
                 isSaved = isSaved,
                 buttonShape = buttonShape,
                 savedText = savedText,
-                saveText = saveText
+                saveText = saveText,
+                onClick = onClick
             )
         }
     }
@@ -76,12 +76,12 @@ internal fun AnimatedSaveButton(
 
 @Composable
 private fun SaveStateAwareButton(
-    onClick: () -> Unit,
     isSaving: Boolean,
     isSaved: Boolean,
     buttonShape: RoundedCornerShape,
     savedText: String,
-    saveText: String
+    saveText: String,
+    onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
