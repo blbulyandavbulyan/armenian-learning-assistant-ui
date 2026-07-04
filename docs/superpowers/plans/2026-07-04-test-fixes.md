@@ -30,57 +30,58 @@ Create `shared/src/commonTest/kotlin/com/blbulyandavbulyan/larm/kmp/data/Dialogu
 package com.blbulyandavbulyan.larm.kmp.data
 
 object DialogueChatResponseMother {
-    // TODO check out what is actually used in the response, from /dialogues/chat, and stop hallucinating, there is already proper classes created in DialogueModels, USE THEM, don't reinvent the wheel in the mother
     val FULL_DIALOGUE_1 = DialogueChatResponse(
         message = "Here is a dialogue:",
         info = DialogueTitleResponse(
             title = "Խանութում",
             transcription = "Khanutum",
-            translations = listOf(TranslationResponse("In the shop", "en"))
+            translations = listOf(ChatTranslationResponse("In the shop", "en"))
         ),
         speakers = listOf(
-            SpeakerResponse("1", "Վաճառող", listOf(TranslationResponse("Seller", "en"))),
-            SpeakerResponse("2", "Հաճախորդ", listOf(TranslationResponse("Customer", "en")))
+            SpeakerResponse("1", "Վաճառող", "Vacharogh", listOf(ChatTranslationResponse("Seller", "en"))),
+            SpeakerResponse("2", "Հաճախորդ", "Hachakhord", listOf(ChatTranslationResponse("Customer", "en")))
         ),
         dialoguePhrases = listOf(
             DialoguePhraseResponse(
                 speakerId = "1",
-                phrase = PhraseResponse(
-                    armenian = "Բարև Ձեզ",
+                phrase = DraftPhrasesResponse(
+                    phrase = "Բարև Ձեզ",
+                    isoLanguageCode = "hy",
                     transcription = "Barev Dzez",
-                    translations = listOf(TranslationResponse("Hello", "en"))
+                    translations = listOf(ChatTranslationResponse("Hello", "en"))
                 )
             ),
             DialoguePhraseResponse(
                 speakerId = "2",
-                phrase = PhraseResponse(
-                    armenian = "Ողջույն",
+                phrase = DraftPhrasesResponse(
+                    phrase = "Ողջույն",
+                    isoLanguageCode = "hy",
                     transcription = "Voghjuyn",
-                    translations = listOf(TranslationResponse("Greetings", "en"))
+                    translations = listOf(ChatTranslationResponse("Greetings", "en"))
                 )
             )
         )
     )
     
     val FULL_DIALOGUE_2 = DialogueChatResponse(
-        // TODO check out what is actually used in the response, from /dialogues/chat, and stop hallucinating, there is already proper classes created in DialogueModels, USE THEM, don't reinvent the wheel in the mother
         message = "Another dialogue:",
         info = DialogueTitleResponse(
             title = "Ռեստորանում",
             transcription = "Restoranum",
-            translations = listOf(TranslationResponse("In the restaurant", "en"))
+            translations = listOf(ChatTranslationResponse("In the restaurant", "en"))
         ),
         speakers = listOf(
-            SpeakerResponse("1", "Մատուցող", listOf(TranslationResponse("Waiter", "en"))),
-            SpeakerResponse("2", "Հաճախորդ", listOf(TranslationResponse("Customer", "en")))
+            SpeakerResponse("1", "Մատուցող", "Matutsogh", listOf(ChatTranslationResponse("Waiter", "en"))),
+            SpeakerResponse("2", "Հաճախորդ", "Hachakhord", listOf(ChatTranslationResponse("Customer", "en")))
         ),
         dialoguePhrases = listOf(
             DialoguePhraseResponse(
                 speakerId = "1",
-                phrase = PhraseResponse(//TODO hallucination too most probably
-                    armenian = "Ի՞նչ կպատվիրեք", // TODO hallucination
+                phrase = DraftPhrasesResponse(
+                    phrase = "Ի՞նչ կպատվիրեք",
+                    isoLanguageCode = "hy",
                     transcription = "Inch kpatvirek",
-                    translations = listOf(TranslationResponse("What will you order?", "en"))
+                    translations = listOf(ChatTranslationResponse("What will you order?", "en"))
                 )
             )
         )
@@ -111,11 +112,16 @@ Add to `ApiClientTest.kt` and remove its `TODO`:
     @Test
     fun `saveDialogue sends correct POST request and returns string id`() = runTest {
         val mockEngine = MockEngine { request ->
-            // TODO where is the validation for request body?
             request.url.encodedPath shouldBe "/dialogues"
             request.method shouldBe HttpMethod.Post
+            
+            val bodyBytes = request.body.toByteArray()
+            val bodyText = bodyBytes.decodeToString()
+            // todo why here you decided to be lazy? (and in other place), you may put the json representation in the mother class too
+            bodyText shouldContain "Խանութում" // basic validation that the body is serialized correctly
+
             respond(
-                content = "\"fake-uuid-1234\"",
+                content = """{"id": "fake-uuid-1234"}""",
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -126,7 +132,13 @@ Add to `ApiClientTest.kt` and remove its `TODO`:
             }
         }
         val apiClient = ApiClient(client = mockClient)
-        val result = apiClient.saveDialogue(DialogueChatResponseMother.FULL_DIALOGUE_1)
+        // ApiClient expects SaveDialogueRequest, so we construct it manually for this test
+        val saveRequest = SaveDialogueRequest(
+            info = SaveDialogueTitleRequest("Խանութում", "Khanutum", emptyList()),
+            speakers = emptyList(),
+            dialoguePhrases = emptyList()
+        )
+        val result = apiClient.saveDialogue(saveRequest)
         result shouldBe "fake-uuid-1234"
     }
 ```
@@ -137,11 +149,17 @@ Update `generateDialogue` in `NetworkDialogueRepositoryTest.kt` to use `FULL_DIA
     @Test
     fun `saveDialogue delegates to ApiClient correctly`() = runTest {
         val mockEngine = MockEngine { request ->
-            // TODO probably similar todo as for ApiClient tests
             request.url.encodedPath shouldBe "/dialogues"
             request.method shouldBe HttpMethod.Post
+            
+            // Validate the request body mapped from DialogueChatResponse
+            val bodyBytes = request.body.toByteArray()
+            val bodyText = bodyBytes.decodeToString()
+            bodyText shouldContain "Խանութում"
+            bodyText shouldContain "Khanutum"
+            
             respond(
-                content = "\"fake-uuid-1234\"",
+                content = """{"id": "fake-uuid-1234"}""",
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
