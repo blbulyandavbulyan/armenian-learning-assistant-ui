@@ -255,5 +255,60 @@ class DialogueViewModelTest {
             (finalState[3] as ConversationItem.AiResponse).isSaved shouldBe true
         }
     }
-    // TODO where is the test for saveDialogue when one is saved and antoher caused error?
+    @Test
+    fun `saveDialogue concurrent saves with one success and one failure`() = runTest {
+        val dialogue1 = DialogueChatResponseMother.FULL_DIALOGUE_1
+        val dialogue2 = DialogueChatResponseMother.FULL_DIALOGUE_2
+        
+        fakeRepository.dialoguesToReturn.add(dialogue1)
+        fakeRepository.dialoguesToReturn.add(dialogue2)
+        
+        viewModel.generateDialogue("p1")
+        testScheduler.advanceUntilIdle()
+        viewModel.generateDialogue("p2")
+        testScheduler.advanceUntilIdle()
+        
+        val state = viewModel.conversation.value
+        val ai1 = state[1] as ConversationItem.AiResponse
+        val ai2 = state[3] as ConversationItem.AiResponse
+        
+        fakeRepository.saveCompletable = CompletableDeferred()
+        
+        viewModel.conversation.test {
+            awaitItem() // Skip initial state
+            
+            // 1. Save ai1 (success pending)
+            fakeRepository.shouldFail = false
+            viewModel.saveDialogue(ai1.response)
+            
+            val stateAfterSave1 = awaitItem()
+            (stateAfterSave1[1] as ConversationItem.AiResponse).isSaving shouldBe true
+            (stateAfterSave1[3] as ConversationItem.AiResponse).isSaving shouldBe false
+            
+            // 2. Save ai2 (immediate failure)
+            fakeRepository.shouldFail = true
+            viewModel.saveDialogue(ai2.response)
+            
+            val stateAfterSave2 = awaitItem() // Synchronous update before launch executes
+            (stateAfterSave2[1] as ConversationItem.AiResponse).isSaving shouldBe true
+            (stateAfterSave2[3] as ConversationItem.AiResponse).isSaving shouldBe true
+            
+            // Now the launch coroutines will execute because awaitItem yields.
+            // ai2 throws Exception immediately and updates state.
+            val stateAfterError = awaitItem()
+            (stateAfterError[1] as ConversationItem.AiResponse).isSaving shouldBe true
+            (stateAfterError[3] as ConversationItem.AiResponse).isSaving shouldBe false
+            (stateAfterError[3] as ConversationItem.AiResponse).isSaved shouldBe false
+            stateAfterError.last().shouldBeInstanceOf<ConversationItem.Error>().message shouldBe "Fake Network Error"
+            
+            // 3. Complete ai1
+            fakeRepository.saveCompletable?.complete("")
+            
+            val finalState = awaitItem()
+            (finalState[1] as ConversationItem.AiResponse).isSaving shouldBe false
+            (finalState[1] as ConversationItem.AiResponse).isSaved shouldBe true
+            (finalState[3] as ConversationItem.AiResponse).isSaving shouldBe false
+            (finalState[3] as ConversationItem.AiResponse).isSaved shouldBe false
+        }
+    }
 }
