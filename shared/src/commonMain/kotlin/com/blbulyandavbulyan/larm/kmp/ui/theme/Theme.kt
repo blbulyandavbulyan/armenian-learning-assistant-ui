@@ -15,7 +15,8 @@ data class AppColors(
     val saveButton: Color,
     val emptyMessage: Color,
     val innerBoxBackground: Color,
-    val unfocusedBorder: Color
+    val unfocusedBorder: Color,
+    val saveButtonLoadingRing: Color
 )
 
 val LocalAppColors = staticCompositionLocalOf<AppColors> {
@@ -28,7 +29,8 @@ private val DarkAppColors = AppColors(
     saveButton = DarkSaveButton,
     emptyMessage = Color.White.copy(alpha = 0.5f),
     innerBoxBackground = Color.White.copy(alpha = 0.05f),
-    unfocusedBorder = Color.White.copy(alpha = 0.3f)
+    unfocusedBorder = Color.White.copy(alpha = 0.3f),
+    saveButtonLoadingRing = Color.White
 )
 
 private val LightAppColors = AppColors(
@@ -37,7 +39,8 @@ private val LightAppColors = AppColors(
     saveButton = LightSaveButton,
     emptyMessage = Color.Black.copy(alpha = 0.5f),
     innerBoxBackground = Color.Black.copy(alpha = 0.05f),
-    unfocusedBorder = Color.Black.copy(alpha = 0.3f)
+    unfocusedBorder = Color.Black.copy(alpha = 0.3f),
+    saveButtonLoadingRing = PrimaryRed
 )
 
 private val DarkColorPalette = darkColorScheme(

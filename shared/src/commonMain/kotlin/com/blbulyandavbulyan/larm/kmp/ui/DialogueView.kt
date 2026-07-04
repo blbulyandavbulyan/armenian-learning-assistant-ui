@@ -81,6 +81,7 @@ private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit)
                     )
                 )
 
+                val ringColor = AppTheme.colors.saveButtonLoadingRing
                 Box(
                     modifier = Modifier
                         .matchParentSize()
@@ -91,8 +92,8 @@ private fun SaveButton(isSaving: Boolean, isSaved: Boolean, onClick: () -> Unit)
                                     brush = Brush.sweepGradient(
                                         colors = listOf(
                                             Color.Transparent,
-                                            Color.White.copy(alpha = 0.8f),
-                                            Color.White,
+                                            ringColor.copy(alpha = 0.8f),
+                                            ringColor,
                                             Color.Transparent
                                         )
                                     ),
