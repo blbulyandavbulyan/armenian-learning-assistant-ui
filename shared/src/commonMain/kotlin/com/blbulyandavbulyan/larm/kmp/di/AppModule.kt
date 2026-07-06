@@ -25,8 +25,12 @@ object AppModule {
             install(Auth) {
                 bearer {
                     loadTokens {
-                        TokenStorage.jwtToken?.let { BearerTokens(it, "") }
+                        TokenStorage.jwtToken?.let {
+                            println("Got token $it")
+                            BearerTokens(it, "")
+                        }
                     }
+                    sendWithoutRequest { true }
                 }
             }
             defaultRequest {

@@ -42,7 +42,12 @@ fun LoginScreen(onTokenReceived: (String) -> Unit) {
             GoogleButtonUiContainer(
                 onGoogleSignInResult = { googleUser ->
                     val jwtToken = googleUser?.idToken
-                    jwtToken?.let { onTokenReceived(it) }
+                    println("Got the following google user: $googleUser")
+                    if (!jwtToken.isNullOrBlank()) {
+                        onTokenReceived(jwtToken)
+                    } else {
+                        println("Warning: Received a blank idToken from Google. AccessToken: ${googleUser?.accessToken}")
+                    }
                 },
                 isAutoSelectEnabled = false,
                 scopes = listOf("openid")
