@@ -9,6 +9,10 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.*
+import com.blbulyandavbulyan.larm.kmp.network.TokenStorage
+
 object AppModule {
     val httpClient by lazy {
         HttpClient {
@@ -17,6 +21,17 @@ object AppModule {
                     ignoreUnknownKeys = true
                     prettyPrint = true
                 })
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        TokenStorage.jwtToken?.let {
+                            println("Got token $it")
+                            BearerTokens(it, "")
+                        }
+                    }
+                    sendWithoutRequest { true }
+                }
             }
             defaultRequest {
                 val baseUrl = BuildKonfig.API_URL
