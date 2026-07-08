@@ -4,7 +4,10 @@ import app.cash.turbine.test
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueTitleResponse
-import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
+import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
+import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.CompletableDeferred
@@ -18,50 +21,12 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-// 1. Create a Fake implementation of the Repository for testing
-class FakeDialogueRepository : DialogueRepository {
-    var shouldFail = false
-    var lastPrompt = ""
-    var saveCompletable: CompletableDeferred<String>? = null
-    var lastSavedDialogue: DialogueChatResponse? = null
-    var dialoguesToReturn = mutableListOf<DialogueChatResponse>()
-
-    @Suppress("TooGenericExceptionThrown")
-    override suspend fun generateDialogue(prompt: String, chatId: String): DialogueChatResponse {
-        lastPrompt = prompt
-        if (shouldFail) {
-            throw Exception("Fake Network Error")
-        }
-
-        // Return mock data
-        return if (dialoguesToReturn.isNotEmpty()) {
-            dialoguesToReturn.removeAt(0)
-        } else {
-            DialogueChatResponse(
-                message = "Here is your dialogue",
-                info = DialogueTitleResponse("Title", "Transcription", emptyList()),
-                speakers = emptyList(),
-                dialoguePhrases = emptyList()
-            )
-        }
-    }
-
-    @Suppress("TooGenericExceptionThrown")
-    override suspend fun saveDialogue(dialogue: DialogueChatResponse): String {
-        lastSavedDialogue = dialogue
-        if (shouldFail) {
-            throw Exception("Fake Network Error")
-        }
-        saveCompletable?.await()
-        return "fake-uuid-1234"
-    }
-}
-
 @OptIn(ExperimentalCoroutinesApi::class)
 class DialogueViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var fakeRepository: FakeDialogueRepository
+    private lateinit var fakeAudioRepository: FakeAssetRepository
     private lateinit var viewModel: DialogueViewModel
 
     @BeforeTest
@@ -70,12 +35,39 @@ class DialogueViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         fakeRepository = FakeDialogueRepository()
-        viewModel = DialogueViewModel(fakeRepository)
+        fakeAudioRepository = FakeAssetRepository()
+        viewModel = DialogueViewModel(fakeRepository, fakeAudioRepository)
     }
 
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `navigation state defaults to Generator and updates correctly`() = runTest {
+        viewModel.currentScreen.test {
+            // Initial state
+            awaitItem().shouldBeInstanceOf<ScreenState.Generator>()
+
+            // Navigate to Search
+            viewModel.navigateToSearch()
+            awaitItem().shouldBeInstanceOf<ScreenState.Search>()
+
+            // Navigate to Detail
+            val fakeDialogue = GetDialogueResponse(
+                id = "1",
+                title = PhraseResponse("1", "Title", "en", "Trans", emptyList(), emptyList()),
+                speakers = emptyList(),
+                dialoguePhrases = emptyList()
+            )
+            viewModel.navigateToDetail(fakeDialogue)
+            awaitItem().shouldBeInstanceOf<ScreenState.Detail>().dialogue.id shouldBe "1"
+
+            // Navigate to Generator
+            viewModel.navigateToGenerator()
+            awaitItem().shouldBeInstanceOf<ScreenState.Generator>()
+        }
     }
 
     @Test
@@ -314,6 +306,104 @@ class DialogueViewModelTest {
             (finalState[1] as ConversationItem.AiResponse).isSaved shouldBe true
             (finalState[3] as ConversationItem.AiResponse).isSaving shouldBe false
             (finalState[3] as ConversationItem.AiResponse).isSaved shouldBe false
+        }
+    }
+
+    @Test
+    fun `searchDialogues transitions to Loading and then Success`() = runTest {
+        viewModel.searchState.test {
+            awaitItem() shouldBe SearchState.Initial
+
+            viewModel.searchDialogues("query")
+
+            awaitItem() shouldBe SearchState.Loading
+
+            val successState = awaitItem() as SearchState.Success
+            successState.results shouldBe emptyList()
+
+            testScheduler.advanceUntilIdle()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `searchDialogues transitions to Error on failure`() = runTest {
+        fakeRepository.shouldFail = true
+        viewModel.searchState.test {
+            awaitItem() shouldBe SearchState.Initial
+
+            viewModel.searchDialogues("query")
+
+            awaitItem() shouldBe SearchState.Loading
+
+            awaitItem().shouldBeInstanceOf<SearchState.Error>().message shouldBe "Fake Network Error"
+
+            testScheduler.advanceUntilIdle()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `playAudio transitions to Error on failure`() = runTest {
+        fakeAudioRepository.shouldFail = true
+        viewModel.searchState.test {
+            awaitItem() // Skip Initial
+
+            viewModel.playAudio("http://example.com")
+
+            awaitItem().shouldBeInstanceOf<SearchState.Error>().message shouldBe "Fake Network Error"
+
+            testScheduler.advanceUntilIdle()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `onDialogueSelected transitions to Detail`() = runTest {
+        viewModel.currentScreen.test {
+            awaitItem() // Skip Initial Generator
+
+            viewModel.onDialogueSelected("123")
+
+            awaitItem().shouldBeInstanceOf<ScreenState.Detail>().dialogue.id shouldBe "123"
+
+            testScheduler.advanceUntilIdle()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `onDialogueSelected transitions to Error on failure`() = runTest {
+        fakeRepository.shouldFail = true
+        viewModel.searchState.test {
+            awaitItem() // Skip Initial
+
+            viewModel.onDialogueSelected("123")
+
+            awaitItem().shouldBeInstanceOf<SearchState.Error>().message shouldBe "Fake Network Error"
+
+            testScheduler.advanceUntilIdle()
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `searchQuery updates when updateSearchQuery is called`() = runTest {
+        viewModel.searchQuery.test {
+            awaitItem() shouldBe ""
+
+            viewModel.updateSearchQuery("test query")
+            awaitItem() shouldBe "test query"
+        }
+    }
+
+    @Test
+    fun `searchQuery updates when searchDialogues is called`() = runTest {
+        viewModel.searchQuery.test {
+            awaitItem() shouldBe ""
+
+            viewModel.searchDialogues("another query")
+            awaitItem() shouldBe "another query"
         }
     }
 }

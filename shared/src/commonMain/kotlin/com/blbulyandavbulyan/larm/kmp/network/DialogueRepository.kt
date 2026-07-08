@@ -8,13 +8,18 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueRequest
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueTitleRequest
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueTranslationRequest
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveSpeakerRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponse
 
 interface DialogueRepository {
     suspend fun generateDialogue(prompt: String, chatId: String): DialogueChatResponse
     suspend fun saveDialogue(dialogue: DialogueChatResponse): String
+    suspend fun searchDialogues(query: String): SearchDialoguesResponse
+    suspend fun getDialogue(id: String): GetDialogueResponse
 }
 
 class NetworkDialogueRepository(private val apiClient: ApiClient) : DialogueRepository {
+
     override suspend fun generateDialogue(prompt: String, chatId: String): DialogueChatResponse {
         return apiClient.generateDialogue(prompt, chatId)
     }
@@ -54,4 +59,12 @@ class NetworkDialogueRepository(private val apiClient: ApiClient) : DialogueRepo
             translationText = translationResponse.translationText,
             isoLanguageCode = translationResponse.isoLanguageCode
         )
+
+    override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+        return apiClient.searchDialogues(query)
+    }
+
+    override suspend fun getDialogue(id: String): GetDialogueResponse {
+        return apiClient.getDialogue(id)
+    }
 }

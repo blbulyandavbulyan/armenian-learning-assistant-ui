@@ -1,6 +1,5 @@
 package com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat
 
-import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -57,20 +55,24 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
 import armenianlearningassistant_kmp.shared.generated.resources.header_subtitle
 import armenianlearningassistant_kmp.shared.generated.resources.input_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.noto_sans_armenian
+import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
+import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
+import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun DialogueGeneratorScreen(viewModel: DialogueViewModel) {
+fun DialogueGeneratorScreen(viewModel: DialogueViewModel, onNavigateToSearch: (String) -> Unit = {}) {
     val conversation by viewModel.conversation.collectAsStateWithLifecycle()
     DialogueGeneratorScreen(
         conversation = conversation,
         onGenerateDialogue = viewModel::generateDialogue,
-        onSaveDialogue = viewModel::saveDialogue
+        onSaveDialogue = viewModel::saveDialogue,
+        onNavigateToSearch = onNavigateToSearch
     )
 }
 
@@ -79,7 +81,8 @@ fun DialogueGeneratorScreen(
     conversation: List<ConversationItem>,
     emptyMessage: String = stringResource(Res.string.empty_conversation_message),
     onGenerateDialogue: (String) -> Unit,
-    onSaveDialogue: (DialogueChatResponse) -> Unit = {}
+    onSaveDialogue: (DialogueChatResponse) -> Unit = {},
+    onNavigateToSearch: (String) -> Unit = {}
 ) {
     var prompt by remember { mutableStateOf("") }
 
@@ -108,7 +111,7 @@ fun DialogueGeneratorScreen(
             .testTag("dialogueGeneratorScreen")
     ) {
         // Header
-        Header()
+        Header(onNavigateToSearch = onNavigateToSearch)
 
         // Main content area
         Box(
@@ -259,10 +262,7 @@ private fun ConversationScreen(
                 }
             }
 
-            VerticalScrollbar(
-                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                adapter = rememberScrollbarAdapter(scrollState = scrollState)
-            )
+            PrimaryVerticalScrollbar(adapter = rememberScrollbarAdapter(scrollState))
         }
     }
 }
@@ -284,20 +284,37 @@ private fun SendButton(onClick: () -> Unit) {
 }
 
 @Composable
-private fun Header() {
-    Text(
-        text = stringResource(Res.string.app_name),
-        style = MaterialTheme.typography.headlineMedium.copy(
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        ),
-        modifier = Modifier.padding(bottom = 8.dp)
-    )
-    Text(
-        text = stringResource(Res.string.header_subtitle),
-        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-        modifier = Modifier.padding(bottom = 24.dp)
-    )
+private fun Header(onNavigateToSearch: (String) -> Unit) {
+    var query by remember { mutableStateOf("") }
+
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
+    ) {
+        Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+            Text(
+                text = stringResource(Res.string.app_name),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                ),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = stringResource(Res.string.header_subtitle),
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            )
+        }
+
+        SearchField(
+            query = query,
+            Modifier.weight(1f).height(height = 60.dp),
+            onSearch = { onNavigateToSearch(query) },
+            onValueChange = { query = it },
+            placeholder = { Text(stringResource(Res.string.search_dialogues_placeholder)) }
+        )
+    }
 }
 
 @Composable
