@@ -97,9 +97,13 @@ private fun SaveStateAwareButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = AppTheme.colors.saveButton,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = if (isSaved) AppTheme.colors.saveButton.copy(
-                alpha = 0.5f
-            ) else AppTheme.colors.saveButton,
+            disabledContainerColor = if (isSaved) {
+                AppTheme.colors.saveButton.copy(
+                    alpha = 0.5f
+                )
+            } else {
+                AppTheme.colors.saveButton
+            },
             disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
         ),
         shape = buttonShape
