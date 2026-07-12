@@ -28,8 +28,30 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
 import androidx.compose.ui.test.assert
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.resetMain
+import kotlin.test.BeforeTest
+import kotlin.test.AfterTest
+
 @OptIn(ExperimentalTestApi::class)
 class DialogueGeneratorScreenTest {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @BeforeTest
+    fun setup() {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     @Test
     fun clickingSendWithText_triggersOnGenerateDialogue() = runComposeUiTest {
