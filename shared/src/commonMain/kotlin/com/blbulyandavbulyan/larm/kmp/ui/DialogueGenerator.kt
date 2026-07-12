@@ -276,7 +276,7 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
             ),
-            modifier = Modifier.fillMaxWidth(0.85f)
+            modifier = Modifier.fillMaxWidth(fraction = 0.85f)
         ) {
             Text(
                 text = text,

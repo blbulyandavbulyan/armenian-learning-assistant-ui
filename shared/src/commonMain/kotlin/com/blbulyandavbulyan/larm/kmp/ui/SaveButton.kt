@@ -55,7 +55,7 @@ internal fun AnimatedSaveButton(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxWidth(0.85f)
+                .fillMaxWidth(fraction = 0.85f)
                 .height(56.dp)
         ) {
             if (isSaving) {
@@ -116,7 +116,7 @@ private fun BoxScope.SavingIndicatorRing(buttonShape: RoundedCornerShape, ringCo
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = LinearEasing),
+            animation = tween(durationMillis = 1500, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         )
     )

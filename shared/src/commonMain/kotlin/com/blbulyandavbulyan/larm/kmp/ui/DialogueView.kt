@@ -17,6 +17,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.action_save_dial
 import armenianlearningassistant_kmp.shared.generated.resources.action_saved_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse
 import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
 import org.jetbrains.compose.resources.stringResource
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
@@ -74,55 +75,71 @@ private fun DialoguePhrasesContent(
                 colors = CardDefaults.cardColors(
                     containerColor = AppTheme.colors.saveButton.copy(alpha = 0.8f)
                 ),
-                modifier = Modifier.fillMaxWidth(0.9f)
+                modifier = Modifier.fillMaxWidth(fraction = 0.9f)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    val speakerText = speaker?.let { spk ->
-                        val translations = spk.translations.joinToString(" | ") { it.translationText }
-                        if (translations.isNotEmpty()) "${spk.title} | $translations" else spk.title
-                    } ?: stringResource(Res.string.unknown_speaker)
-
-                    Text(
-                        text = speakerText,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = fontFamily
-                        ),
-                        modifier = Modifier.padding(bottom = 4.dp).testTag("dialogueSpeaker")
-                    )
-                    Text(
-                        text = phraseObj.phrase.phrase,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 18.sp,
-                            fontFamily = fontFamily
-                        ),
-                        modifier = Modifier.testTag("dialoguePhraseText")
-                    )
-                    Text(
-                        text = phraseObj.phrase.transcription,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontStyle = FontStyle.Italic
-                        )
-                    )
-
-                    val phraseTranslations =
-                        phraseObj.phrase.translations.joinToString(" | ") { it.translationText }
-                    if (phraseTranslations.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = phraseTranslations,
-                            fontSize = 14.sp,
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        )
-                    }
+                    SpeakerInfo(speaker, fontFamily)
+                    PhraseInfo(fontFamily, phraseObj.phrase)
                 }
             }
         }
     }
+}
+
+@Composable
+private fun PhraseInfo(
+    fontFamily: FontFamily,
+    response: DraftPhrasesResponse
+) {
+    Text(
+        text = response.phrase,
+        style = MaterialTheme.typography.bodyLarge.copy(
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 18.sp,
+            fontFamily = fontFamily
+        ),
+        modifier = Modifier.testTag("dialoguePhraseText")
+    )
+    Text(
+        text = response.transcription,
+        style = MaterialTheme.typography.bodyMedium.copy(
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontStyle = FontStyle.Italic
+        )
+    )
+
+    val phraseTranslations =
+        response.translations.joinToString(" | ") { it.translationText }
+    if (phraseTranslations.isNotEmpty()) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = phraseTranslations,
+            fontSize = 14.sp,
+            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+        )
+    }
+}
+
+@Composable
+private fun SpeakerInfo(
+    speaker: SpeakerResponse?,
+    fontFamily: FontFamily
+) {
+    val speakerText = speaker?.let { spk ->
+        val translations = spk.translations.joinToString(" | ") { it.translationText }
+        if (translations.isNotEmpty()) "${spk.title} | $translations" else spk.title
+    } ?: stringResource(Res.string.unknown_speaker)
+
+    Text(
+        text = speakerText,
+        style = MaterialTheme.typography.labelMedium.copy(
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            fontFamily = fontFamily
+        ),
+        modifier = Modifier.padding(bottom = 4.dp).testTag("dialogueSpeaker")
+    )
 }
 
 @Composable
@@ -172,7 +189,7 @@ private fun AiMessageBubble(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
             ),
-            modifier = Modifier.fillMaxWidth(0.85f).padding(bottom = 16.dp)
+            modifier = Modifier.fillMaxWidth(fraction = 0.85f).padding(bottom = 16.dp)
         ) {
             Text(
                 text = message,
