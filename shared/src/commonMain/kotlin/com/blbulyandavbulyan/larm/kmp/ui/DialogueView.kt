@@ -19,8 +19,8 @@ import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse
 import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
-import org.jetbrains.compose.resources.stringResource
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DialogueView(

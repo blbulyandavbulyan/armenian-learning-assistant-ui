@@ -32,7 +32,7 @@ class NetworkDialogueRepository(private val apiClient: ApiClient) : DialogueRepo
                     title = speakerResponse.title,
                     transcription = speakerResponse.transcription,
                     translations = speakerResponse.translations.map(::mapTranslationResponseToRequest)
-                ) 
+                )
             },
             dialoguePhrases = dialogue.dialoguePhrases.map { dialoguePhraseResponse ->
                 SaveDialoguePhraseRequest(
@@ -43,7 +43,7 @@ class NetworkDialogueRepository(private val apiClient: ApiClient) : DialogueRepo
                         transcription = dialoguePhraseResponse.phrase.transcription,
                         translations = dialoguePhraseResponse.phrase.translations.map(::mapTranslationResponseToRequest)
                     )
-                ) 
+                )
             }
         )
         return apiClient.saveDialogue(request)

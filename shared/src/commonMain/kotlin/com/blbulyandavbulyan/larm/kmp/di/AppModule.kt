@@ -13,10 +13,12 @@ object AppModule {
     val httpClient by lazy {
         HttpClient {
             install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    prettyPrint = true
-                })
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        prettyPrint = true
+                    }
+                )
             }
             defaultRequest {
                 val baseUrl = BuildKonfig.API_URL

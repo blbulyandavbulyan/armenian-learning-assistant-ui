@@ -33,7 +33,7 @@ object DialogueChatResponseMother {
             )
         )
     )
-    
+
     val FULL_DIALOGUE_2 = DialogueChatResponse(
         message = "Another dialogue:",
         info = DialogueTitleResponse(
@@ -67,4 +67,3 @@ object DialogueChatResponseMother {
         )
     )
 }
-

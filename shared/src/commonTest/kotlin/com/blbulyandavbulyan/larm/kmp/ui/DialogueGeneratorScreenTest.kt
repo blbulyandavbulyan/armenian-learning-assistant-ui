@@ -1,40 +1,34 @@
 package com.blbulyandavbulyan.larm.kmp.ui
 
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasProgressBarRangeInfo
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.test.withKeyDown
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
+import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
-import kotlin.test.Test
-import androidx.compose.ui.test.performKeyInput
-import androidx.compose.ui.test.pressKey
-import androidx.compose.ui.test.withKeyDown
-import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.test.hasText
-import com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.DialoguePhraseResponse
-import com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse
-import com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse
-import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
-import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
-import androidx.compose.ui.test.hasProgressBarRangeInfo
-import androidx.compose.ui.semantics.ProgressBarRangeInfo
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
-import androidx.compose.ui.test.assert
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.test.resetMain
-import kotlin.test.BeforeTest
+import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
 class DialogueGeneratorScreenTest {
@@ -68,14 +62,14 @@ class DialogueGeneratorScreenTest {
 
         // Type into the input field
         onNodeWithTag("inputMessageField").performTextInput("Hello, generating a dialogue!")
-        
+
         // Click the send button
         onNodeWithTag("sendButton").performClick()
-        
+
         // Assert that the callback was triggered with the correct text
         generatedPrompt shouldBe "Hello, generating a dialogue!"
     }
-    
+
     @Test
     fun clickingSendWithEmptyText_doesNotTriggerOnGenerateDialogue() = runComposeUiTest {
         var callbackTriggered = false
@@ -91,10 +85,11 @@ class DialogueGeneratorScreenTest {
 
         // Click the send button without typing anything
         onNodeWithTag("sendButton").performClick()
-        
+
         // Assert that the callback was NOT triggered
         callbackTriggered shouldBe false
     }
+
     @Test
     fun emptyConversation_displaysEmptyMessage() = runComposeUiTest {
         setContent {
@@ -106,7 +101,7 @@ class DialogueGeneratorScreenTest {
                 )
             }
         }
-        
+
         onNodeWithTag("emptyConversationText").assertIsDisplayed()
         onNodeWithTag("conversationScreen").assertDoesNotExist()
     }
@@ -125,7 +120,7 @@ class DialogueGeneratorScreenTest {
 
         onNodeWithTag("inputMessageField").performTextInput("Hello via enter")
         onNodeWithTag("inputMessageField").performKeyInput { pressKey(Key.Enter) }
-        
+
         generatedPrompt shouldBe "Hello via enter"
     }
 
@@ -142,12 +137,12 @@ class DialogueGeneratorScreenTest {
         }
 
         onNodeWithTag("inputMessageField").performTextInput("Hello via shift enter")
-        onNodeWithTag("inputMessageField").performKeyInput { 
+        onNodeWithTag("inputMessageField").performKeyInput {
             withKeyDown(Key.ShiftLeft) {
                 pressKey(Key.Enter)
             }
         }
-        
+
         generatedPrompt shouldBe null
     }
 
@@ -161,7 +156,7 @@ class DialogueGeneratorScreenTest {
                 )
             }
         }
-        
+
         onNodeWithTag("userMessageText").assertIsDisplayed()
             .assertTextEquals("Hello user message")
     }
@@ -176,7 +171,7 @@ class DialogueGeneratorScreenTest {
                 )
             }
         }
-        
+
         onNodeWithTag("loadingIndicator").assertIsDisplayed()
     }
 
@@ -190,7 +185,7 @@ class DialogueGeneratorScreenTest {
                 )
             }
         }
-        
+
         onNodeWithTag("errorMessage").assertIsDisplayed()
         onNode(hasText("Network failure", substring = true)).assertIsDisplayed()
     }
@@ -207,15 +202,15 @@ class DialogueGeneratorScreenTest {
                 )
             }
         }
-        
+
         // Assert AI's initial conversational message is displayed and has correct text
         onNodeWithTag("aiMessageText").assertIsDisplayed()
         onNode(hasText("Here is a dialogue:")).assertIsDisplayed()
-        
+
         // Assert Dialogue Info is displayed
         onNode(hasText("Խանութում | In the shop")).assertIsDisplayed() // Title + Translation
         onNode(hasText("Khanutum")).assertIsDisplayed() // Transcription
-        
+
         // Assert Speakers are correctly mapped and displayed
         onAllNodesWithTag("dialogueSpeaker")[0].assertTextEquals("Վաճառող | Seller")
         onAllNodesWithTag("dialogueSpeaker")[1].assertTextEquals("Հաճախորդ | Customer")
@@ -224,7 +219,7 @@ class DialogueGeneratorScreenTest {
         onAllNodesWithTag("dialoguePhraseText")[0].assertTextEquals("Բարև Ձեզ")
         onNode(hasText("Barev Dzez")).assertIsDisplayed()
         onNode(hasText("Hello")).assertIsDisplayed()
-        
+
         onAllNodesWithTag("dialoguePhraseText")[1].assertTextEquals("Ողջույն")
         onNode(hasText("Voghjuyn")).assertIsDisplayed()
         onNode(hasText("Greetings")).assertIsDisplayed()
@@ -251,14 +246,14 @@ class DialogueGeneratorScreenTest {
         // Verify semantics on the saving button (second item)
         onAllNodesWithTag("saveButton")[1]
             .assert(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
-            
+
         // Verify that the other button does not have the indeterminate loading semantics
         onAllNodesWithTag("saveButton")[0]
             .assert(!hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
 
         // Click the first button
         onAllNodesWithTag("saveButton")[0].performClick()
-        
+
         savedDialogues.size shouldBe 1
         savedDialogues[0] shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
     }

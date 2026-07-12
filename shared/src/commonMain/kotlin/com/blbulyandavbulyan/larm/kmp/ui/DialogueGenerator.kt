@@ -20,10 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.*
+import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 
@@ -97,8 +97,8 @@ fun DialogueGeneratorScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             InputMessageField(
-                value = prompt, 
-                fontFamily = notoArmenian, 
+                value = prompt,
+                fontFamily = notoArmenian,
                 modifier = Modifier.weight(1f),
                 onValueChange = { prompt = it }
             ) {
@@ -116,10 +116,10 @@ fun DialogueGeneratorScreen(
 
 @Composable
 internal fun InputMessageField(
-    value: String, 
-    fontFamily: FontFamily, 
+    value: String,
+    fontFamily: FontFamily,
     modifier: Modifier = Modifier,
-    onValueChange: (String) -> Unit, 
+    onValueChange: (String) -> Unit,
     onSend: () -> Unit
 ) {
     OutlinedTextField(
@@ -289,4 +289,3 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
         }
     }
 }
-

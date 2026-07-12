@@ -1,5 +1,6 @@
 package com.blbulyandavbulyan.larm.kmp.presentation
 
+import app.cash.turbine.test
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse
@@ -17,8 +18,6 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-import app.cash.turbine.test
-
 // 1. Create a Fake implementation of the Repository for testing
 class FakeDialogueRepository : DialogueRepository {
     var shouldFail = false
@@ -32,7 +31,7 @@ class FakeDialogueRepository : DialogueRepository {
         if (shouldFail) {
             throw Exception("Fake Network Error")
         }
-        
+
         // Return mock data
         return if (dialoguesToReturn.isNotEmpty()) {
             dialoguesToReturn.removeAt(0)
@@ -171,10 +170,10 @@ class DialogueViewModelTest {
     @Test
     fun `saveDialogue updates state correctly on single success`() = runTest {
         val fakeResponse = DialogueChatResponseMother.FULL_DIALOGUE_1
-        
+
         fakeRepository.dialoguesToReturn.add(fakeResponse)
         fakeRepository.saveCompletable = CompletableDeferred()
-        
+
         viewModel.generateDialogue("prompt")
         testScheduler.advanceUntilIdle() // Wait for it to finish generating
         val generatedState = viewModel.conversation.value
@@ -184,7 +183,7 @@ class DialogueViewModelTest {
             awaitItem() // Skip current state
 
             viewModel.saveDialogue(dialogue)
-            
+
             val savingState = awaitItem()
             val aiSaving = savingState.last() as ConversationItem.AiResponse
             aiSaving.isSaving shouldBe true
@@ -196,7 +195,7 @@ class DialogueViewModelTest {
             val aiSaved = finalState.last() as ConversationItem.AiResponse
             aiSaved.isSaving shouldBe false
             aiSaved.isSaved shouldBe true
-            
+
             fakeRepository.lastSavedDialogue shouldBe dialogue
         }
     }
@@ -205,41 +204,40 @@ class DialogueViewModelTest {
     fun `saveDialogue multiple saves concurrent states`() = runTest {
         val dialogue1 = DialogueChatResponseMother.FULL_DIALOGUE_1
         val dialogue2 = DialogueChatResponseMother.FULL_DIALOGUE_2
-        
+
         fakeRepository.dialoguesToReturn.add(dialogue1)
         fakeRepository.dialoguesToReturn.add(dialogue2)
-        
+
         viewModel.generateDialogue("p1")
         testScheduler.advanceUntilIdle()
         viewModel.generateDialogue("p2")
         testScheduler.advanceUntilIdle()
-        
+
         val state = viewModel.conversation.value
         val ai1 = state[1] as ConversationItem.AiResponse
         val ai2 = state[3] as ConversationItem.AiResponse
-        
+
         fakeRepository.saveCompletable = CompletableDeferred()
-        
+
         viewModel.conversation.test {
             // The first awaitItem() consumes the current initial state of the StateFlow upon subscription.
             awaitItem()
 
-            
             viewModel.saveDialogue(ai1.response)
-            
+
             val stateAfterSave1 = awaitItem()
             (stateAfterSave1[1] as ConversationItem.AiResponse).isSaving shouldBe true
             (stateAfterSave1[3] as ConversationItem.AiResponse).isSaving shouldBe false
-            
+
             viewModel.saveDialogue(ai2.response)
-            
+
             val stateAfterSave2 = awaitItem()
             (stateAfterSave2[1] as ConversationItem.AiResponse).isSaving shouldBe true
             (stateAfterSave2[3] as ConversationItem.AiResponse).isSaving shouldBe true
-            
+
             fakeRepository.saveCompletable?.complete("")
-            
-            val stateAfterComplete1 = awaitItem() 
+
+            val stateAfterComplete1 = awaitItem()
             // Assert that the first dialogue save has completed in this intermediate state.
             // Coroutines waiting on the same CompletableDeferred resume in the order they were suspended (FIFO).
             // Since saveDialogue for ai1 was called first, it resumes and emits its saved state first.
@@ -255,32 +253,33 @@ class DialogueViewModelTest {
             (finalState[3] as ConversationItem.AiResponse).isSaved shouldBe true
         }
     }
+
     @Test
     fun `saveDialogue concurrent saves with one success and one failure`() = runTest {
         val dialogue1 = DialogueChatResponseMother.FULL_DIALOGUE_1
         val dialogue2 = DialogueChatResponseMother.FULL_DIALOGUE_2
-        
+
         fakeRepository.dialoguesToReturn.add(dialogue1)
         fakeRepository.dialoguesToReturn.add(dialogue2)
-        
+
         viewModel.generateDialogue("p1")
         testScheduler.advanceUntilIdle()
         viewModel.generateDialogue("p2")
         testScheduler.advanceUntilIdle()
-        
+
         val state = viewModel.conversation.value
         val ai1 = state[1] as ConversationItem.AiResponse
         val ai2 = state[3] as ConversationItem.AiResponse
-        
+
         fakeRepository.saveCompletable = CompletableDeferred()
-        
+
         viewModel.conversation.test {
             awaitItem() // Skip initial state
-            
+
             // 1. Save ai1 (success pending)
             fakeRepository.shouldFail = false
             viewModel.saveDialogue(ai1.response)
-            
+
             // Force the test dispatcher to run the queued coroutine for ai1 so it reads shouldFail = false
             // and safely suspends on saveCompletable?.await() before we flip the flag below.
             testScheduler.runCurrent()
@@ -289,15 +288,14 @@ class DialogueViewModelTest {
             (stateAfterSave1[1] as ConversationItem.AiResponse).isSaving shouldBe true
             (stateAfterSave1[3] as ConversationItem.AiResponse).isSaving shouldBe false
 
-            
             // 2. Save ai2 (immediate failure)
             fakeRepository.shouldFail = true
             viewModel.saveDialogue(ai2.response)
-            
+
             val stateAfterSave2 = awaitItem() // Synchronous update before launch executes
             (stateAfterSave2[1] as ConversationItem.AiResponse).isSaving shouldBe true
             (stateAfterSave2[3] as ConversationItem.AiResponse).isSaving shouldBe true
-            
+
             // Now the launch coroutines will execute because awaitItem yields.
             // ai2 throws Exception immediately and updates state.
             val stateAfterError = awaitItem()
@@ -305,10 +303,10 @@ class DialogueViewModelTest {
             (stateAfterError[3] as ConversationItem.AiResponse).isSaving shouldBe false
             (stateAfterError[3] as ConversationItem.AiResponse).isSaved shouldBe false
             stateAfterError.last().shouldBeInstanceOf<ConversationItem.Error>().message shouldBe "Fake Network Error"
-            
+
             // 3. Complete ai1
             fakeRepository.saveCompletable?.complete("")
-            
+
             val finalState = awaitItem()
             (finalState[1] as ConversationItem.AiResponse).isSaving shouldBe false
             (finalState[1] as ConversationItem.AiResponse).isSaved shouldBe true
