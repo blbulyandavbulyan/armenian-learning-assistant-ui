@@ -793,7 +793,7 @@ style:
     active: true
     ignoreLateinitVar: false
   WildcardImport:
-    active: true
+    active: false
     excludeImports:
       - 'java.util.*'
 
@@ -963,7 +963,7 @@ formatting:
   NoWildcardImports:
     active: true
     autoCorrect: true
-    packagesToUseImportOnDemandProperty: 'java.util.*,kotlinx.android.synthetic.**'
+    packagesToUseImportOnDemandProperty: 'java.util.*,kotlinx.android.synthetic.**,io.ktor.**'
   NullableTypeSpacing:
     active: true
     autoCorrect: true
