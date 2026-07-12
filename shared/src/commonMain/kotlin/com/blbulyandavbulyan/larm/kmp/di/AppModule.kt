@@ -4,8 +4,8 @@ import com.blbulyandavbulyan.larm.kmp.BuildKonfig
 import com.blbulyandavbulyan.larm.kmp.network.ApiClient
 import com.blbulyandavbulyan.larm.kmp.network.NetworkDialogueRepository
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
