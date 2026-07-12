@@ -962,6 +962,7 @@ formatting:
     autoCorrect: true
   NoWildcardImports:
     active: true
+    autoCorrect: true
     packagesToUseImportOnDemandProperty: 'java.util.*,kotlinx.android.synthetic.**'
   NullableTypeSpacing:
     active: true
