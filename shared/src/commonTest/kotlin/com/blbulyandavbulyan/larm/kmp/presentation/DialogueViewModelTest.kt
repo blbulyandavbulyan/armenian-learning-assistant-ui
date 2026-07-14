@@ -26,6 +26,7 @@ class FakeDialogueRepository : DialogueRepository {
     var lastSavedDialogue: DialogueChatResponse? = null
     var dialoguesToReturn = mutableListOf<DialogueChatResponse>()
 
+    @Suppress("TooGenericExceptionThrown")
     override suspend fun generateDialogue(prompt: String, chatId: String): DialogueChatResponse {
         lastPrompt = prompt
         if (shouldFail) {
@@ -45,6 +46,7 @@ class FakeDialogueRepository : DialogueRepository {
         }
     }
 
+    @Suppress("TooGenericExceptionThrown")
     override suspend fun saveDialogue(dialogue: DialogueChatResponse): String {
         lastSavedDialogue = dialogue
         if (shouldFail) {

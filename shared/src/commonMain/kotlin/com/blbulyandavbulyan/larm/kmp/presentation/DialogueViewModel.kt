@@ -33,6 +33,7 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
 
     private val chatId = Uuid.random().toString()
 
+    @Suppress("TooGenericExceptionCaught")
     fun generateDialogue(prompt: String) {
         if (prompt.isBlank()) return
 
@@ -55,6 +56,7 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun saveDialogue(dialogue: DialogueChatResponse) {
         _conversation.value = _conversation.value.map {
             if (it is ConversationItem.AiResponse && it.response === dialogue) {
