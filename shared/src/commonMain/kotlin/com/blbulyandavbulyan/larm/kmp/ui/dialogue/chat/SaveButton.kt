@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.ui
+package com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode

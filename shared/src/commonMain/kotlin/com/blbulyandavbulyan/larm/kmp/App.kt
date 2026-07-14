@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.blbulyandavbulyan.larm.kmp.di.AppModule
-import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
-import com.blbulyandavbulyan.larm.kmp.ui.DialogueGeneratorScreen
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
+import com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat.DialogueGeneratorScreen
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 
 @Composable

@@ -1,5 +1,12 @@
 package com.blbulyandavbulyan.larm.kmp.data
 
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialoguePhraseInnerRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialoguePhraseRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueTitleRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueTranslationRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveSpeakerRequest
+
 object SaveDialogueRequestMother {
     val FULL_REQUEST_1 = SaveDialogueRequest(
         info = SaveDialogueTitleRequest(

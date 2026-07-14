@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.ui
+package com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat
 
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -16,9 +16,9 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
-import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers

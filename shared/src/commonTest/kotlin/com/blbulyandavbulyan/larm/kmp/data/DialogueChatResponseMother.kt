@@ -1,5 +1,12 @@
 package com.blbulyandavbulyan.larm.kmp.data
 
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.ChatTranslationResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialoguePhraseResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueTitleResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DraftPhrasesResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SpeakerResponse
+
 object DialogueChatResponseMother {
     val FULL_DIALOGUE_1 = DialogueChatResponse(
         message = "Here is a dialogue:",

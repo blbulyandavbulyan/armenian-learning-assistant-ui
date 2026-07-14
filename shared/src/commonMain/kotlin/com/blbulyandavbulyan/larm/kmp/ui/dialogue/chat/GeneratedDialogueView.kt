@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.ui
+package com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,14 +25,14 @@ import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.action_saved_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.DraftPhrasesResponse
-import com.blbulyandavbulyan.larm.kmp.data.SpeakerResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DraftPhrasesResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SpeakerResponse
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun DialogueView(
+fun GeneratedDialogueView(
     dialogue: DialogueChatResponse,
     fontFamily: FontFamily,
     isSaving: Boolean = false,

@@ -1,9 +1,9 @@
-package com.blbulyandavbulyan.larm.kmp.presentation
+package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 
 import app.cash.turbine.test
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
-import com.blbulyandavbulyan.larm.kmp.data.DialogueTitleResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueTitleResponse
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf

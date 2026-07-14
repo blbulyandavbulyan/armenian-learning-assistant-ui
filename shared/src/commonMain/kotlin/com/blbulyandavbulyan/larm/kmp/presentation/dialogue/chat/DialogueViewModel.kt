@@ -1,11 +1,11 @@
-package com.blbulyandavbulyan.larm.kmp.presentation
+package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

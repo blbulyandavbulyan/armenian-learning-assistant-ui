@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.data
+package com.blbulyandavbulyan.larm.kmp.data.dialogue.chat
 
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.ui
+package com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -56,9 +57,9 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
 import armenianlearningassistant_kmp.shared.generated.resources.header_subtitle
 import armenianlearningassistant_kmp.shared.generated.resources.input_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.noto_sans_armenian
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.presentation.ConversationItem
-import com.blbulyandavbulyan.larm.kmp.presentation.DialogueViewModel
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
@@ -246,7 +247,7 @@ private fun ConversationScreen(
                         }
 
                         is ConversationItem.AiResponse -> {
-                            DialogueView(
+                            GeneratedDialogueView(
                                 dialogue = item.response,
                                 fontFamily = notoArmenian,
                                 isSaving = item.isSaving,
@@ -260,7 +261,7 @@ private fun ConversationScreen(
 
             VerticalScrollbar(
                 modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                adapter = androidx.compose.foundation.rememberScrollbarAdapter(scrollState = scrollState)
+                adapter = rememberScrollbarAdapter(scrollState = scrollState)
             )
         }
     }
