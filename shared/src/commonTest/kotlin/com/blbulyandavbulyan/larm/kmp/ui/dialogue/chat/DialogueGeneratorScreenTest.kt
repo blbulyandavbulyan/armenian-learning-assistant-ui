@@ -16,8 +16,8 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
