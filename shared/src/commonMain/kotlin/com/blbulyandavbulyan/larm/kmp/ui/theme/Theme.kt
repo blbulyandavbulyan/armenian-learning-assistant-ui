@@ -51,7 +51,7 @@ private val DarkColorPalette = darkColorScheme(
     surface = DarkBackgroundTop,
     onSurface = Color.White,
     onSurfaceVariant = DarkSubtitle,
-    error = PrimaryRed 
+    error = PrimaryRed
 )
 
 private val LightColorPalette = lightColorScheme(

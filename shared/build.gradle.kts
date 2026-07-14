@@ -25,16 +25,30 @@ kotlin {
     js {
         browser {
             testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+                useMocha {
+                    timeout = "30000"
+                }
                 filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.ui.*")
             }
         }
     }
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        browser()
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+                useMocha {
+                    timeout = "30000"
+                }
+            }
+        }
     }
-    
 
     sourceSets {
         commonMain.dependencies {

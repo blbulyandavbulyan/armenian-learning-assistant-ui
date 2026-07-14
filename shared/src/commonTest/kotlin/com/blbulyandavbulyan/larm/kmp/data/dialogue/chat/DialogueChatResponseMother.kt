@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.data
+package com.blbulyandavbulyan.larm.kmp.data.dialogue.chat
 
 object DialogueChatResponseMother {
     val FULL_DIALOGUE_1 = DialogueChatResponse(
@@ -33,7 +33,7 @@ object DialogueChatResponseMother {
             )
         )
     )
-    
+
     val FULL_DIALOGUE_2 = DialogueChatResponse(
         message = "Another dialogue:",
         info = DialogueTitleResponse(
@@ -67,4 +67,3 @@ object DialogueChatResponseMother {
         )
     )
 }
-

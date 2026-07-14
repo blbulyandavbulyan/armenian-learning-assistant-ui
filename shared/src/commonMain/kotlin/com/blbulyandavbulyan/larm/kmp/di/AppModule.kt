@@ -4,8 +4,8 @@ import com.blbulyandavbulyan.larm.kmp.BuildKonfig
 import com.blbulyandavbulyan.larm.kmp.network.ApiClient
 import com.blbulyandavbulyan.larm.kmp.network.NetworkDialogueRepository
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
@@ -13,10 +13,12 @@ object AppModule {
     val httpClient by lazy {
         HttpClient {
             install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    prettyPrint = true
-                })
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        prettyPrint = true
+                    }
+                )
             }
             defaultRequest {
                 val baseUrl = BuildKonfig.API_URL

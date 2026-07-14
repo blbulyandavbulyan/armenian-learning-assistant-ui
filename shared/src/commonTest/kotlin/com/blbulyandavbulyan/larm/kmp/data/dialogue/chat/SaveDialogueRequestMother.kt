@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.data
+package com.blbulyandavbulyan.larm.kmp.data.dialogue.chat
 
 object SaveDialogueRequestMother {
     val FULL_REQUEST_1 = SaveDialogueRequest(

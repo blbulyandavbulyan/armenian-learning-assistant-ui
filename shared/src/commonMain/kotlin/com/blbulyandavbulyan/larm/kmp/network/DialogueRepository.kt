@@ -1,13 +1,13 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.data.ChatTranslationResponse
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.SaveDialoguePhraseInnerRequest
-import com.blbulyandavbulyan.larm.kmp.data.SaveDialoguePhraseRequest
-import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueRequest
-import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueTitleRequest
-import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueTranslationRequest
-import com.blbulyandavbulyan.larm.kmp.data.SaveSpeakerRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.ChatTranslationResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialoguePhraseInnerRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialoguePhraseRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueTitleRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueTranslationRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveSpeakerRequest
 
 interface DialogueRepository {
     suspend fun generateDialogue(prompt: String, chatId: String): DialogueChatResponse
@@ -32,7 +32,7 @@ class NetworkDialogueRepository(private val apiClient: ApiClient) : DialogueRepo
                     title = speakerResponse.title,
                     transcription = speakerResponse.transcription,
                     translations = speakerResponse.translations.map(::mapTranslationResponseToRequest)
-                ) 
+                )
             },
             dialoguePhrases = dialogue.dialoguePhrases.map { dialoguePhraseResponse ->
                 SaveDialoguePhraseRequest(
@@ -43,7 +43,7 @@ class NetworkDialogueRepository(private val apiClient: ApiClient) : DialogueRepo
                         transcription = dialoguePhraseResponse.phrase.transcription,
                         translations = dialoguePhraseResponse.phrase.translations.map(::mapTranslationResponseToRequest)
                     )
-                ) 
+                )
             }
         )
         return apiClient.saveDialogue(request)

@@ -1,9 +1,9 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.data.ChatRequest
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueRequest
-import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.ChatRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueRequest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

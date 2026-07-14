@@ -1,5 +1,8 @@
-package com.blbulyandavbulyan.larm.kmp.ui
+package com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
@@ -10,11 +13,8 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
 import androidx.compose.ui.text.font.FontFamily
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import kotlin.test.Test
 import io.kotest.matchers.shouldBe
+import kotlin.test.Test
 
 class InputMessageFieldTest {
 
@@ -36,7 +36,7 @@ class InputMessageFieldTest {
         }
 
         onNodeWithTag("inputMessageField").performTextInput("Barev!")
-        
+
         onNodeWithTag("inputMessageField").performKeyInput {
             pressKey(Key.Enter)
         }
@@ -72,7 +72,6 @@ class InputMessageFieldTest {
         currentPrompt shouldBe "Barev!"
     }
 
-
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun typingAndPressingShiftEnter() = runComposeUiTest {
@@ -91,7 +90,7 @@ class InputMessageFieldTest {
         }
 
         onNodeWithTag("inputMessageField").performTextInput("Barev!")
-        
+
         onNodeWithTag("inputMessageField").performKeyInput {
             withKeyDown(Key.ShiftLeft) {
                 pressKey(Key.Enter)
@@ -130,5 +129,4 @@ class InputMessageFieldTest {
         sendTriggered shouldBe false
         currentPrompt shouldBe "Barev!\n"
     }
-
 }

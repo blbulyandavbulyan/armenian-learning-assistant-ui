@@ -1,19 +1,19 @@
-package com.blbulyandavbulyan.larm.kmp.presentation
+package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponse
+import armenianlearningassistant_kmp.shared.generated.resources.Res
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save
+import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-import org.jetbrains.compose.resources.getString
-import armenianlearningassistant_kmp.shared.generated.resources.Res
-import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save
-import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
 
 sealed class ConversationItem {
     data class UserMessage(val text: String) : ConversationItem()
@@ -33,14 +33,15 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
 
     private val chatId = Uuid.random().toString()
 
+    @Suppress("TooGenericExceptionCaught")
     fun generateDialogue(prompt: String) {
         if (prompt.isBlank()) return
-        
+
         val current = _conversation.value.toMutableList()
         current.add(ConversationItem.UserMessage(prompt))
         current.add(ConversationItem.Loading)
         _conversation.value = current
-        
+
         viewModelScope.launch {
             try {
                 val response = repository.generateDialogue(prompt, chatId)
@@ -55,11 +56,14 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun saveDialogue(dialogue: DialogueChatResponse) {
         _conversation.value = _conversation.value.map {
             if (it is ConversationItem.AiResponse && it.response === dialogue) {
                 it.copy(isSaving = true)
-            } else it
+            } else {
+                it
+            }
         }
 
         viewModelScope.launch {
@@ -68,13 +72,17 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
                 _conversation.value = _conversation.value.map {
                     if (it is ConversationItem.AiResponse && it.response === dialogue) {
                         it.copy(isSaving = false, isSaved = true)
-                    } else it
+                    } else {
+                        it
+                    }
                 }
             } catch (e: Exception) {
                 val currentConv = _conversation.value.map {
                     if (it is ConversationItem.AiResponse && it.response === dialogue) {
                         it.copy(isSaving = false)
-                    } else it
+                    } else {
+                        it
+                    }
                 }.toMutableList()
                 currentConv.add(ConversationItem.Error(e.message ?: getString(Res.string.error_failed_to_save)))
                 _conversation.value = currentConv
