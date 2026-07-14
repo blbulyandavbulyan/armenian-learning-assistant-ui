@@ -1,11 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.data
-
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.ChatTranslationResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialoguePhraseResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueTitleResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DraftPhrasesResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SpeakerResponse
+package com.blbulyandavbulyan.larm.kmp.data.dialogue.chat
 
 object DialogueChatResponseMother {
     val FULL_DIALOGUE_1 = DialogueChatResponse(

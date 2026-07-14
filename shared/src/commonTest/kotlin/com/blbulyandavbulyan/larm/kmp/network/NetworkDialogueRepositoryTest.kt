@@ -1,7 +1,7 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.data.DialogueChatResponseMother
-import com.blbulyandavbulyan.larm.kmp.data.SaveDialogueRequestMother
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueRequestMother
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
