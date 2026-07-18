@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search
+package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
@@ -41,10 +42,10 @@ private class ChatBubbleShape(
                     top = 0f,
                     right = size.width,
                     bottom = size.height - tailHeight,
-                    topLeftCornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius),
-                    topRightCornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius),
-                    bottomLeftCornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius),
-                    bottomRightCornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius)
+                    topLeftCornerRadius = CornerRadius(cornerRadius),
+                    topRightCornerRadius = CornerRadius(cornerRadius),
+                    bottomLeftCornerRadius = CornerRadius(cornerRadius),
+                    bottomRightCornerRadius = CornerRadius(cornerRadius)
                 )
             )
 
