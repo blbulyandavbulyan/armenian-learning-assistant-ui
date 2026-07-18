@@ -1,10 +1,8 @@
 package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -39,6 +37,7 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenButton
+import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
@@ -138,46 +137,17 @@ private fun PhraseInfo(
         modifier = modifier
     ) {
         // The Chat Bubble Box
-        ChatBubbleBox {
+        val phraseAudio = dialoguePhrase.phrase.audioAssetUrl
+
+        ChatBubbleBox(testTag = "listenPhraseButton_${dialoguePhrase.phrase.id}", onClick = { phraseAudio?.let { onPlayAudio(it) } }) {
             Column {
-                MainPhrase(dialoguePhrase = dialoguePhrase, onPlayAudio = onPlayAudio)
+                MainPhrase(dialoguePhrase = dialoguePhrase, displayListenIcon = phraseAudio != null)
 
                 PhraseTranscription(dialoguePhrase)
 
                 PhraseTranslations(dialoguePhrase)
             }
         }
-    }
-}
-
-@Composable
-private fun ChatBubbleBox(content: @Composable BoxScope.() -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant, // Slightly different shade for the bubble
-                // This shape mimics a chat bubble tail on the bottom-left
-                shape = RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 16.dp,
-                    bottomEnd = 16.dp,
-                    bottomStart = 2.dp
-                )
-            )
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                shape = RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 16.dp,
-                    bottomEnd = 16.dp,
-                    bottomStart = 2.dp
-                )
-            )
-            .padding(all = 16.dp)
-    ) {
-        content()
     }
 }
 
@@ -210,9 +180,14 @@ private fun PhraseTranscription(dialoguePhrase: GetDialoguePhraseResponse) {
 @Composable
 private fun MainPhrase(
     dialoguePhrase: GetDialoguePhraseResponse,
-    onPlayAudio: (String) -> Unit
+    displayListenIcon: Boolean
 ) {
     Row {
+        if (displayListenIcon) {
+            ListenIcon(modifier = Modifier.size(size = 40.dp).padding(4.dp))
+            Spacer(modifier = Modifier.width(width = 10.dp))
+        }
+
         Text(
             text = dialoguePhrase.phrase.phrase,
             style = MaterialTheme.typography.titleMedium,
@@ -222,17 +197,6 @@ private fun MainPhrase(
                 .padding(bottom = 6.dp)
                 .testTag("phraseText_${dialoguePhrase.phrase.id}")
         )
-
-        Spacer(modifier = Modifier.width(width = 10.dp))
-
-        dialoguePhrase.phrase.audioAssetUrl?.let { url ->
-            ListenButton(
-                size = 40.dp,
-                testTag = "listenPhraseButton_${dialoguePhrase.phrase.id}"
-            ) {
-                onPlayAudio(url)
-            }
-        }
     }
 }
 

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,9 +15,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
-import armenianlearningassistant_kmp.shared.generated.resources.ic_text_to_speech_24px
 import armenianlearningassistant_kmp.shared.generated.resources.listen_phrase_button
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -38,11 +35,7 @@ fun ListenButton(
             .testTag(testTag),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
-            painter = painterResource(Res.drawable.ic_text_to_speech_24px),
-            contentDescription = text,
-            tint = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.fillMaxSize().padding(4.dp)
-        )
+        ListenIcon(text, Modifier.fillMaxSize().padding(4.dp))
     }
 }
+
