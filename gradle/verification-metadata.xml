@@ -3,6 +3,11 @@
    <configuration>
       <verify-metadata>true</verify-metadata>
       <verify-signatures>true</verify-signatures>
+      <trusted-artifacts>
+         <trust group="gradle" name="gradle"/>
+         <trust file=".*-javadoc[.]jar" regex="true"/>
+         <trust file=".*-sources[.]jar" regex="true"/>
+      </trusted-artifacts>
       <ignored-keys>
          <ignored-key id="A6BC6A2C25A6479C" reason="Key couldn't be downloaded from any key server"/>
          <ignored-key id="CFAE163B64AC9189" reason="Key couldn't be downloaded from any key server"/>
