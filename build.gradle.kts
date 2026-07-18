@@ -43,8 +43,8 @@ sonarqube {
         property("sonar.projectKey", "blbulyandavbulyan_armenian-learning-assistant-ui")
         property("sonar.organization", "blbulyandavbulyan")
         property("sonar.host.url", "https://sonarcloud.io")
-        val koverReports = subprojects.joinToString(",") { 
-            "${it.layout.buildDirectory.get()}/reports/kover/report.xml" 
+        val koverReports = subprojects.joinToString(",") {
+            "${it.layout.buildDirectory.get()}/reports/kover/report.xml"
         }
         property("sonar.coverage.jacoco.xmlReportPaths", koverReports)
     }
