@@ -74,7 +74,7 @@ fun DialogueSearchScreen(viewModel: DialogueViewModel, onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                GoBackButton (width = 50.dp, height = 50.dp, onClick = onBack)
+                GoBackButton(width = 50.dp, height = 50.dp, onClick = onBack)
                 Spacer(modifier = Modifier.width(8.dp))
                 SearchField(
                     query = query,

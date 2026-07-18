@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.LayoutDirection
 
 class RoundedCutBottomRightShape(
     private val cornerRadius: Float = 32f, // How round the 3 normal corners are
-    private val cutOffset: Float = 40f     // How far inward the slant starts
+    private val cutOffset: Float = 40f // How far inward the slant starts
 ) : Shape {
 
     override fun createOutline(
@@ -27,14 +27,14 @@ class RoundedCutBottomRightShape(
             // Top edge to Top-Right corner
             lineTo(size.width - r, 0f)
             arcTo(
-                rect = Rect(size.width - 2 * r, 0f, size.width, 2 * r),
+                rect = Rect(left = size.width - 2 * r, top = 0f, right = size.width, bottom = 2 * r),
                 startAngleDegrees = 270f,
                 sweepAngleDegrees = 90f,
                 forceMoveTo = false
             )
 
             // Right edge down to where the slanted cut begins
-            lineTo(size.width, size.height * 0.7f)
+            lineTo(x = size.width, y = size.height * 0.7f)
 
             // THE SHARP CUT: Diagonal line straight to the bottom edge
             lineTo(size.width - cutOffset, size.height)
@@ -42,7 +42,7 @@ class RoundedCutBottomRightShape(
             // Bottom edge over to the Bottom-Left corner
             lineTo(r, size.height)
             arcTo(
-                rect = Rect(0f, size.height - 2 * r, 2 * r, size.height),
+                rect = Rect(left = 0f, top = size.height - 2 * r, right = 2 * r, bottom = size.height),
                 startAngleDegrees = 90f,
                 sweepAngleDegrees = 90f,
                 forceMoveTo = false
@@ -51,7 +51,7 @@ class RoundedCutBottomRightShape(
             // Left edge going back up to Top-Left corner
             lineTo(0f, r)
             arcTo(
-                rect = Rect(0f, 0f, 2 * r, 2 * r),
+                rect = Rect(left = 0f, top = 0f, right = 2 * r, bottom = 2 * r),
                 startAngleDegrees = 180f,
                 sweepAngleDegrees = 90f,
                 forceMoveTo = false
@@ -65,7 +65,7 @@ class RoundedCutBottomRightShape(
 
 class RoundedTopLeftCutShape(
     private val cornerRadius: Float = 24f, // Matches your title rounding
-    private val cutOffset: Float = 30f     // Sleek cut accent
+    private val cutOffset: Float = 30f // Sleek cut accent
 ) : Shape {
 
     override fun createOutline(
@@ -77,21 +77,26 @@ class RoundedTopLeftCutShape(
             val r = cornerRadius
 
             // Start right after the top-left cut
-            moveTo(cutOffset, 0f)
+            moveTo(x = cutOffset, y = 0f)
 
             // Top edge to Top-Right corner
-            lineTo(size.width - r, 0f)
+            lineTo(x = size.width - r, y = 0f)
             arcTo(
-                rect = Rect(size.width - 2 * r, 0f, size.width, 2 * r),
+                rect = Rect(left = size.width - 2 * r, top = 0f, right = size.width, bottom = 2 * r),
                 startAngleDegrees = 270f,
                 sweepAngleDegrees = 90f,
                 forceMoveTo = false
             )
 
             // Right edge to Bottom-Right corner
-            lineTo(size.width, size.height - r)
+            lineTo(x = size.width, y = size.height - r)
             arcTo(
-                rect = Rect(size.width - 2 * r, size.height - 2 * r, size.width, size.height),
+                rect = Rect(
+                    left = size.width - 2 * r,
+                    top = size.height - 2 * r,
+                    right = size.width,
+                    bottom = size.height
+                ),
                 startAngleDegrees = 0f,
                 sweepAngleDegrees = 90f,
                 forceMoveTo = false
@@ -100,17 +105,17 @@ class RoundedTopLeftCutShape(
             // Bottom edge to Bottom-Left corner
             lineTo(r, size.height)
             arcTo(
-                rect = Rect(0f, size.height - 2 * r, 2 * r, size.height),
+                rect = Rect(left = 0f, top = size.height - 2 * r, right = 2 * r, bottom = size.height),
                 startAngleDegrees = 90f,
                 sweepAngleDegrees = 90f,
                 forceMoveTo = false
             )
 
             // Left edge up to where the top-left cut begins
-            lineTo(0f, size.height * 0.3f)
+            lineTo(x = 0f, y = size.height * 0.3f)
 
             // THE SHARP CUT: Diagonal line straight back to the top edge
-            lineTo(cutOffset, 0f)
+            lineTo(x = cutOffset, y = 0f)
 
             close()
         }

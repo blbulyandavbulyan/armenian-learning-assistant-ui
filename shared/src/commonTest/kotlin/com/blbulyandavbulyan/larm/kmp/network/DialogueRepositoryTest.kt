@@ -54,7 +54,7 @@ class DialogueRepositoryTest {
                       "speakers": [],
                       "dialoguePhrases": []
                     }
-                    """.trimIndent(),
+                """.trimIndent(),
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )

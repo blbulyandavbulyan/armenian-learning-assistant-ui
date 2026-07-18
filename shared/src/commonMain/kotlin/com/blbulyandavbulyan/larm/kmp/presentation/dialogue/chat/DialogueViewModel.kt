@@ -160,7 +160,8 @@ class DialogueViewModel(
                 audioPlayer.play(bytes)
             } catch (e: Exception) {
                 // TODO moreover, almost ALL of the implementations of AudioPlayer -> SWALLOW THE FUCKING EXCETPION, so this won't even WORK AT ALL
-                // TODO this is TOO bad for such error, this probably means that the ENTIRE SCREEN will display the dumb error, even though only AUDIO DOES NOT WORK !!!!
+                // TODO this is TOO bad for such error, this probably means that the ENTIRE SCREEN will display the dumb error,
+                //  even though only AUDIO DOES NOT WORK !!!!
                 _searchState.value = SearchState.Error(e.message ?: getString(Res.string.error_unknown))
             }
         }

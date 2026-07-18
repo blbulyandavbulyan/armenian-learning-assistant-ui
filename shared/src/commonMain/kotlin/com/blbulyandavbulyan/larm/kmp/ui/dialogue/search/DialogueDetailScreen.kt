@@ -137,7 +137,14 @@ private fun PhraseInfo(
         // The Chat Bubble Box
         val phraseAudio = dialoguePhrase.phrase.audioAssetUrl
 
-        ChatBubbleBox(testTag = "listenPhraseButton_${dialoguePhrase.phrase.id}", onClick = { phraseAudio?.let { onPlayAudio(it) } }) {
+        ChatBubbleBox(
+            testTag = "listenPhraseButton_${dialoguePhrase.phrase.id}",
+            onClick = {
+                phraseAudio?.let {
+                    onPlayAudio(it)
+                }
+            }
+        ) {
             Column {
                 MainPhrase(dialoguePhrase = dialoguePhrase, displayListenIcon = phraseAudio != null)
 
@@ -283,7 +290,7 @@ private fun DialogueTitle(
 ) {
     val headerShape = RoundedCutBottomRightShape(
         cornerRadius = 24f, // Smooth rounding
-        cutOffset = 50f     // Sharp accent cut
+        cutOffset = 50f // Sharp accent cut
     )
 
     val audioAssetUrl = dialogue.title.audioAssetUrl
@@ -310,7 +317,11 @@ private fun DialogueTitle(
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (audioAssetUrl != null) {
-                    ListenIcon(modifier = Modifier.size(size = 40.dp).padding(4.dp), tint = MaterialTheme.colorScheme.primary)
+                    ListenIcon(
+                        modifier = Modifier.size(size = 40.dp)
+                            .padding(4.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(modifier = Modifier.width(width = 10.dp))
                 }
                 Text(

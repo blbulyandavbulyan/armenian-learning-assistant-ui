@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.dp
 
 private class ChatBubbleShape(
     private val cornerRadius: Float = 45f, // Rounded corners for the body
-    private val tailWidth: Float = 35f,    // Width of the tail at the bubble base
-    private val tailHeight: Float = 30f,   // How far down the tail points
-    private val tailOffset: Float = 60f    // Distance from the left edge to the tail
+    private val tailWidth: Float = 35f, // Width of the tail at the bubble base
+    private val tailHeight: Float = 30f, // How far down the tail points
+    private val tailOffset: Float = 60f // Distance from the left edge to the tail
 ) : Shape {
 
     override fun createOutline(
@@ -50,7 +50,7 @@ private class ChatBubbleShape(
 
             // 2. Draw the tail on the bottom-left side
             moveTo(tailOffset, size.height - tailHeight) // Start of tail
-            lineTo(tailOffset, size.height)              // Tip of the tail pointing down
+            lineTo(tailOffset, size.height) // Tip of the tail pointing down
             lineTo(tailOffset + tailWidth, size.height - tailHeight) // End of tail back to the body
             close()
         }
@@ -63,7 +63,8 @@ private class ChatBubbleShape(
 fun ChatBubbleBox(
     testTag: String? = null,
     onClick: () -> Unit,
-    content: @Composable BoxScope.() -> Unit) {
+    content: @Composable BoxScope.() -> Unit
+) {
     // You can tweak these values to perfectly match your UI scale
     val bubbleShape = ChatBubbleShape(
         cornerRadius = 32f,
