@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.detail
+package com.blbulyandavbulyan.larm.kmp.ui.dialogue.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
