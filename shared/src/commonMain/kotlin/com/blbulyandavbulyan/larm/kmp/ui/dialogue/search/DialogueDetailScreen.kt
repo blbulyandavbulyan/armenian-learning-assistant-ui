@@ -1,6 +1,8 @@
 package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +27,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +39,6 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialoguePhraseResp
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
-import com.blbulyandavbulyan.larm.kmp.ui.common.ListenButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
@@ -211,51 +213,69 @@ private fun SpeakerInfo(
         return
     }
 
-    val speakerName = speaker.name.phrase
-    Column(
-        modifier = modifier,
-    ) {
-        // Speaker Name & Small Audio Button
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 4.dp)
-        ) {
-            Text(
-                text = speakerName,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.testTag("speakerName_${speaker.id}")
+    val speakerShape = RoundedTopLeftCutShape(cornerRadius = 24f, cutOffset = 35f)
+
+    // Wrap the speaker info inside a stylized container box
+    val audioAssetUrl = speaker.name.audioAssetUrl
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
+                shape = speakerShape
             )
-
-            Spacer(modifier = Modifier.width(width = 4.dp))
-
-            speaker.name.audioAssetUrl?.let { url ->
-                // Mini circular play button next to the name
-                ListenButton(size = 40.dp, testTag = "listenSpeakerButton_${speaker.id}") {
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                shape = speakerShape
+            )
+            .clip(speakerShape)
+            .clickable {
+                audioAssetUrl?.let { url ->
                     onPlayAudio(url)
                 }
             }
-        }
+            .padding(start = 40.dp, top = 12.dp, end = 12.dp, bottom = 12.dp) // Generous inner padding
+    ) {
+        Column {
+            // Speaker Name & Small Audio Button
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 4.dp)
+            ) {
+                if (audioAssetUrl != null) {
+                    ListenIcon(modifier = Modifier.size(size = 40.dp).padding(4.dp))
+                    Spacer(modifier = Modifier.width(width = 10.dp))
+                }
 
-        // Speaker Transcription
-        Text(
-            text = "(${speaker.name.transcription})",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(
-                bottom = 12.dp
-            ).testTag("speakerTranscription_${speaker.id}")
-        )
+                Text(
+                    text = speaker.name.phrase,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.testTag("speakerName_${speaker.id}")
+                )
+            }
 
-        // Speaker Translations
-        speaker.name.translations.forEach { translation ->
+            // Speaker Transcription
             Text(
-                text = translation.translationText,
-                style = MaterialTheme.typography.bodySmall,
+                text = "(${speaker.name.transcription})",
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 2.dp)
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .testTag("speakerTranscription_${speaker.id}")
             )
+
+            // Speaker Translations
+            speaker.name.translations.forEach { translation ->
+                Text(
+                    text = translation.translationText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
         }
     }
 }
@@ -265,39 +285,61 @@ private fun DialogueTitle(
     dialogue: GetDialogueResponse,
     onPlayAudio: (String) -> Unit
 ) {
-    Row {
-        Text(
-            text = dialogue.title.phrase,
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 8.dp).testTag("detailTitleText")
-        )
-
-        Spacer(modifier = Modifier.width(5.dp))
-
-        dialogue.title.audioAssetUrl?.let { url ->
-            ListenButton(
-                size = 40.dp,
-                testTag = "listenTitleButton_${dialogue.id}"
-            ) {
-                onPlayAudio(url)
-            }
-        }
-    }
-
-    Text(
-        text = dialogue.title.transcription,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 8.dp).testTag("detailTranscriptionText")
+    val headerShape = RoundedCutBottomRightShape(
+        cornerRadius = 24f, // Smooth rounding
+        cutOffset = 50f     // Sharp accent cut
     )
 
-    dialogue.title.translations.forEach { translation ->
-        Text(
-            text = translation.translationText,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 4.dp),
-            color = MaterialTheme.colorScheme.onBackground
-        )
+    val audioAssetUrl = dialogue.title.audioAssetUrl
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                shape = headerShape
+            )
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                shape = headerShape
+            )
+            .clip(headerShape)
+            .clickable {
+                audioAssetUrl?.let { url ->
+                    onPlayAudio(url)
+                }
+            }
+            .padding(16.dp)
+    ) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (audioAssetUrl != null) {
+                    ListenIcon(modifier = Modifier.size(size = 40.dp).padding(4.dp), tint = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.width(width = 10.dp))
+                }
+                Text(
+                    text = dialogue.title.phrase,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 8.dp).testTag("detailTitleText")
+                )
+            }
+
+            Text(
+                text = dialogue.title.transcription,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp).testTag("detailTranscriptionText")
+            )
+
+            dialogue.title.translations.forEach { translation ->
+                Text(
+                    text = translation.translationText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        }
     }
 }
