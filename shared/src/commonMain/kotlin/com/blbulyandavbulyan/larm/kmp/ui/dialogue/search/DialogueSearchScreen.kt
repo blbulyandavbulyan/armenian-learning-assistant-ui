@@ -24,7 +24,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,7 +33,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
-import armenianlearningassistant_kmp.shared.generated.resources.back_button_text
 import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
 import armenianlearningassistant_kmp.shared.generated.resources.no_results_found
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
@@ -42,6 +40,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.search_results_t
 import armenianlearningassistant_kmp.shared.generated.resources.view_full_dialogue_button
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.SearchState
+import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
@@ -75,9 +74,7 @@ fun DialogueSearchScreen(viewModel: DialogueViewModel, onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onBack, modifier = Modifier.testTag("backButton")) {
-                    Text(stringResource(Res.string.back_button_text))
-                }
+                GoBackButton (width = 50.dp, height = 50.dp, onClick = onBack)
                 Spacer(modifier = Modifier.width(8.dp))
                 SearchField(
                     query = query,

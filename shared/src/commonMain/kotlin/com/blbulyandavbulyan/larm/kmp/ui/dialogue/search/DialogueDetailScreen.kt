@@ -22,7 +22,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,12 +32,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
-import armenianlearningassistant_kmp.shared.generated.resources.back_button_text
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialoguePhraseResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
+import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
@@ -64,10 +63,7 @@ fun DialogueDetailScreen(
         TopAppBar(
             title = { },
             navigationIcon = {
-                TextButton(onClick = onBack, modifier = Modifier.testTag("backButton")) {
-                    // TODO 'back icon' should be used here
-                    Text(stringResource(Res.string.back_button_text))
-                }
+                GoBackButton(width = 50.dp, height = 50.dp, onClick = onBack)
             }
         )
 
