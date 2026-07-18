@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.kotlinJvm) apply false
     alias(libs.plugins.detekt)
+    alias(libs.plugins.sonarqube)
 }
 
 dependencies {
@@ -30,5 +31,14 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         html.required.set(true)
         sarif.required.set(true)
         md.required.set(true)
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "blbulyandavbulyan_armenian-learning-assistant-ui")
+        property("sonar.organization", "blbulyandavbulyan")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/kover/report.xml")
     }
 }
