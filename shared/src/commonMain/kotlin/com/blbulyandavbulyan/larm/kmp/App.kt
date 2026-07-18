@@ -9,7 +9,7 @@ import com.blbulyandavbulyan.larm.kmp.di.AppModule
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ScreenState
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat.DialogueGeneratorScreen
-import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.DialogueDetailScreen
+import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.detail.DialogueDetailScreen
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.DialogueSearchScreen
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 

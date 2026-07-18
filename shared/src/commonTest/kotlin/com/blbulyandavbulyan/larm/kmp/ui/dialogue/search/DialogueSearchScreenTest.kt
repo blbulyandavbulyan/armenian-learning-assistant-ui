@@ -17,6 +17,7 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesRespon
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
+import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.detail.DialogueDetailScreen
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
