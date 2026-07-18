@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       # Set up Java environment required by Gradle
       - name: Set up JDK 17
@@ -24,7 +26,7 @@ jobs:
 
       # The official Gradle action for caching and executing Gradle builds
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 #v6
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
