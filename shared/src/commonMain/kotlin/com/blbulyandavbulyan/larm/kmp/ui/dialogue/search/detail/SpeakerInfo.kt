@@ -25,7 +25,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseTranslation
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
-import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.RoundedTopLeftCutShape
+import com.blbulyandavbulyan.larm.kmp.ui.common.RoundedTopLeftCutShape
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

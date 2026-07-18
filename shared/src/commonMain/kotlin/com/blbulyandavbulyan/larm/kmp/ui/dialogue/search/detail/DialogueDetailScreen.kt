@@ -31,7 +31,7 @@ import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewMod
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
-import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.RoundedCutBottomRightShape
+import com.blbulyandavbulyan.larm.kmp.ui.common.RoundedCutBottomRightShape
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 
 @Composable

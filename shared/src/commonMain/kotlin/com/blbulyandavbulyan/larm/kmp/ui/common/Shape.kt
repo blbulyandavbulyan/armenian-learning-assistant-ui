@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search
+package com.blbulyandavbulyan.larm.kmp.ui.common
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
