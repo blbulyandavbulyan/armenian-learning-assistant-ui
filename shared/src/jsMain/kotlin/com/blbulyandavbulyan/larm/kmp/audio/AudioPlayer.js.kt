@@ -11,22 +11,27 @@ actual class AudioPlayer actual constructor() {
     @Suppress("TooGenericExceptionCaught")
     actual suspend fun play(audioBytes: ByteArray) {
         var url: String? = null
+        var audio: HTMLAudioElement? = null
         try {
             val blob = Blob(arrayOf(audioBytes), BlobPropertyBag(type = "audio/wav"))
             url = URL.createObjectURL(blob)
-            val audio = document.createElement("audio") as HTMLAudioElement
+            audio = document.createElement("audio") as HTMLAudioElement
             audio.src = url
+            document.body?.append(audio)
             audio.addEventListener("ended") {
                 url.let { URL.revokeObjectURL(it) }
+                audio.remove()
             }
             audio.addEventListener("error") {
                 println("Audio playback error event")
                 url.let { URL.revokeObjectURL(it) }
+                audio.remove()
             }
             audio.play().await()
         } catch (e: Throwable) {
             println("Audio setup failed: ${e.message}")
             url?.let { URL.revokeObjectURL(it) }
+            audio?.remove()
             throw AudioPlayException(e.message ?: "Unknown audio error", e)
         }
     }
