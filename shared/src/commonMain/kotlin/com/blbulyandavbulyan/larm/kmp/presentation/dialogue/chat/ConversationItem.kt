@@ -10,5 +10,4 @@ sealed class ConversationItem {
         val isSaved: Boolean = false
     ) : ConversationItem()
     data object Loading : ConversationItem()
-
 }

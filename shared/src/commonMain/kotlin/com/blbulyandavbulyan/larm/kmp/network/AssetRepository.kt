@@ -1,6 +1,11 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
 fun interface AssetRepository {
+    /**
+     * Fetches asset
+     * @return asset content
+     * @throws AssetFetchException if an error occurs during audio initialization or playback.
+     */
     suspend fun getAssetBytes(url: String): ByteArray
 }
 
@@ -9,10 +14,10 @@ class NetworkAssetRepository(private val apiClient: ApiClient) : AssetRepository
     override suspend fun getAssetBytes(url: String): ByteArray {
         return try {
             apiClient.getAssetBytes(url)
-        } catch (e: Exception) {
-            throw AudioFetchException(e.message ?: "Unknown audio error", e)
+        } catch (e: Throwable) {
+            throw AssetFetchException(e.message ?: "Unknown asset error", Exception(e))
         }
     }
 }
 
-class AudioFetchException(message: String, cause: Exception? = null) : Exception(message, cause)
+class AssetFetchException(message: String, cause: Exception? = null) : Exception(message, cause)

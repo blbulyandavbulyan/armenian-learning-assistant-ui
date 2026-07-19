@@ -4,7 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
-import io.ktor.client.plugins.cache.HttpCache
+import io.ktor.client.plugins.cache.*
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -52,7 +52,7 @@ class AssetRepositoryTest {
         val apiClient = ApiClient(client = mockClient)
         val repository = NetworkAssetRepository(apiClient)
 
-        shouldThrow<AudioFetchException> {
+        shouldThrow<AssetFetchException> {
             repository.getAssetBytes("http://example.com/audio.mp3")
         }
     }

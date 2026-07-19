@@ -17,7 +17,9 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesRespon
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponseMother
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.detail.DialogueDetailScreen
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
@@ -92,10 +94,8 @@ class DialogueSearchScreenTest {
                 GlobalErrorManager()
             )
 
-        val appViewModel = com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel()
-        val chatViewModel = com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel(
-            fakeDialogueRepository, fakeAudioRepository, com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
-        )
+        val appViewModel = AppViewModel()
+        val chatViewModel = DialogueChatViewModel(fakeDialogueRepository, GlobalErrorManager())
 
         // Set the state to Search before setting content to avoid animation/recomposition timing issues
         appViewModel.navigateToSearch()

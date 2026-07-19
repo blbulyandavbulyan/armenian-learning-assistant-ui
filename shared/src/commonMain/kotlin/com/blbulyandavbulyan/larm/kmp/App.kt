@@ -84,6 +84,7 @@ fun App(
                         .navigationBarsPadding(),
                     contentAlignment = Alignment.BottomCenter
                 ) {
+                    println("Error handler got error $error")
                     ErrorBanner(
                         errorTitle = error.title,
                         errorMessage = error.message,

@@ -40,7 +40,7 @@ class DialogueChatViewModel(
                 val newConv = _conversation.value.filter { it !is ConversationItem.Loading }.toMutableList()
                 newConv.add(ConversationItem.AiResponse(response))
                 _conversation.value = newConv
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val newConv = _conversation.value.filter { it !is ConversationItem.Loading }.toMutableList()
                 _conversation.value = newConv
                 println(e)
@@ -72,7 +72,7 @@ class DialogueChatViewModel(
                         it
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val currentConv = _conversation.value.map {
                     if (it is ConversationItem.AiResponse && it.response === dialogue) {
                         it.copy(isSaving = false)

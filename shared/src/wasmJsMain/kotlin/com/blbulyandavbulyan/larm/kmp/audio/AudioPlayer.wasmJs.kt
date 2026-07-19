@@ -4,13 +4,13 @@ package com.blbulyandavbulyan.larm.kmp.audio
 
 import kotlinx.browser.document
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import org.khronos.webgl.Uint8Array
 import org.w3c.dom.HTMLAudioElement
 import org.w3c.dom.url.URL
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @JsFun("(size) => new Uint8Array(size)")
 private external fun createUint8Array(size: Int): Uint8Array

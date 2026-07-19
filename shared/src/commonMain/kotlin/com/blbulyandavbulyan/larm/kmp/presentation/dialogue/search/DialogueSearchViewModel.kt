@@ -10,8 +10,8 @@ import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayer
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.network.AssetFetchException
 import com.blbulyandavbulyan.larm.kmp.network.AssetRepository
-import com.blbulyandavbulyan.larm.kmp.network.AudioFetchException
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +44,7 @@ class DialogueSearchViewModel(
             try {
                 val response = repository.searchDialogues(query)
                 _searchState.value = SearchState.Success(response.dialogues)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 _searchState.value = SearchState.Initial // TODO, WHY??? If user was on the chat screen, he stays there
                 println(e)
                 globalErrorManager.showError(
@@ -67,7 +67,7 @@ class DialogueSearchViewModel(
                     getString(Res.string.audio_playback_error_title),
                     e.message ?: getString(Res.string.error_unknown)
                 )
-            } catch (e: AudioFetchException) {
+            } catch (e: AssetFetchException) {
                 println(e)
                 globalErrorManager.showError(
                     getString(Res.string.audio_playback_error_title),
@@ -83,7 +83,7 @@ class DialogueSearchViewModel(
             try {
                 val fullDialogue = repository.getDialogue(id)
                 onDialogueReady(fullDialogue)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 println(e)
                 globalErrorManager.showError(
                     getString(Res.string.error_prefix),

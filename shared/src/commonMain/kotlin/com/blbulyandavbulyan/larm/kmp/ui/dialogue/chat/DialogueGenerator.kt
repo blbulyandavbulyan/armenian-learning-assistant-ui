@@ -64,7 +64,11 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun DialogueGeneratorScreen(viewModel: com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel, onNavigateToSearch: (String) -> Unit = {}) {
+fun DialogueGeneratorScreen(
+    viewModel: com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel,
+    onNavigateToSearch: (String) -> Unit = {
+    }
+) {
     val conversation by viewModel.conversation.collectAsStateWithLifecycle()
     DialogueGeneratorScreen(
         conversation = conversation,

@@ -175,8 +175,6 @@ class DialogueGeneratorScreenTest {
         onNodeWithTag("loadingIndicator").assertIsDisplayed()
     }
 
-
-
     @Test
     fun aiResponse_displaysFullDialogueDataCorrectly() = runComposeUiTest {
         val mockAiResponse = DialogueChatResponseMother.FULL_DIALOGUE_1

@@ -49,7 +49,11 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun DialogueSearchScreen(viewModel: DialogueSearchViewModel, onBack: () -> Unit, onNavigateToDetail: (com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse) -> Unit) {
+fun DialogueSearchScreen(
+    viewModel: DialogueSearchViewModel,
+    onBack: () -> Unit,
+    onNavigateToDetail: (com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse) -> Unit
+) {
     val searchState by viewModel.searchState.collectAsState()
     val query by viewModel.searchQuery.collectAsState()
 
@@ -91,7 +95,6 @@ fun DialogueSearchScreen(viewModel: DialogueSearchViewModel, onBack: () -> Unit,
                 }
 
                 is SearchState.Loading -> LoadingIndicator()
-
 
                 is SearchState.Success -> {
                     DialogueSearchResults(
