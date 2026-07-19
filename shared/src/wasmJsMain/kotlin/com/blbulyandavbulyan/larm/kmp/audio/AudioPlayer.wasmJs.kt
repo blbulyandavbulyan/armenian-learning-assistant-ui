@@ -3,7 +3,9 @@
 package com.blbulyandavbulyan.larm.kmp.audio
 
 import kotlinx.browser.document
-import kotlinx.coroutines.await
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import org.khronos.webgl.Uint8Array
 import org.w3c.dom.HTMLAudioElement
 import org.w3c.dom.url.URL
@@ -19,10 +21,14 @@ private external fun setUint8Array(array: Uint8Array, index: Int, value: Byte)
 @JsFun("(array) => [array]")
 private external fun wrapInArray(array: Uint8Array): JsArray<JsAny?>
 
+@JsFun("(audio, onSuccess, onError) => { audio.play().then(() => onSuccess(), (e) => onError(e.toString())); }")
+private external fun jsPlayAudio(audio: HTMLAudioElement, onSuccess: () -> Unit, onError: (String) -> Unit)
+
 actual class AudioPlayer actual constructor() {
     @Suppress("TooGenericExceptionCaught")
     actual suspend fun play(audioBytes: ByteArray) {
         var url: String? = null
+        var audio: HTMLAudioElement? = null
         try {
             val uint8Array = createUint8Array(audioBytes.size)
             for (i in audioBytes.indices) {
@@ -34,19 +40,29 @@ actual class AudioPlayer actual constructor() {
             val blob = Blob(jsArray, blobPropertyBag)
 
             url = URL.createObjectURL(blob)
-            val audio = document.createElement("audio") as HTMLAudioElement
+            audio = document.createElement("audio") as HTMLAudioElement
             audio.src = url
+            document.body?.append(audio)
             audio.addEventListener("ended") {
                 url.let { URL.revokeObjectURL(it) }
+                audio.remove()
             }
             audio.addEventListener("error") {
                 println("Audio playback error event")
                 url.let { URL.revokeObjectURL(it) }
+                audio.remove()
             }
-            audio.play().await()
+            suspendCancellableCoroutine<Unit> { cont ->
+                jsPlayAudio(audio, {
+                    cont.resume(Unit)
+                }, {
+                    cont.resumeWithException(AudioPlayException(it))
+                })
+            }
         } catch (e: Throwable) {
             println("Audio setup failed: ${e.message}")
             url?.let { URL.revokeObjectURL(it) }
+            audio?.remove()
             throw AudioPlayException(e.message ?: "Unknown audio error", e)
         }
     }
