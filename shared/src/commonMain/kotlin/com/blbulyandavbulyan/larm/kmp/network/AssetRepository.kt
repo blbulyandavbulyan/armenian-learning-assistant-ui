@@ -5,6 +5,7 @@ fun interface AssetRepository {
 }
 
 class NetworkAssetRepository(private val apiClient: ApiClient) : AssetRepository {
+    @Suppress("TooGenericExceptionCaught")
     override suspend fun getAssetBytes(url: String): ByteArray {
         return try {
             apiClient.getAssetBytes(url)

@@ -35,4 +35,5 @@ object AppModule {
     val apiClient by lazy { ApiClient(httpClient) }
     val dialogueRepository by lazy { NetworkDialogueRepository(apiClient) }
     val audioRepository by lazy { NetworkAssetRepository(apiClient) }
+    val globalErrorManager by lazy { com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager() }
 }

@@ -1,6 +1,7 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 
 import app.cash.turbine.test
+import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueTitleResponse
@@ -8,6 +9,7 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.CompletableDeferred
@@ -27,6 +29,7 @@ class DialogueViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var fakeRepository: FakeDialogueRepository
     private lateinit var fakeAudioRepository: FakeAssetRepository
+    private lateinit var globalErrorManager: GlobalErrorManager
     private lateinit var viewModel: DialogueViewModel
 
     @BeforeTest
@@ -36,7 +39,8 @@ class DialogueViewModelTest {
 
         fakeRepository = FakeDialogueRepository()
         fakeAudioRepository = FakeAssetRepository()
-        viewModel = DialogueViewModel(fakeRepository, fakeAudioRepository)
+        globalErrorManager = GlobalErrorManager()
+        viewModel = DialogueViewModel(fakeRepository, fakeAudioRepository, globalErrorManager)
     }
 
     @AfterTest
@@ -346,16 +350,12 @@ class DialogueViewModelTest {
     @Test
     fun `playAudio transitions to Error on failure`() = runTest {
         fakeAudioRepository.shouldFail = true
-        viewModel.searchState.test {
-            awaitItem() // Skip Initial
+        viewModel.playAudio("http://example.com")
+        testScheduler.advanceUntilIdle()
 
-            viewModel.playAudio("http://example.com")
-
-            awaitItem().shouldBeInstanceOf<SearchState.Error>().message shouldBe "Fake Network Error"
-
-            testScheduler.advanceUntilIdle()
-            expectNoEvents()
-        }
+        val error = globalErrorManager.currentError.value
+        error.shouldNotBeNull()
+        error.message shouldBe "Fake Network Error"
     }
 
     @Test
@@ -364,7 +364,9 @@ class DialogueViewModelTest {
         viewModel.playAudio("url")
         testScheduler.advanceUntilIdle()
 
-        viewModel.audioError.value shouldBe "Fake Audio Error"
+        val error = globalErrorManager.currentError.value
+        error.shouldNotBeNull()
+        error.message shouldBe "Fake Audio Error"
         viewModel.searchState.value shouldBe SearchState.Initial
     }
 

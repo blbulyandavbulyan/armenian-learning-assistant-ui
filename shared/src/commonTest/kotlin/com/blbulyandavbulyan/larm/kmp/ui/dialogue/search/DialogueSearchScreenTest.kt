@@ -50,7 +50,12 @@ class DialogueSearchScreenTest {
     fun typingInSearchBar_updatesViewModelQuery_andPersistsWhenReturning() = runComposeUiTest {
         val fakeDialogueRepository = FakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
-        val viewModel = DialogueViewModel(fakeDialogueRepository, fakeAudioRepository)
+        val viewModel =
+            DialogueViewModel(
+                fakeDialogueRepository,
+                fakeAudioRepository,
+                com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+            )
         var backPressed = false
 
         setContent {
@@ -78,7 +83,12 @@ class DialogueSearchScreenTest {
     fun searchResults_areDisplayedCorrectly_whenQueryIsSubmitted() = runComposeUiTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
-        val viewModel = DialogueViewModel(fakeDialogueRepository, fakeAudioRepository)
+        val viewModel =
+            DialogueViewModel(
+                fakeDialogueRepository,
+                fakeAudioRepository,
+                com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+            )
 
         // Set the state to Search before setting content to avoid animation/recomposition timing issues
         viewModel.navigateToSearch()
@@ -87,12 +97,33 @@ class DialogueSearchScreenTest {
             App(viewModel = viewModel)
         }
 
+        performSearchAndAssertResultsVisible()
+
+        val dialogueId1 = GetDialogueResponseMother.FULL_DIALOGUE_1.id
+        // Click View Full
+        onNodeWithTag("viewFullDialogueButton_$dialogueId1").performClick()
+
+        // Wait for animation to finish and detail screen to appear
+        waitUntil(timeoutMillis = 5000) {
+            onAllNodesWithTag("detailTitleText", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Ensure ViewModel navigation to detail is triggered
+        viewModel.currentScreen.value::class.simpleName shouldBe "Detail"
+
+        assertDetailScreenContentVisible()
+
+        onNodeWithTag("backButton").performClick()
+
+        waitUntil(timeoutMillis = 5000) { onAllNodesWithTag("searchInputField").fetchSemanticsNodes().isNotEmpty() }
+
+        viewModel.searchQuery.value shouldBe "Hello"
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    private fun androidx.compose.ui.test.ComposeUiTest.performSearchAndAssertResultsVisible() {
         onNodeWithTag("searchInputField").performTextInput("Hello")
-
-        // Submit search
         onNodeWithTag("searchSubmitButton").performClick()
-
-        // Wait for search to finish
         waitForIdle()
 
         val dialogueId1 = GetDialogueResponseMother.FULL_DIALOGUE_1.id
@@ -106,35 +137,21 @@ class DialogueSearchScreenTest {
         onNodeWithTag("searchResultCard_$dialogueId1").performScrollTo().assertIsDisplayed()
         onNodeWithTag("searchResultPhrase_$dialogueId1", useUnmergedTree = true).assertIsDisplayed()
             .assertTextEquals(expectedPhrase1)
-        onNodeWithTag(
-            testTag = "searchResultTranscription_$dialogueId1",
-            useUnmergedTree = true
-        ).assertIsDisplayed().assertTextEquals(expectedTranscription1)
+        onNodeWithTag("searchResultTranscription_$dialogueId1", useUnmergedTree = true).assertIsDisplayed()
+            .assertTextEquals(expectedTranscription1)
 
         // Assert the second dialogue is visible
         onNodeWithTag("searchResultCard_$dialogueId2").performScrollTo().assertIsDisplayed()
-        onNodeWithTag(
-            "searchResultPhrase_$dialogueId2",
-            useUnmergedTree = true
-        ).assertIsDisplayed().assertTextEquals(secondDialogue.title.phrase)
-        onNodeWithTag(
-            "searchResultTranscription_$dialogueId2",
-            useUnmergedTree = true
-        ).assertIsDisplayed().assertTextEquals(secondDialogue.title.transcription)
+        onNodeWithTag("searchResultPhrase_$dialogueId2", useUnmergedTree = true).assertIsDisplayed()
+            .assertTextEquals(secondDialogue.title.phrase)
+        onNodeWithTag("searchResultTranscription_$dialogueId2", useUnmergedTree = true).assertIsDisplayed()
+            .assertTextEquals(secondDialogue.title.transcription)
+    }
 
-        // Click View Full
-        onNodeWithTag("viewFullDialogueButton_$dialogueId1").performClick()
-
-        // Wait for animation to finish and detail screen to appear
-        waitUntil(timeoutMillis = 5000) {
-            onAllNodesWithTag(
-                "detailTitleText",
-                useUnmergedTree = true
-            ).fetchSemanticsNodes().isNotEmpty()
-        }
-
-        // Ensure ViewModel navigation to detail is triggered
-        viewModel.currentScreen.value::class.simpleName shouldBe "Detail"
+    @OptIn(ExperimentalTestApi::class)
+    private fun androidx.compose.ui.test.ComposeUiTest.assertDetailScreenContentVisible() {
+        val expectedPhrase1 = GetDialogueResponseMother.FULL_DIALOGUE_1.title.phrase
+        val expectedTranscription1 = GetDialogueResponseMother.FULL_DIALOGUE_1.title.transcription
 
         // Assert the correct dialogue is shown in the detail screen
         onNodeWithTag("detailTitleText", useUnmergedTree = true).assertIsDisplayed().assertTextEquals(expectedPhrase1)
@@ -148,73 +165,60 @@ class DialogueSearchScreenTest {
         val phrase2 = GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases[1].phrase
 
         // Assert the first speaker and phrase are shown using tags
-        onNodeWithTag(
-            "speakerName_${speaker1.id}",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker1.name.phrase)
+        onNodeWithTag("speakerName_${speaker1.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(speaker1.name.phrase)
         onNodeWithTag(
             "speakerTranscription_${speaker1.id}",
             useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals("(${speaker1.name.transcription})")
+        ).performScrollTo().assertIsDisplayed()
+            .assertTextEquals("(${speaker1.name.transcription})")
         onNodeWithTag(
             "speakerTranslation_${speaker1.id}_0",
             useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker1.name.translations[0].translationText)
+        ).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(speaker1.name.translations[0].translationText)
 
         onNodeWithTag("phraseText_${phrase1.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
             .assertTextEquals(phrase1.phrase)
-        onNodeWithTag(
-            "phraseTranscription_${phrase1.id}",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(phrase1.transcription)
+        onNodeWithTag("phraseTranscription_${phrase1.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(phrase1.transcription)
         // Assert phrase 1 translation is shown
-        onNodeWithTag(
-            "phraseTranslation_${phrase1.id}_0",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(phrase1.translations[0].translationText)
+        onNodeWithTag("phraseTranslation_${phrase1.id}_0", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(phrase1.translations[0].translationText)
 
         // Assert the second speaker and phrase are shown using tags
-        onNodeWithTag(
-            "speakerName_${speaker2.id}",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker2.name.phrase)
+        onNodeWithTag("speakerName_${speaker2.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(speaker2.name.phrase)
         onNodeWithTag(
             "speakerTranscription_${speaker2.id}",
             useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals("(${speaker2.name.transcription})")
+        ).performScrollTo().assertIsDisplayed()
+            .assertTextEquals("(${speaker2.name.transcription})")
         onNodeWithTag(
-            testTag = "speakerTranslation_${speaker2.id}_0",
+            "speakerTranslation_${speaker2.id}_0",
             useUnmergedTree = true
-        ).performScrollTo()
-            .assertIsDisplayed()
+        ).performScrollTo().assertIsDisplayed()
             .assertTextEquals(speaker2.name.translations[0].translationText)
 
-        onNodeWithTag("phraseText_${phrase2.id}", useUnmergedTree = true)
-            .performScrollTo()
-            .assertIsDisplayed()
+        onNodeWithTag("phraseText_${phrase2.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
             .assertTextEquals(phrase2.phrase)
-        onNodeWithTag(
-            "phraseTranscription_${phrase2.id}",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(phrase2.transcription)
+        onNodeWithTag("phraseTranscription_${phrase2.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(phrase2.transcription)
         // Assert phrase 2 translation is shown
-        onNodeWithTag(
-            "phraseTranslation_${phrase2.id}_0",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(phrase2.translations[0].translationText)
-
-        onNodeWithTag("backButton").performClick()
-
-        waitUntil(timeoutMillis = 5000) { onAllNodesWithTag("searchInputField").fetchSemanticsNodes().isNotEmpty() }
-
-        viewModel.searchQuery.value shouldBe "Hello"
+        onNodeWithTag("phraseTranslation_${phrase2.id}_0", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(phrase2.translations[0].translationText)
     }
 
     @Test
     fun detailScreen_listenButtonsInvokeCorrectAudioEndpoint() = runComposeUiTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
-        val viewModel = DialogueViewModel(fakeDialogueRepository, fakeAudioRepository)
+        val viewModel =
+            DialogueViewModel(
+                fakeDialogueRepository,
+                fakeAudioRepository,
+                com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+            )
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
@@ -250,7 +254,12 @@ class DialogueSearchScreenTest {
     fun searchScreen_listenButtonInvokesCorrectAudioEndpoint() = runComposeUiTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
-        val viewModel = DialogueViewModel(fakeDialogueRepository, fakeAudioRepository)
+        val viewModel =
+            DialogueViewModel(
+                fakeDialogueRepository,
+                fakeAudioRepository,
+                com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+            )
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {

@@ -3,10 +3,12 @@ package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import armenianlearningassistant_kmp.shared.generated.resources.Res
+import armenianlearningassistant_kmp.shared.generated.resources.audio_playback_error_title
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayer
+import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.DialogueSummaryResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
@@ -48,7 +50,8 @@ sealed class ScreenState {
 @OptIn(ExperimentalUuidApi::class)
 class DialogueViewModel(
     private val repository: DialogueRepository,
-    private val assetRepository: AssetRepository
+    private val assetRepository: AssetRepository,
+    private val globalErrorManager: GlobalErrorManager
 ) : ViewModel() {
     private val _conversation = MutableStateFlow<List<ConversationItem>>(emptyList())
     val conversation: StateFlow<List<ConversationItem>> = _conversation.asStateFlow()
@@ -58,13 +61,6 @@ class DialogueViewModel(
 
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Initial)
     val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
-
-    private val _audioError = MutableStateFlow<String?>(null)
-    val audioError: StateFlow<String?> = _audioError.asStateFlow()
-
-    fun dismissAudioError() {
-        _audioError.value = null
-    }
 
     private val audioPlayer = AudioPlayer()
 
@@ -166,12 +162,15 @@ class DialogueViewModel(
             try {
                 val bytes = assetRepository.getAssetBytes(url)
                 audioPlayer.play(bytes)
-            } catch (e: AudioPlayException) {
-                println(e)
-                _audioError.value = e.message ?: getString(Res.string.error_unknown)
-            } catch (e: AudioFetchException) {
-                println(e)
-                _audioError.value = e.message ?: getString(Res.string.error_unknown)
+            } catch (e: Exception) {
+                if (e is AudioPlayException || e is AudioFetchException) {
+                    println(e)
+                    val title = try { getString(Res.string.audio_playback_error_title) } catch (ex: Throwable) { "Playback Error" }
+                    val unknown = try { getString(Res.string.error_unknown) } catch (ex: Throwable) { "Unknown error" }
+                    globalErrorManager.showError(title, e.message ?: unknown)
+                } else {
+                    throw e
+                }
             }
         }
     }
