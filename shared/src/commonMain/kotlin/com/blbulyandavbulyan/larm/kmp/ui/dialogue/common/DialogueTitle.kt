@@ -27,6 +27,9 @@ import com.blbulyandavbulyan.larm.kmp.ui.common.RoundedCutBottomRightShape
 @Composable
 fun DialogueTitle(
     dialogueTitle: PhraseResponse,
+    testTag: String? = null,
+    phraseTestTag: String = "detailTitleText",
+    transcriptionTestTag: String = "detailTranscriptionText",
     onPlayAudio: (String) -> Unit
 ) {
     val headerShape = RoundedCutBottomRightShape(
@@ -53,15 +56,17 @@ fun DialogueTitle(
                     onPlayAudio(url)
                 }
             }
+            .then(if (testTag != null) Modifier.testTag(testTag) else Modifier)
             .padding(16.dp)
     ) {
         Column {
             DialogueTitlePhrase(
                 shouldShowListenButton = audioAssetUrl != null,
-                phrase = dialogueTitle.phrase
+                phrase = dialogueTitle.phrase,
+                testTag = phraseTestTag
             )
 
-            DialogueTitleTranscription(dialogueTitle.transcription)
+            DialogueTitleTranscription(dialogueTitle.transcription, testTag = transcriptionTestTag)
 
             DialogueTitleTranslations(dialogueTitle.translations)
         }
@@ -69,7 +74,7 @@ fun DialogueTitle(
 }
 
 @Composable
-private fun DialogueTitlePhrase(shouldShowListenButton: Boolean, phrase: String) {
+private fun DialogueTitlePhrase(shouldShowListenButton: Boolean, phrase: String, testTag: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (shouldShowListenButton) {
             ListenIcon(
@@ -84,18 +89,18 @@ private fun DialogueTitlePhrase(shouldShowListenButton: Boolean, phrase: String)
             text = phrase,
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 8.dp).testTag("detailTitleText")
+            modifier = Modifier.padding(bottom = 8.dp).testTag(testTag)
         )
     }
 }
 
 @Composable
-private fun DialogueTitleTranscription(transcription: String) {
+private fun DialogueTitleTranscription(transcription: String, testTag: String) {
     Text(
         text = transcription,
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 8.dp).testTag("detailTranscriptionText")
+        modifier = Modifier.padding(bottom = 8.dp).testTag(testTag)
     )
 }
 

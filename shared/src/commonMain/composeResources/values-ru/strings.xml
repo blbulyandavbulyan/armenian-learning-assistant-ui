@@ -11,4 +11,5 @@
     <string name="action_saved_dialogue">Сохранено!</string>
     <string name="error_failed_to_save">Не удалось сохранить диалог</string>
     <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="audio_playback_error_title">Ошибка аудио</string>
 </resources>

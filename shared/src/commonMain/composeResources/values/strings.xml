@@ -19,4 +19,6 @@
     <string name="no_results_found">No dialogues found.</string>
     <string name="back_button_text">Back</string>
     <string name="listen_phrase_button">Listen</string>
+    <string name="audio_playback_error_title">Audio Error</string>
+    <string name="dismiss_button">Dismiss</string>
 </resources>

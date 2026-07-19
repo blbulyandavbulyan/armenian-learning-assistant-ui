@@ -60,6 +60,7 @@ fun SpeakerInfo(
                     onPlayAudio(url)
                 }
             }
+            .testTag("listenSpeakerButton_${speaker.id}")
             .padding(start = 40.dp, top = 12.dp, end = 12.dp, bottom = 12.dp) // Generous inner padding
     ) {
         Column {
@@ -114,13 +115,13 @@ private fun SpeakerTranslations(
     speakerId: String,
     translations: List<PhraseTranslation>
 ) {
-    translations.forEach { translation ->
+    translations.forEachIndexed { index, translation ->
         Text(
             text = translation.translationText,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 2.dp)
-                .testTag("speakerTranslation_${speakerId}_${translation.id}")
+                .testTag("speakerTranslation_${speakerId}_$index")
         )
     }
 }

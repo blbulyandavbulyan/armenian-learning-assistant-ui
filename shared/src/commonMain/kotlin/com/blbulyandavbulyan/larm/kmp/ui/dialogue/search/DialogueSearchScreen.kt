@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
@@ -22,7 +23,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
@@ -44,6 +48,7 @@ import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.SearchState
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
+import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.AudioErrorBanner
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.DialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.painterResource
@@ -53,6 +58,7 @@ import org.jetbrains.compose.resources.stringResource
 fun DialogueSearchScreen(viewModel: DialogueViewModel, onBack: () -> Unit) {
     val searchState by viewModel.searchState.collectAsState()
     val query by viewModel.searchQuery.collectAsState()
+    val audioError by viewModel.audioError.collectAsState()
 
     val appColors = AppTheme.colors
     val gradientBackground = Brush.verticalGradient(
@@ -102,6 +108,12 @@ fun DialogueSearchScreen(viewModel: DialogueViewModel, onBack: () -> Unit) {
                         onPlayAudio = viewModel::playAudio
                     )
                 }
+            }
+        }
+
+        audioError?.let { errorMsg ->
+            Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding()) {
+                AudioErrorBanner(errorMessage = errorMsg, onDismiss = viewModel::dismissAudioError)
             }
         }
     }
@@ -162,7 +174,13 @@ private fun DialogueSearchResult(
                     .weight(weight = 1f)
                     .padding(all = 16.dp)
             ) {
-                DialogueTitle(dialogueTitle = dialogue.title, onPlayAudio = onPlayAudio)
+                DialogueTitle(
+                    dialogueTitle = dialogue.title,
+                    testTag = "listenButton_${dialogue.id}",
+                    phraseTestTag = "searchResultPhrase_${dialogue.id}",
+                    transcriptionTestTag = "searchResultTranscription_${dialogue.id}",
+                    onPlayAudio = onPlayAudio
+                )
             }
 
             ViewDialogueDetailsButton(dialogue, onGetDialogueDetails)

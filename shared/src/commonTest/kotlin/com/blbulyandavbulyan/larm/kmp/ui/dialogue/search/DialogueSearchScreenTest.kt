@@ -104,32 +104,32 @@ class DialogueSearchScreenTest {
 
         // Assert the first dialogue is visible
         onNodeWithTag("searchResultCard_$dialogueId1").performScrollTo().assertIsDisplayed()
-        onNodeWithTag("searchResultPhrase_$dialogueId1").assertIsDisplayed().assertTextEquals(expectedPhrase1)
+        onNodeWithTag("searchResultPhrase_$dialogueId1", useUnmergedTree = true).assertIsDisplayed().assertTextEquals(expectedPhrase1)
         onNodeWithTag(
-            "searchResultTranscription_$dialogueId1"
+            "searchResultTranscription_$dialogueId1", useUnmergedTree = true
         ).assertIsDisplayed().assertTextEquals(expectedTranscription1)
 
         // Assert the second dialogue is visible
         onNodeWithTag("searchResultCard_$dialogueId2").performScrollTo().assertIsDisplayed()
         onNodeWithTag(
-            "searchResultPhrase_$dialogueId2"
+            "searchResultPhrase_$dialogueId2", useUnmergedTree = true
         ).assertIsDisplayed().assertTextEquals(secondDialogue.title.phrase)
         onNodeWithTag(
-            "searchResultTranscription_$dialogueId2"
+            "searchResultTranscription_$dialogueId2", useUnmergedTree = true
         ).assertIsDisplayed().assertTextEquals(secondDialogue.title.transcription)
 
         // Click View Full
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").performClick()
 
         // Wait for animation to finish and detail screen to appear
-        waitUntil(timeoutMillis = 5000) { onAllNodesWithTag("detailTitleText").fetchSemanticsNodes().isNotEmpty() }
+        waitUntil(timeoutMillis = 5000) { onAllNodesWithTag("detailTitleText", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
 
         // Ensure ViewModel navigation to detail is triggered
         viewModel.currentScreen.value::class.simpleName shouldBe "Detail"
 
         // Assert the correct dialogue is shown in the detail screen
-        onNodeWithTag("detailTitleText").assertIsDisplayed().assertTextEquals(expectedPhrase1)
-        onNodeWithTag("detailTranscriptionText").assertIsDisplayed().assertTextEquals(expectedTranscription1)
+        onNodeWithTag("detailTitleText", useUnmergedTree = true).assertIsDisplayed().assertTextEquals(expectedPhrase1)
+        onNodeWithTag("detailTranscriptionText", useUnmergedTree = true).assertIsDisplayed().assertTextEquals(expectedTranscription1)
 
         val speaker1 = GetDialogueResponseMother.FULL_DIALOGUE_1.speakers[0]
         val phrase1 = GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases[0].phrase
@@ -139,42 +139,42 @@ class DialogueSearchScreenTest {
 
         // Assert the first speaker and phrase are shown using tags
         onNodeWithTag(
-            "speakerName_${speaker1.id}"
+            "speakerName_${speaker1.id}", useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker1.name.phrase)
         onNodeWithTag(
-            "speakerTranscription_${speaker1.id}"
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker1.name.transcription)
+            "speakerTranscription_${speaker1.id}", useUnmergedTree = true
+        ).performScrollTo().assertIsDisplayed().assertTextEquals("(${speaker1.name.transcription})")
         onNodeWithTag(
-            "speakerTranslation_${speaker1.id}_0"
+            "speakerTranslation_${speaker1.id}_0", useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker1.name.translations[0].translationText)
 
-        onNodeWithTag("phraseText_${phrase1.id}").performScrollTo().assertIsDisplayed().assertTextEquals(phrase1.phrase)
+        onNodeWithTag("phraseText_${phrase1.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed().assertTextEquals(phrase1.phrase)
         onNodeWithTag(
-            "phraseTranscription_${phrase1.id}"
+            "phraseTranscription_${phrase1.id}", useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed().assertTextEquals(phrase1.transcription)
         // Assert phrase 1 translation is shown
         onNodeWithTag(
-            "phraseTranslation_${phrase1.id}_0"
+            "phraseTranslation_${phrase1.id}_0", useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed().assertTextEquals(phrase1.translations[0].translationText)
 
         // Assert the second speaker and phrase are shown using tags
         onNodeWithTag(
-            "speakerName_${speaker2.id}"
+            "speakerName_${speaker2.id}", useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker2.name.phrase)
         onNodeWithTag(
-            "speakerTranscription_${speaker2.id}"
-        ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker2.name.transcription)
+            "speakerTranscription_${speaker2.id}", useUnmergedTree = true
+        ).performScrollTo().assertIsDisplayed().assertTextEquals("(${speaker2.name.transcription})")
         onNodeWithTag(
-            "speakerTranslation_${speaker2.id}_0"
+            "speakerTranslation_${speaker2.id}_0", useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed().assertTextEquals(speaker2.name.translations[0].translationText)
 
-        onNodeWithTag("phraseText_${phrase2.id}").performScrollTo().assertIsDisplayed().assertTextEquals(phrase2.phrase)
+        onNodeWithTag("phraseText_${phrase2.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed().assertTextEquals(phrase2.phrase)
         onNodeWithTag(
-            "phraseTranscription_${phrase2.id}"
+            "phraseTranscription_${phrase2.id}", useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed().assertTextEquals(phrase2.transcription)
         // Assert phrase 2 translation is shown
         onNodeWithTag(
-            "phraseTranslation_${phrase2.id}_0"
+            "phraseTranslation_${phrase2.id}_0", useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed().assertTextEquals(phrase2.translations[0].translationText)
 
         onNodeWithTag("backButton").performClick()
@@ -209,13 +209,13 @@ class DialogueSearchScreenTest {
 
         // Test Case 2: Speaker Listen Button
         val speakerId = GetDialogueResponseMother.FULL_DIALOGUE_1.speakers.first().id
-        onNodeWithTag("listenSpeakerButton_$speakerId").performClick()
+        onNodeWithTag("listenSpeakerButton_$speakerId").performScrollTo().performClick()
 
         fakeAudioRepository.requestedUrls.last() shouldBe GetDialogueResponseMother.FULL_DIALOGUE_1.speakers.first().name.assets.first().url
 
         // Test Case 2: Phrase Listen Button
         val phraseId = GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases.first().phrase.id
-        onNodeWithTag("listenPhraseButton_$phraseId").performClick()
+        onNodeWithTag("listenPhraseButton_$phraseId").performScrollTo().performClick()
 
         fakeAudioRepository.requestedUrls.last() shouldBe GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases.first().phrase.assets.first().url
     }

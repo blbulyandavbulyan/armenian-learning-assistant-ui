@@ -359,6 +359,17 @@ class DialogueViewModelTest {
     }
 
     @Test
+    fun `playAudio_whenAudioPlayExceptionThrown_updatesAudioErrorStateAndDoesNotChangeSearchState`() = runTest {
+        fakeAudioRepository.shouldFailWithAudioException = true
+        
+        viewModel.playAudio("url")
+        testScheduler.advanceUntilIdle()
+
+        viewModel.audioError.value shouldBe "Fake Audio Error"
+        viewModel.searchState.value shouldBe SearchState.Initial
+    }
+
+    @Test
     fun `onDialogueSelected transitions to Detail`() = runTest {
         viewModel.currentScreen.test {
             awaitItem() // Skip Initial Generator

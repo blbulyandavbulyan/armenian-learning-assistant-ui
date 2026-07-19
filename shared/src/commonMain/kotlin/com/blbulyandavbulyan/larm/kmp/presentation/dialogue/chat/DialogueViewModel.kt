@@ -57,6 +57,13 @@ class DialogueViewModel(
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Initial)
     val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
 
+    private val _audioError = MutableStateFlow<String?>(null)
+    val audioError: StateFlow<String?> = _audioError.asStateFlow()
+
+    fun dismissAudioError() {
+        _audioError.value = null
+    }
+
     private val audioPlayer = AudioPlayer()
 
     private val chatId = Uuid.random().toString()
@@ -158,10 +165,10 @@ class DialogueViewModel(
             try {
                 val bytes = assetRepository.getAssetBytes(url)
                 audioPlayer.play(bytes)
+            } catch (e: com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException) {
+                println(e)
+                _audioError.value = e.message ?: getString(Res.string.error_unknown)
             } catch (e: Exception) {
-                // TODO moreover, almost ALL of the implementations of AudioPlayer -> SWALLOW THE FUCKING EXCETPION, so this won't even WORK AT ALL
-                // TODO this is TOO bad for such error, this probably means that the ENTIRE SCREEN will display the dumb error,
-                //  even though only AUDIO DOES NOT WORK !!!!
                 _searchState.value = SearchState.Error(e.message ?: getString(Res.string.error_unknown))
             }
         }

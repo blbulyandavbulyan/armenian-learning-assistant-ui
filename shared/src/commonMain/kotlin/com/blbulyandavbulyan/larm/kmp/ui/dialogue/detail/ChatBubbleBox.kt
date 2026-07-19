@@ -90,10 +90,10 @@ fun ChatBubbleBox(
         // Extra bottom padding accounts for the tail height so text stays inside the main bubble
         .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 40.dp)
 
-    testTag?.let(modifier::testTag)
+    val finalModifier = if (testTag != null) modifier.testTag(testTag) else modifier
 
     Box(
-        modifier = modifier
+        modifier = finalModifier
     ) {
         content()
     }
