@@ -1,9 +1,10 @@
 package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,13 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,15 +36,17 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
 import armenianlearningassistant_kmp.shared.generated.resources.no_results_found
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.search_results_title
+import armenianlearningassistant_kmp.shared.generated.resources.view_dialogue_details
 import armenianlearningassistant_kmp.shared.generated.resources.view_full_dialogue_button
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.DialogueSummaryResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.SearchState
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
-import com.blbulyandavbulyan.larm.kmp.ui.common.ListenButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
+import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.DialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -153,84 +154,42 @@ private fun DialogueSearchResult(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .testTag("searchResultCard_${dialogue.id}"),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row {
-                Text(
-                    text = dialogue.title.phrase,
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.testTag("searchResultPhrase_${dialogue.id}")
-                )
-
-                Spacer(modifier = Modifier.width(5.dp))
-
-                dialogue.title.audioAssetUrl?.let { url ->
-                    ListenButton(
-                        size = 40.dp,
-                        testTag = "listenButton_${dialogue.id}"
-                    ) {
-                        onPlayAudio(url)
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = dialogue.title.transcription,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.testTag("searchResultTranscription_${dialogue.id}")
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Translations
-            dialogue.title.translations.forEach { translation ->
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = 2.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = RoundedCornerShape(
-                                8.dp
-                            )
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = translation.translationText,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Action Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+            Column(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .padding(all = 16.dp)
             ) {
-                // Distinct View Full Button
-                Button(
-                    onClick = {
-                        onGetDialogueDetails(dialogue.id)
-                    },
-                    modifier = Modifier.testTag(
-                        "viewFullDialogueButton_${dialogue.id}"
-                    ),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    )
-                ) {
-                    Text(stringResource(Res.string.view_full_dialogue_button))
-                }
+                DialogueTitle(dialogueTitle = dialogue.title, onPlayAudio = onPlayAudio)
             }
+
+            ViewDialogueDetailsButton(dialogue, onGetDialogueDetails)
         }
+    }
+}
+
+@Composable
+private fun ViewDialogueDetailsButton(
+    dialogue: DialogueSummaryResponse,
+    onGetDialogueDetails: (String) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .width(width = 36.dp)
+            .fillMaxHeight()
+            .background(MaterialTheme.colorScheme.secondary)
+            .clickable { onGetDialogueDetails(dialogue.id) }
+            .testTag("viewFullDialogueButton_${dialogue.id}"),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.view_dialogue_details),
+            contentDescription = stringResource(Res.string.view_full_dialogue_button),
+            modifier = Modifier.fillMaxHeight().width(width = 30.dp),
+            tint = MaterialTheme.colorScheme.onSecondary
+        )
     }
 }
 

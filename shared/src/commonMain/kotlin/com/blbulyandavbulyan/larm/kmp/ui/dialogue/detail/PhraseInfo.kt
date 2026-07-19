@@ -38,21 +38,21 @@ fun DialoguePhrases(
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(space = 12.dp)
+                verticalArrangement = Arrangement.spacedBy(space = 12.dp)
             ) {
                 SpeakerInfo(
                     speaker = speaker,
-                    modifier = Modifier.weight(weight = 0.35f),
+                    modifier = Modifier,
                     onPlayAudio = onPlayAudio
                 )
 
                 PhraseInfo(
                     dialoguePhrase = dialoguePhrase,
-                    modifier = Modifier.weight(weight = 0.65f),
+                    modifier = Modifier,
                     onPlayAudio = onPlayAudio
                 )
             }
