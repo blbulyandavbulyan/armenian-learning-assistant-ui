@@ -90,7 +90,7 @@ jobs:
 
       # CodeQL requires the project to be built while it traces the compilation
       - name: Build project
-        run: ./gradlew assemble
+        run: ./gradlew clean assemble --dependency-verification=off --no-build-cache
 
       # Performs the actual analysis and uploads the results
       - name: Perform CodeQL Analysis
