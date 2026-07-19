@@ -82,7 +82,6 @@ private fun SpeakerName(id: String, name: String, showListenIcon: Boolean) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(bottom = 4.dp)
     ) {
-
         if (showListenIcon) {
             ListenIcon(modifier = Modifier.size(size = 40.dp).padding(4.dp))
             Spacer(modifier = Modifier.width(width = 10.dp))
@@ -112,7 +111,8 @@ private fun SpeakerTranscription(speakerId: String, transcription: String) {
 
 @Composable
 private fun SpeakerTranslations(
-    speakerId: String, translations: List<PhraseTranslation>
+    speakerId: String,
+    translations: List<PhraseTranslation>
 ) {
     translations.forEach { translation ->
         Text(

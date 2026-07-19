@@ -38,6 +38,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.no_results_found
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.search_results_title
 import armenianlearningassistant_kmp.shared.generated.resources.view_full_dialogue_button
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.DialogueSummaryResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.SearchState
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
@@ -70,20 +71,16 @@ fun DialogueSearchScreen(viewModel: DialogueViewModel, onBack: () -> Unit) {
                 .padding(16.dp)
         ) {
             // Search Bar with Back Button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                GoBackButton(width = 50.dp, height = 50.dp, onClick = onBack)
-                Spacer(modifier = Modifier.width(8.dp))
-                SearchField(
-                    query = query,
-                    textFieldModifier = Modifier.weight(1f).height(height = 60.dp).testTag("searchInputField"),
-                    onSearch = { viewModel.searchDialogues(query) },
-                    onValueChange = { viewModel.updateSearchQuery(it) },
-                    placeholder = { Text(stringResource(Res.string.search_dialogues_placeholder)) }
-                )
-            }
+            SearchBarAndBackButton(
+                query = query,
+                onBack = onBack,
+                onValueChange = {
+                    viewModel.updateSearchQuery(it)
+                },
+                onSearch = {
+                    viewModel.searchDialogues(query)
+                }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -93,129 +90,194 @@ fun DialogueSearchScreen(viewModel: DialogueViewModel, onBack: () -> Unit) {
                     // empty state
                 }
 
-                is SearchState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
+                is SearchState.Loading -> LoadingIndicator()
 
-                is SearchState.Error -> {
-                    Text(
-                        text = "${stringResource(Res.string.error_prefix)} ${state.message}",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                is SearchState.Error -> GlobalError(state)
 
                 is SearchState.Success -> {
-                    if (state.results.isEmpty()) {
-                        Text(
-                            text = stringResource(Res.string.no_results_found),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    } else {
-                        val scrollState = rememberScrollState()
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .verticalScroll(scrollState)
-                                    .padding(end = 12.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(Res.string.search_results_title),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                state.results.forEach { dialogue ->
-                                    Card(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 8.dp)
-                                            .testTag("searchResultCard_${dialogue.id}"),
-                                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                                    ) {
-                                        Column(modifier = Modifier.padding(16.dp)) {
-                                            Row {
-                                                Text(
-                                                    text = dialogue.title.phrase,
-                                                    style = MaterialTheme.typography.headlineSmall,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    modifier = Modifier.testTag("searchResultPhrase_${dialogue.id}")
-                                                )
-
-                                                Spacer(modifier = Modifier.width(5.dp))
-
-                                                dialogue.title.audioAssetUrl?.let { url ->
-                                                    ListenButton(
-                                                        size = 40.dp,
-                                                        testTag = "listenButton_${dialogue.id}"
-                                                    ) { viewModel.playAudio(url) }
-                                                }
-                                            }
-
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Text(
-                                                text = dialogue.title.transcription,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                modifier = Modifier.testTag("searchResultTranscription_${dialogue.id}")
-                                            )
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            // Translations
-                                            dialogue.title.translations.forEach { translation ->
-                                                Box(
-                                                    modifier = Modifier
-                                                        .padding(vertical = 2.dp)
-                                                        .background(
-                                                            color = MaterialTheme.colorScheme.surfaceVariant,
-                                                            shape = RoundedCornerShape(
-                                                                8.dp
-                                                            )
-                                                        )
-                                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                                ) {
-                                                    Text(
-                                                        text = translation.translationText,
-                                                        style = MaterialTheme.typography.bodyMedium,
-                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                    )
-                                                }
-                                            }
-
-                                            Spacer(modifier = Modifier.height(16.dp))
-
-                                            // Action Buttons
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.SpaceBetween,
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                // Distinct View Full Button
-                                                Button(
-                                                    onClick = { viewModel.onDialogueSelected(dialogue.id) },
-                                                    modifier = Modifier.testTag(
-                                                        "viewFullDialogueButton_${dialogue.id}"
-                                                    ),
-                                                    colors = ButtonDefaults.buttonColors(
-                                                        containerColor = MaterialTheme.colorScheme.secondary,
-                                                        contentColor = MaterialTheme.colorScheme.onSecondary
-                                                    )
-                                                ) {
-                                                    Text(stringResource(Res.string.view_full_dialogue_button))
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            PrimaryVerticalScrollbar(adapter = rememberScrollbarAdapter(scrollState))
-                        }
-                    }
+                    DialogueSearchResults(
+                        state = state,
+                        onGetDialogueDetails = viewModel::onDialogueSelected,
+                        onPlayAudio = viewModel::playAudio
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DialogueSearchResults(
+    state: SearchState.Success,
+    onGetDialogueDetails: (dialogueId: String) -> Unit,
+    onPlayAudio: (String) -> Unit
+) {
+    if (state.results.isEmpty()) {
+        Text(
+            text = stringResource(Res.string.no_results_found),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        return
+    }
+
+    val scrollState = rememberScrollState()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(end = 12.dp)
+        ) {
+            SearchResultsTitle()
+            Spacer(modifier = Modifier.height(8.dp))
+            state.results.forEach { dialogue ->
+                DialogueSearchResult(
+                    dialogue = dialogue,
+                    onGetDialogueDetails = onGetDialogueDetails,
+                    onPlayAudio = onPlayAudio
+                )
+            }
+        }
+        PrimaryVerticalScrollbar(adapter = rememberScrollbarAdapter(scrollState))
+    }
+}
+
+@Composable
+private fun DialogueSearchResult(
+    dialogue: DialogueSummaryResponse,
+    onGetDialogueDetails: (dialogueId: String) -> Unit,
+    onPlayAudio: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .testTag("searchResultCard_${dialogue.id}"),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row {
+                Text(
+                    text = dialogue.title.phrase,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.testTag("searchResultPhrase_${dialogue.id}")
+                )
+
+                Spacer(modifier = Modifier.width(5.dp))
+
+                dialogue.title.audioAssetUrl?.let { url ->
+                    ListenButton(
+                        size = 40.dp,
+                        testTag = "listenButton_${dialogue.id}"
+                    ) {
+                        onPlayAudio(url)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = dialogue.title.transcription,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.testTag("searchResultTranscription_${dialogue.id}")
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Translations
+            dialogue.title.translations.forEach { translation ->
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 2.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(
+                                8.dp
+                            )
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = translation.translationText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Action Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Distinct View Full Button
+                Button(
+                    onClick = {
+                        onGetDialogueDetails(dialogue.id)
+                    },
+                    modifier = Modifier.testTag(
+                        "viewFullDialogueButton_${dialogue.id}"
+                    ),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    )
+                ) {
+                    Text(stringResource(Res.string.view_full_dialogue_button))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchResultsTitle() {
+    Text(
+        text = stringResource(Res.string.search_results_title),
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.onBackground
+    )
+}
+
+@Composable
+private fun GlobalError(state: SearchState.Error) {
+    Text(
+        text = "${stringResource(Res.string.error_prefix)} ${state.message}",
+        color = MaterialTheme.colorScheme.error,
+        style = MaterialTheme.typography.bodyLarge
+    )
+}
+
+@Composable
+private fun LoadingIndicator() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun SearchBarAndBackButton(
+    query: String,
+    onBack: () -> Unit,
+    onValueChange: (String) -> Unit,
+    onSearch: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        GoBackButton(width = 50.dp, height = 50.dp, onClick = onBack)
+        Spacer(modifier = Modifier.width(8.dp))
+        SearchField(
+            query = query,
+            textFieldModifier = Modifier.weight(1f).height(height = 60.dp).testTag("searchInputField"),
+            onSearch = onSearch,
+            onValueChange = onValueChange,
+            placeholder = { Text(stringResource(Res.string.search_dialogues_placeholder)) }
+        )
     }
 }
