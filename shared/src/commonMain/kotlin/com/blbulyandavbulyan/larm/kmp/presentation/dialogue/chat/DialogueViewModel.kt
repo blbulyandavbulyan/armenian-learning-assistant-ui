@@ -162,15 +162,18 @@ class DialogueViewModel(
             try {
                 val bytes = assetRepository.getAssetBytes(url)
                 audioPlayer.play(bytes)
-            } catch (e: Exception) {
-                if (e is AudioPlayException || e is AudioFetchException) {
-                    println(e)
-                    val title = try { getString(Res.string.audio_playback_error_title) } catch (ex: Throwable) { "Playback Error" }
-                    val unknown = try { getString(Res.string.error_unknown) } catch (ex: Throwable) { "Unknown error" }
-                    globalErrorManager.showError(title, e.message ?: unknown)
-                } else {
-                    throw e
-                }
+            } catch (e: AudioPlayException) {
+                println(e)
+                globalErrorManager.showError(
+                    getString(Res.string.audio_playback_error_title),
+                    e.message ?: getString(Res.string.error_unknown)
+                )
+            } catch (e: AudioFetchException) {
+                println(e)
+                globalErrorManager.showError(
+                    getString(Res.string.audio_playback_error_title),
+                    e.message ?: getString(Res.string.error_unknown)
+                )
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.blbulyandavbulyan.larm.kmp.di
 
 import com.blbulyandavbulyan.larm.kmp.BuildKonfig
+import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.network.ApiClient
 import com.blbulyandavbulyan.larm.kmp.network.NetworkAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.NetworkDialogueRepository
@@ -35,5 +36,5 @@ object AppModule {
     val apiClient by lazy { ApiClient(httpClient) }
     val dialogueRepository by lazy { NetworkDialogueRepository(apiClient) }
     val audioRepository by lazy { NetworkAssetRepository(apiClient) }
-    val globalErrorManager by lazy { com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager() }
+    val globalErrorManager by lazy { GlobalErrorManager() }
 }
