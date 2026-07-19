@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
+import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayer
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.DialogueSummaryResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.network.AssetRepository
+import com.blbulyandavbulyan.larm.kmp.network.AudioFetchException
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -159,17 +161,17 @@ class DialogueViewModel(
         }
     }
 
-    @Suppress("TooGenericExceptionCaught")
     fun playAudio(url: String) {
         viewModelScope.launch {
             try {
                 val bytes = assetRepository.getAssetBytes(url)
                 audioPlayer.play(bytes)
-            } catch (e: com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException) {
+            } catch (e: AudioPlayException) {
                 println(e)
                 _audioError.value = e.message ?: getString(Res.string.error_unknown)
-            } catch (e: Exception) {
-                _searchState.value = SearchState.Error(e.message ?: getString(Res.string.error_unknown))
+            } catch (e: AudioFetchException) {
+                println(e)
+                _audioError.value = e.message ?: getString(Res.string.error_unknown)
             }
         }
     }

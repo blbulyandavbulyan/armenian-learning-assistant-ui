@@ -359,9 +359,8 @@ class DialogueViewModelTest {
     }
 
     @Test
-    fun `playAudio_whenAudioPlayExceptionThrown_updatesAudioErrorStateAndDoesNotChangeSearchState`() = runTest {
+    fun playAudio_whenAudioPlayExceptionThrown_updatesAudioErrorStateAndDoesNotChangeSearchState() = runTest {
         fakeAudioRepository.shouldFailWithAudioException = true
-        
         viewModel.playAudio("url")
         testScheduler.advanceUntilIdle()
 

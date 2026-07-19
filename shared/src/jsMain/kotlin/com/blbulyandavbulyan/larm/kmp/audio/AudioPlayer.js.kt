@@ -8,6 +8,7 @@ import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 
 actual class AudioPlayer actual constructor() {
+    @Suppress("TooGenericExceptionCaught")
     actual suspend fun play(audioBytes: ByteArray) {
         var url: String? = null
         try {

@@ -3,13 +3,12 @@
 package com.blbulyandavbulyan.larm.kmp.audio
 
 import kotlinx.browser.document
+import kotlinx.coroutines.await
 import org.khronos.webgl.Uint8Array
 import org.w3c.dom.HTMLAudioElement
 import org.w3c.dom.url.URL
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
-
-import kotlinx.coroutines.await
 
 @JsFun("(size) => new Uint8Array(size)")
 private external fun createUint8Array(size: Int): Uint8Array
@@ -21,6 +20,7 @@ private external fun setUint8Array(array: Uint8Array, index: Int, value: Byte)
 private external fun wrapInArray(array: Uint8Array): JsArray<JsAny?>
 
 actual class AudioPlayer actual constructor() {
+    @Suppress("TooGenericExceptionCaught")
     actual suspend fun play(audioBytes: ByteArray) {
         var url: String? = null
         try {

@@ -1,4 +1,4 @@
-package com.blbulyandavbulyan.larm.kmp.ui.dialogue.common
+package com.blbulyandavbulyan.larm.kmp.ui.common
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -11,19 +11,19 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
-import armenianlearningassistant_kmp.shared.generated.resources.audio_playback_error_title
 import armenianlearningassistant_kmp.shared.generated.resources.dismiss_button
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun AudioErrorBanner(
+fun ErrorBanner(
+    errorTitle: String,
     errorMessage: String,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit
 ) {
     Snackbar(
         action = {
-            TextButton(onClick = onDismiss, modifier = Modifier.testTag("DismissAudioErrorButton")) {
+            TextButton(onClick = onDismiss, modifier = Modifier.testTag("dismissErrorBannerButton")) {
                 Text(text = stringResource(Res.string.dismiss_button))
             }
         },
@@ -31,7 +31,7 @@ fun AudioErrorBanner(
     ) {
         Column {
             Text(
-                text = stringResource(Res.string.audio_playback_error_title),
+                text = errorTitle,
                 fontWeight = FontWeight.Bold
             )
             Text(text = errorMessage)
