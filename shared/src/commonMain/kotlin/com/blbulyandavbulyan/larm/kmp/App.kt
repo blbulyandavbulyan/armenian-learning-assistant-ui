@@ -11,8 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.blbulyandavbulyan.larm.kmp.di.AppModule
-import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
-import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ScreenState
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.global.ScreenState
 import com.blbulyandavbulyan.larm.kmp.ui.common.ErrorBanner
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat.DialogueGeneratorScreen
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.detail.DialogueDetailScreen
@@ -21,16 +23,25 @@ import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 
 @Composable
 fun App(
-    viewModel: DialogueViewModel = remember {
-        DialogueViewModel(
+    appViewModel: AppViewModel = remember {
+        AppViewModel()
+    },
+    searchViewModel: DialogueSearchViewModel = remember {
+        DialogueSearchViewModel(
             AppModule.dialogueRepository,
             AppModule.audioRepository,
+            AppModule.globalErrorManager
+        )
+    },
+    chatViewModel: DialogueChatViewModel = remember {
+        DialogueChatViewModel(
+            AppModule.dialogueRepository,
             AppModule.globalErrorManager
         )
     }
 ) {
     ArmenianLearningTheme {
-        val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
+        val currentScreen by appViewModel.currentScreen.collectAsStateWithLifecycle()
 
         val appError by AppModule.globalErrorManager.currentError.collectAsStateWithLifecycle()
 
@@ -39,26 +50,28 @@ fun App(
                 when (state) {
                     is ScreenState.Generator -> {
                         DialogueGeneratorScreen(
-                            viewModel = viewModel,
+                            viewModel = chatViewModel,
                             onNavigateToSearch = { query ->
                                 if (query.isNotBlank()) {
-                                    viewModel.searchDialogues(query)
+                                    searchViewModel.updateSearchQuery(query)
+                                    searchViewModel.searchDialogues(query)
                                 }
-                                viewModel.navigateToSearch()
+                                appViewModel.navigateToSearch()
                             }
                         )
                     }
                     is ScreenState.Search -> {
                         DialogueSearchScreen(
-                            viewModel = viewModel,
-                            onBack = { viewModel.navigateToGenerator() }
+                            viewModel = searchViewModel,
+                            onBack = { appViewModel.navigateToGenerator() },
+                            onNavigateToDetail = { appViewModel.navigateToDetail(it) }
                         )
                     }
                     is ScreenState.Detail -> {
                         DialogueDetailScreen(
                             dialogue = state.dialogue,
-                            onBack = { viewModel.navigateToSearch() },
-                            viewModel = viewModel
+                            onBack = { appViewModel.navigateToSearch() },
+                            onPlayAudio = searchViewModel::playAudio
                         )
                     }
                 }

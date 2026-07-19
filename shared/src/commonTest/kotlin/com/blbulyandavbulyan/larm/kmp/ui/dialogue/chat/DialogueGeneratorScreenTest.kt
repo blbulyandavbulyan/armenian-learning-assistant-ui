@@ -175,20 +175,7 @@ class DialogueGeneratorScreenTest {
         onNodeWithTag("loadingIndicator").assertIsDisplayed()
     }
 
-    @Test
-    fun errorState_isDisplayedCorrectly() = runComposeUiTest {
-        setContent {
-            ArmenianLearningTheme(darkTheme = true) {
-                DialogueGeneratorScreen(
-                    conversation = listOf(ConversationItem.Error("Network failure")),
-                    onGenerateDialogue = { }
-                )
-            }
-        }
 
-        onNodeWithTag("errorMessage").assertIsDisplayed()
-        onNode(hasText("Network failure", substring = true)).assertIsDisplayed()
-    }
 
     @Test
     fun aiResponse_displaysFullDialogueDataCorrectly() = runComposeUiTest {

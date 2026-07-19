@@ -51,14 +51,12 @@ import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_send
 import armenianlearningassistant_kmp.shared.generated.resources.app_name
 import armenianlearningassistant_kmp.shared.generated.resources.empty_conversation_message
-import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
 import armenianlearningassistant_kmp.shared.generated.resources.header_subtitle
 import armenianlearningassistant_kmp.shared.generated.resources.input_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.noto_sans_armenian
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
-import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
@@ -66,7 +64,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun DialogueGeneratorScreen(viewModel: DialogueViewModel, onNavigateToSearch: (String) -> Unit = {}) {
+fun DialogueGeneratorScreen(viewModel: com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel, onNavigateToSearch: (String) -> Unit = {}) {
     val conversation by viewModel.conversation.collectAsStateWithLifecycle()
     DialogueGeneratorScreen(
         conversation = conversation,
@@ -239,14 +237,6 @@ private fun ConversationScreen(
                             ) {
                                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                             }
-                        }
-
-                        is ConversationItem.Error -> {
-                            Text(
-                                text = "${stringResource(Res.string.error_prefix)} ${item.message}",
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("errorMessage")
-                            )
                         }
 
                         is ConversationItem.AiResponse -> {

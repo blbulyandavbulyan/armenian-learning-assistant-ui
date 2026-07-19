@@ -10,13 +10,14 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.App
+import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponseMother
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
-import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.detail.DialogueDetailScreen
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
@@ -51,10 +52,10 @@ class DialogueSearchScreenTest {
         val fakeDialogueRepository = FakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
         val viewModel =
-            DialogueViewModel(
+            DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAudioRepository,
-                com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+                GlobalErrorManager()
             )
         var backPressed = false
 
@@ -62,7 +63,8 @@ class DialogueSearchScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueSearchScreen(
                     viewModel = viewModel,
-                    onBack = { backPressed = true }
+                    onBack = { backPressed = true },
+                    onNavigateToDetail = {}
                 )
             }
         }
@@ -84,17 +86,22 @@ class DialogueSearchScreenTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
         val viewModel =
-            DialogueViewModel(
+            DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAudioRepository,
-                com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+                GlobalErrorManager()
             )
 
+        val appViewModel = com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel()
+        val chatViewModel = com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel(
+            fakeDialogueRepository, fakeAudioRepository, com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+        )
+
         // Set the state to Search before setting content to avoid animation/recomposition timing issues
-        viewModel.navigateToSearch()
+        appViewModel.navigateToSearch()
 
         setContent {
-            App(viewModel = viewModel)
+            App(appViewModel = appViewModel, searchViewModel = viewModel, chatViewModel = chatViewModel)
         }
 
         performSearchAndAssertResultsVisible()
@@ -109,7 +116,7 @@ class DialogueSearchScreenTest {
         }
 
         // Ensure ViewModel navigation to detail is triggered
-        viewModel.currentScreen.value::class.simpleName shouldBe "Detail"
+        appViewModel.currentScreen.value::class.simpleName shouldBe "Detail"
 
         assertDetailScreenContentVisible()
 
@@ -214,10 +221,10 @@ class DialogueSearchScreenTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
         val viewModel =
-            DialogueViewModel(
+            DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAudioRepository,
-                com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+                GlobalErrorManager()
             )
 
         setContent {
@@ -225,7 +232,7 @@ class DialogueSearchScreenTest {
                 DialogueDetailScreen(
                     dialogue = GetDialogueResponseMother.FULL_DIALOGUE_1,
                     onBack = { },
-                    viewModel = viewModel
+                    onPlayAudio = viewModel::playAudio
                 )
             }
         }
@@ -255,15 +262,15 @@ class DialogueSearchScreenTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
         val viewModel =
-            DialogueViewModel(
+            DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAudioRepository,
-                com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager()
+                GlobalErrorManager()
             )
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
-                DialogueSearchScreen(viewModel = viewModel, onBack = { })
+                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onNavigateToDetail = {})
             }
         }
 

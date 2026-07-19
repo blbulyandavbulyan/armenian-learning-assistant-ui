@@ -32,15 +32,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
-import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
 import armenianlearningassistant_kmp.shared.generated.resources.no_results_found
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.search_results_title
 import armenianlearningassistant_kmp.shared.generated.resources.view_dialogue_details
 import armenianlearningassistant_kmp.shared.generated.resources.view_full_dialogue_button
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.DialogueSummaryResponse
-import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
-import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.SearchState
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.SearchState
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
@@ -50,7 +49,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun DialogueSearchScreen(viewModel: DialogueViewModel, onBack: () -> Unit) {
+fun DialogueSearchScreen(viewModel: DialogueSearchViewModel, onBack: () -> Unit, onNavigateToDetail: (com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse) -> Unit) {
     val searchState by viewModel.searchState.collectAsState()
     val query by viewModel.searchQuery.collectAsState()
 
@@ -93,12 +92,11 @@ fun DialogueSearchScreen(viewModel: DialogueViewModel, onBack: () -> Unit) {
 
                 is SearchState.Loading -> LoadingIndicator()
 
-                is SearchState.Error -> GlobalError(state)
 
                 is SearchState.Success -> {
                     DialogueSearchResults(
                         state = state,
-                        onGetDialogueDetails = viewModel::onDialogueSelected,
+                        onGetDialogueDetails = { id -> viewModel.displayDialogue(id, onNavigateToDetail) },
                         onPlayAudio = viewModel::playAudio
                     )
                 }
@@ -132,11 +130,13 @@ private fun DialogueSearchResults(
             SearchResultsTitle()
             Spacer(modifier = Modifier.height(8.dp))
             state.results.forEach { dialogue ->
-                DialogueSearchResult(
-                    dialogue = dialogue,
-                    onGetDialogueDetails = onGetDialogueDetails,
-                    onPlayAudio = onPlayAudio
-                )
+                androidx.compose.runtime.key(dialogue.id) {
+                    DialogueSearchResult(
+                        dialogue = dialogue,
+                        onGetDialogueDetails = onGetDialogueDetails,
+                        onPlayAudio = onPlayAudio
+                    )
+                }
             }
         }
         PrimaryVerticalScrollbar(adapter = rememberScrollbarAdapter(scrollState))
@@ -205,15 +205,6 @@ private fun SearchResultsTitle() {
         text = stringResource(Res.string.search_results_title),
         style = MaterialTheme.typography.titleLarge,
         color = MaterialTheme.colorScheme.onBackground
-    )
-}
-
-@Composable
-private fun GlobalError(state: SearchState.Error) {
-    Text(
-        text = "${stringResource(Res.string.error_prefix)} ${state.message}",
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.bodyLarge
     )
 }
 

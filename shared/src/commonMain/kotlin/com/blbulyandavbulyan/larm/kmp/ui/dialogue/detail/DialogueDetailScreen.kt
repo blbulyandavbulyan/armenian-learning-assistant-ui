@@ -12,12 +12,10 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
-import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.DialogueTitle
@@ -27,7 +25,7 @@ import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 fun DialogueDetailScreen(
     dialogue: GetDialogueResponse,
     onBack: () -> Unit,
-    viewModel: DialogueViewModel
+    onPlayAudio: (String) -> Unit
 ) {
     val appColors = AppTheme.colors
     val gradientBackground = Brush.verticalGradient(
@@ -57,14 +55,13 @@ fun DialogueDetailScreen(
                 ) {
                     DialogueTitle(
                         dialogueTitle = dialogue.title,
-                        testTag = "listenTitleButton_${dialogue.id}"
-                    ) { audioUrl ->
-                        viewModel.playAudio(audioUrl)
-                    }
+                        testTag = "listenTitleButton_${dialogue.id}",
+                        onPlayAudio = onPlayAudio
+                    )
 
                     Spacer(modifier = Modifier.height(height = 16.dp))
 
-                    DialoguePhrases(dialogue = dialogue, onPlayAudio = viewModel::playAudio)
+                    DialoguePhrases(dialogue = dialogue, onPlayAudio = onPlayAudio)
                 }
                 PrimaryVerticalScrollbar(adapter = rememberScrollbarAdapter(scrollState))
             }
