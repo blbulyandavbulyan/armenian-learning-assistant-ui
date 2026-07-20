@@ -37,7 +37,7 @@ class DialogueSearchViewModel(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    fun searchDialogues(query: String, onSuccess: () -> Unit = {}) {
+    fun searchDialogues(query: String, onSuccess: () -> Unit = {}, onError: () -> Unit = {}) {
         _searchQuery.value = query // TODO, where the heck are the tests for these? You can add the check for it in the existing tests (if they exist)
         if (query.isBlank()) return
         _searchState.value = SearchState.Loading
@@ -53,6 +53,7 @@ class DialogueSearchViewModel(
                     UiText.from(Res.string.error_failed_to_search_dialogues), // Or a specific search error title
                     UiText.from(e.message, Res.string.error_unknown)
                 )
+                onError()
             }
         }
     }

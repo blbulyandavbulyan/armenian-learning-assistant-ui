@@ -6,4 +6,5 @@ sealed class ScreenState {
     data object Generator : ScreenState()
     data object Search : ScreenState()
     data class Detail(val dialogue: GetDialogueResponse) : ScreenState()
+    data object Loading : ScreenState()
 }

@@ -37,6 +37,8 @@ class AppViewModelTest {
             awaitItem().shouldBeInstanceOf<ScreenState.Generator>()
             viewModel.navigateToSearch()
             awaitItem().shouldBeInstanceOf<ScreenState.Search>()
+            viewModel.navigateToLoading()
+            awaitItem().shouldBeInstanceOf<ScreenState.Loading>()
             val fakeDialogue = GetDialogueResponse(
                 id = "1",
                 title = PhraseResponse("1", "Title", "en", "Trans", emptyList(), emptyList()),

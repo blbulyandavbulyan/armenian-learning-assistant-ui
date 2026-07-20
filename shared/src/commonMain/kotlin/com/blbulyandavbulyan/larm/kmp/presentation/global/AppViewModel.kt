@@ -14,6 +14,10 @@ class AppViewModel : ViewModel() {
         _currentScreen.value = ScreenState.Search
     }
 
+    fun navigateToLoading() {
+        _currentScreen.value = ScreenState.Loading
+    }
+
     fun navigateToGenerator() {
         _currentScreen.value = ScreenState.Generator
     }

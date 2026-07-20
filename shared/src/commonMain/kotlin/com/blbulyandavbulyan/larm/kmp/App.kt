@@ -4,12 +4,14 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.blbulyandavbulyan.larm.kmp.core.error.AppError
 import com.blbulyandavbulyan.larm.kmp.di.AppModule
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
@@ -45,54 +47,81 @@ fun App(
 
         val appError by AppModule.globalErrorManager.currentError.collectAsStateWithLifecycle()
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Crossfade(targetState = currentScreen) { state ->
-                when (state) {
-                    is ScreenState.Generator -> {
-                        DialogueGeneratorScreen(
-                            viewModel = chatViewModel,
-                            onNavigateToSearch = { query ->
-                                if (query.isNotBlank()) {
-                                    searchViewModel.updateSearchQuery(query)
-                                    searchViewModel.searchDialogues(query) {
-                                        appViewModel.navigateToSearch()
-                                    }
-                                }
+        Content(currentScreen, chatViewModel, appViewModel, searchViewModel, appError)
+    }
+}
+
+@Composable
+private fun Content(
+    currentScreen: ScreenState,
+    chatViewModel: DialogueChatViewModel,
+    appViewModel: AppViewModel,
+    searchViewModel: DialogueSearchViewModel,
+    appError: AppError?
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Crossfade(targetState = currentScreen) { state ->
+            when (state) {
+                is ScreenState.Generator -> {
+                    DialogueGeneratorScreen(
+                        viewModel = chatViewModel,
+                        onNavigateToSearch = { query ->
+                            if (query.isNotBlank()) {
+                                appViewModel.navigateToLoading()
+                                searchViewModel.updateSearchQuery(query)
+                                searchViewModel.searchDialogues(
+                                    query = query,
+                                    onSuccess = appViewModel::navigateToSearch,
+                                    onError = appViewModel::navigateToGenerator
+                                )
                             }
-                        )
-                    }
-                    is ScreenState.Search -> {
-                        DialogueSearchScreen(
-                            viewModel = searchViewModel,
-                            onBack = appViewModel::navigateToGenerator,
-                            onNavigateToDetail = appViewModel::navigateToDetail
-                        )
-                    }
-                    is ScreenState.Detail -> {
-                        DialogueDetailScreen(
-                            dialogue = state.dialogue,
-                            onBack = appViewModel::navigateToSearch,
-                            onPlayAudio = searchViewModel::playAudio
-                        )
+                        }
+                    )
+                }
+
+                is ScreenState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
                 }
-            }
 
-            appError?.let { error ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding(),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    println("Error handler got error $error")
-                    ErrorBanner(
-                        errorTitle = error.title.asString(),
-                        errorMessage = error.message.asString(),
-                        onDismiss = { AppModule.globalErrorManager.dismissError() }
+                is ScreenState.Search -> {
+                    DialogueSearchScreen(
+                        viewModel = searchViewModel,
+                        onBack = appViewModel::navigateToGenerator,
+                        onNavigateToDetail = appViewModel::navigateToDetail
+                    )
+                }
+
+                is ScreenState.Detail -> {
+                    DialogueDetailScreen(
+                        dialogue = state.dialogue,
+                        onBack = appViewModel::navigateToSearch,
+                        onPlayAudio = searchViewModel::playAudio
                     )
                 }
             }
+        }
+
+        OptionalErrorBanner(appError)
+    }
+}
+
+@Composable
+private fun OptionalErrorBanner(appError: AppError?) {
+    appError?.let { error ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            println("Error handler got error $error")
+            ErrorBanner(
+                errorTitle = error.title.asString(),
+                errorMessage = error.message.asString(),
+                onDismiss = { AppModule.globalErrorManager.dismissError() }
+            )
         }
     }
 }
