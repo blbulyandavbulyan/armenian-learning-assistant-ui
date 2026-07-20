@@ -79,9 +79,6 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.okhttp)
-            implementation(
-                "org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.0"
-            ) // TODO HEH???? LOOK AT THE DEPENDENCIES DECLARED ABOVE !!!
         }
     }
 }

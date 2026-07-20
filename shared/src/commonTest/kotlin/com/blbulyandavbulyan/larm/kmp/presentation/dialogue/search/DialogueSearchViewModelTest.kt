@@ -1,6 +1,11 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search
 
 import app.cash.turbine.test
+import armenianlearningassistant_kmp.shared.generated.resources.Res
+import armenianlearningassistant_kmp.shared.generated.resources.audio_playback_error_title
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_display_dialogue
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
+import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
@@ -62,7 +67,8 @@ class DialogueSearchViewModelTest {
             testScheduler.advanceUntilIdle()
             val error = globalErrorManager.currentError.value
             error.shouldNotBeNull()
-            error.message shouldBe "Fake Network Error"
+            error.message shouldBe UiText.from("Fake Network Error")
+            error.title shouldBe UiText.Companion.from(Res.string.error_failed_to_search_dialogues)
             expectNoEvents()
         }
     }
@@ -74,7 +80,8 @@ class DialogueSearchViewModelTest {
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
         error.shouldNotBeNull()
-        error.message shouldBe "Fake Network Error"
+        error.message shouldBe UiText.from("Fake Network Error")
+        error.title shouldBe UiText.from(Res.string.audio_playback_error_title)
     }
 
     @Test
@@ -84,7 +91,8 @@ class DialogueSearchViewModelTest {
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
         error.shouldNotBeNull()
-        error.message shouldBe "Fake Audio Error"
+        error.message shouldBe UiText.from("Fake Audio Error")
+        error.title shouldBe UiText.from(Res.string.audio_playback_error_title)
         viewModel.searchState.value shouldBe SearchState.Initial
     }
 
@@ -103,7 +111,8 @@ class DialogueSearchViewModelTest {
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
         error.shouldNotBeNull()
-        error.message shouldBe "Fake Network Error"
+        error.message shouldBe UiText.from("Fake Network Error")
+        error.title shouldBe UiText.from(Res.string.error_failed_to_display_dialogue)
     }
 
     @Test

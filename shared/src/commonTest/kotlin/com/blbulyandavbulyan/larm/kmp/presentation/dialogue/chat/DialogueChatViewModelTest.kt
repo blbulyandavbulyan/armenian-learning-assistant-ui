@@ -1,6 +1,10 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 
 import app.cash.turbine.test
+import armenianlearningassistant_kmp.shared.generated.resources.Res
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_generate_dialogue
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save_dialogue
+import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
@@ -77,7 +81,8 @@ class DialogueChatViewModelTest {
             testScheduler.advanceUntilIdle()
             val error = globalErrorManager.currentError.value
             error.shouldNotBeNull()
-            error.message shouldBe "Fake Network Error"
+            error.message shouldBe UiText.from("Fake Network Error")
+            error.title shouldBe UiText.from(Res.string.error_failed_to_generate_dialogue)
             expectNoEvents()
         }
     }
@@ -107,7 +112,8 @@ class DialogueChatViewModelTest {
             testScheduler.advanceUntilIdle()
             val error = globalErrorManager.currentError.value
             error.shouldNotBeNull()
-            error.message shouldBe "Fake Network Error"
+            error.message shouldBe UiText.from("Fake Network Error")
+            error.title shouldBe UiText.from(Res.string.error_failed_to_save_dialogue)
         }
     }
 
@@ -206,7 +212,8 @@ class DialogueChatViewModelTest {
             (stateAfterError[1] as ConversationItem.AiResponse).isSaving shouldBe true
             (stateAfterError[3] as ConversationItem.AiResponse).isSaving shouldBe false
             (stateAfterError[3] as ConversationItem.AiResponse).isSaved shouldBe false
-            globalErrorManager.currentError.value?.message shouldBe "Fake Network Error"
+            globalErrorManager.currentError.value?.message shouldBe UiText.from("Fake Network Error")
+            globalErrorManager.currentError.value?.title shouldBe UiText.from(Res.string.error_failed_to_save_dialogue)
             fakeRepository.saveCompletable?.complete("")
             val finalState = awaitItem()
             (finalState[1] as ConversationItem.AiResponse).isSaving shouldBe false

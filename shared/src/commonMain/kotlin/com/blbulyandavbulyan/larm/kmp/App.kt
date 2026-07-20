@@ -86,8 +86,8 @@ fun App(
                 ) {
                     println("Error handler got error $error")
                     ErrorBanner(
-                        errorTitle = error.title,
-                        errorMessage = error.message,
+                        errorTitle = error.title.asString(),
+                        errorMessage = error.message.asString(),
                         onDismiss = { AppModule.globalErrorManager.dismissError() }
                     )
                 }

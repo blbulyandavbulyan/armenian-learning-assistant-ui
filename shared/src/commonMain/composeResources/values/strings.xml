@@ -9,7 +9,8 @@
     <string name="error_prefix">Error:</string>
     <string name="unknown_speaker">Unknown</string>
     <string name="action_saved_dialogue">Saved!</string>
-    <string name="error_failed_to_save">Failed to save dialogue</string>
+    <string name="error_failed_to_save_dialogue">Failed to save dialogue</string>
+    <string name="error_failed_to_generate_dialogue">Failed to generate dialogue</string>
     <string name="error_unknown">Unknown error</string>
     <string name="search_dialogues_placeholder">Type query to find existing dialogue</string>
     <string name="search_button_text">Search</string>
@@ -21,4 +22,6 @@
     <string name="listen_phrase_button">Listen</string>
     <string name="audio_playback_error_title">Audio Error</string>
     <string name="dismiss_button">Dismiss</string>
+    <string name="error_failed_to_search_dialogues">Failed to search dialogues</string>
+    <string name="error_failed_to_display_dialogue">Failed to display dialogue</string>
 </resources>

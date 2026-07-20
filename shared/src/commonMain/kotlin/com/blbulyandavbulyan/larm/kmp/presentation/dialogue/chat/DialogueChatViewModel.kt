@@ -3,9 +3,10 @@ package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import armenianlearningassistant_kmp.shared.generated.resources.Res
-import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save
-import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_generate_dialogue
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
+import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
@@ -13,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 import kotlin.uuid.Uuid
 
 class DialogueChatViewModel(
@@ -45,8 +45,8 @@ class DialogueChatViewModel(
                 _conversation.value = newConv
                 println(e)
                 globalErrorManager.showError(
-                    getString(Res.string.error_prefix),
-                    e.message ?: getString(Res.string.error_unknown)
+                    UiText.from(Res.string.error_failed_to_generate_dialogue),
+                    UiText.from(e.message, Res.string.error_unknown)
                 )
             }
         }
@@ -83,8 +83,8 @@ class DialogueChatViewModel(
                 _conversation.value = currentConv
                 println(e)
                 globalErrorManager.showError(
-                    getString(Res.string.error_prefix),
-                    e.message ?: getString(Res.string.error_failed_to_save)
+                    UiText.from(Res.string.error_failed_to_save_dialogue),
+                    UiText.from(e.message, Res.string.error_unknown)
                 )
             }
         }

@@ -55,7 +55,9 @@ class DialogueGeneratorScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
-                    onGenerateDialogue = { generatedPrompt = it }
+                    onGenerateDialogue = { generatedPrompt = it },
+                    onSaveDialogue = {},
+                    onNavigateToSearch = {}
                 )
             }
         }
@@ -78,7 +80,9 @@ class DialogueGeneratorScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
-                    onGenerateDialogue = { callbackTriggered = true }
+                    onGenerateDialogue = { callbackTriggered = true },
+                    onSaveDialogue = {},
+                    onNavigateToSearch = {}
                 )
             }
         }
@@ -97,7 +101,9 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
                     emptyMessage = "No conversation yet",
-                    onGenerateDialogue = { }
+                    onGenerateDialogue = { },
+                    onSaveDialogue = {},
+                    onNavigateToSearch = {}
                 )
             }
         }
@@ -113,7 +119,9 @@ class DialogueGeneratorScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
-                    onGenerateDialogue = { generatedPrompt = it }
+                    onGenerateDialogue = { generatedPrompt = it },
+                    onSaveDialogue = {},
+                    onNavigateToSearch = {}
                 )
             }
         }
@@ -131,7 +139,9 @@ class DialogueGeneratorScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
-                    onGenerateDialogue = { generatedPrompt = it }
+                    onGenerateDialogue = { generatedPrompt = it },
+                    onSaveDialogue = {},
+                    onNavigateToSearch = {}
                 )
             }
         }
@@ -152,7 +162,9 @@ class DialogueGeneratorScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.UserMessage("Hello user message")),
-                    onGenerateDialogue = { }
+                    onGenerateDialogue = { },
+                    onSaveDialogue = {},
+                    onNavigateToSearch = {}
                 )
             }
         }
@@ -167,7 +179,9 @@ class DialogueGeneratorScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.Loading),
-                    onGenerateDialogue = { }
+                    onGenerateDialogue = { },
+                    onSaveDialogue = {},
+                    onNavigateToSearch = {}
                 )
             }
         }
@@ -183,7 +197,9 @@ class DialogueGeneratorScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.AiResponse(mockAiResponse)),
-                    onGenerateDialogue = { }
+                    onGenerateDialogue = { },
+                    onSaveDialogue = {},
+                    onNavigateToSearch = {}
                 )
             }
         }
@@ -223,7 +239,8 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = conversation,
                     onGenerateDialogue = {},
-                    onSaveDialogue = { savedDialogues.add(it) }
+                    onSaveDialogue = { savedDialogues.add(it) },
+                    onNavigateToSearch = {}
                 )
             }
         }

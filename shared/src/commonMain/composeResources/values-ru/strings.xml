@@ -9,7 +9,10 @@
     <string name="error_prefix">Ошибка:</string>
     <string name="unknown_speaker">Неизвестно</string>
     <string name="action_saved_dialogue">Сохранено!</string>
-    <string name="error_failed_to_save">Не удалось сохранить диалог</string>
+    <string name="error_failed_to_save_dialogue">Не удалось сохранить диалог</string>
+    <string name="error_failed_to_generate_dialogue">Не удалось сгенерировать диалог</string>
     <string name="error_unknown">Неизвестная ошибка</string>
     <string name="audio_playback_error_title">Ошибка аудио</string>
+    <string name="error_failed_to_search_dialogues">Поиск диалогов не удался</string>
+    <string name="error_failed_to_display_dialogue">Не удалось показать диалог</string>
 </resources>

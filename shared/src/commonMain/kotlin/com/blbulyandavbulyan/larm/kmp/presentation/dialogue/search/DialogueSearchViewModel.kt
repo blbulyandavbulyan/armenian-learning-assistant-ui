@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.audio_playback_error_title
-import armenianlearningassistant_kmp.shared.generated.resources.error_prefix
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_display_dialogue
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayer
+import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.network.AssetFetchException
@@ -17,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 
 class DialogueSearchViewModel(
     private val repository: DialogueRepository,
@@ -48,9 +49,8 @@ class DialogueSearchViewModel(
                 _searchState.value = SearchState.Initial // TODO, WHY??? If user was on the chat screen, he stays there
                 println(e)
                 globalErrorManager.showError(
-                    // TODO, not OR, BUT SPECIFIC ERROR TITLE!!!!!
-                    getString(Res.string.error_prefix), // Or a specific search error title
-                    e.message ?: getString(Res.string.error_unknown)
+                    UiText.from(Res.string.error_failed_to_search_dialogues), // Or a specific search error title
+                    UiText.from(e.message, Res.string.error_unknown)
                 )
             }
         }
@@ -64,14 +64,14 @@ class DialogueSearchViewModel(
             } catch (e: AudioPlayException) {
                 println(e)
                 globalErrorManager.showError(
-                    getString(Res.string.audio_playback_error_title),
-                    e.message ?: getString(Res.string.error_unknown)
+                    UiText.from(Res.string.audio_playback_error_title),
+                    UiText.from(e.message, Res.string.error_unknown)
                 )
             } catch (e: AssetFetchException) {
                 println(e)
                 globalErrorManager.showError(
-                    getString(Res.string.audio_playback_error_title),
-                    e.message ?: getString(Res.string.error_unknown)
+                    UiText.from(Res.string.audio_playback_error_title),
+                    UiText.from(e.message, Res.string.error_unknown)
                 )
             }
         }
@@ -86,8 +86,8 @@ class DialogueSearchViewModel(
             } catch (e: Throwable) {
                 println(e)
                 globalErrorManager.showError(
-                    getString(Res.string.error_prefix),
-                    e.message ?: getString(Res.string.error_unknown)
+                    UiText.from(Res.string.error_failed_to_display_dialogue),
+                    UiText.from(e.message, Res.string.error_unknown)
                 )
             }
         }

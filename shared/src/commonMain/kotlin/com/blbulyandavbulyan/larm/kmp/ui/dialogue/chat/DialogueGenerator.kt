@@ -66,8 +66,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun DialogueGeneratorScreen(
     viewModel: com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel,
-    onNavigateToSearch: (String) -> Unit = {
-    }
+    onNavigateToSearch: (String) -> Unit
 ) {
     val conversation by viewModel.conversation.collectAsStateWithLifecycle()
     DialogueGeneratorScreen(
@@ -83,8 +82,8 @@ fun DialogueGeneratorScreen(
     conversation: List<ConversationItem>,
     emptyMessage: String = stringResource(Res.string.empty_conversation_message),
     onGenerateDialogue: (String) -> Unit,
-    onSaveDialogue: (DialogueChatResponse) -> Unit = {},
-    onNavigateToSearch: (String) -> Unit = {}
+    onSaveDialogue: (DialogueChatResponse) -> Unit,
+    onNavigateToSearch: (String) -> Unit
 ) {
     var prompt by remember { mutableStateOf("") }
 
