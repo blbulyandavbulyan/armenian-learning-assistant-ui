@@ -54,23 +54,24 @@ fun App(
                             onNavigateToSearch = { query ->
                                 if (query.isNotBlank()) {
                                     searchViewModel.updateSearchQuery(query)
-                                    searchViewModel.searchDialogues(query)
+                                    searchViewModel.searchDialogues(query) {
+                                        appViewModel.navigateToSearch()
+                                    }
                                 }
-                                appViewModel.navigateToSearch()
                             }
                         )
                     }
                     is ScreenState.Search -> {
                         DialogueSearchScreen(
                             viewModel = searchViewModel,
-                            onBack = { appViewModel.navigateToGenerator() },
-                            onNavigateToDetail = { appViewModel.navigateToDetail(it) }
+                            onBack = appViewModel::navigateToGenerator,
+                            onNavigateToDetail = appViewModel::navigateToDetail
                         )
                     }
                     is ScreenState.Detail -> {
                         DialogueDetailScreen(
                             dialogue = state.dialogue,
-                            onBack = { appViewModel.navigateToSearch() },
+                            onBack = appViewModel::navigateToSearch,
                             onPlayAudio = searchViewModel::playAudio
                         )
                     }

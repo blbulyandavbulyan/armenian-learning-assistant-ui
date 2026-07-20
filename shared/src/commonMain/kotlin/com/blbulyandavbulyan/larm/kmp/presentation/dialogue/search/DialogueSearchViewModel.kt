@@ -37,7 +37,7 @@ class DialogueSearchViewModel(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    fun searchDialogues(query: String) {
+    fun searchDialogues(query: String, onSuccess: () -> Unit = {}) {
         _searchQuery.value = query // TODO, where the heck are the tests for these? You can add the check for it in the existing tests (if they exist)
         if (query.isBlank()) return
         _searchState.value = SearchState.Loading
@@ -45,6 +45,7 @@ class DialogueSearchViewModel(
             try {
                 val response = repository.searchDialogues(query)
                 _searchState.value = SearchState.Success(response.dialogues)
+                onSuccess()
             } catch (e: Throwable) {
                 _searchState.value = SearchState.Initial // TODO, WHY??? If user was on the chat screen, he stays there
                 println(e)
