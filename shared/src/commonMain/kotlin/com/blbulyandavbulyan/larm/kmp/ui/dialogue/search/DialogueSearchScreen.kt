@@ -2,6 +2,7 @@ package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -29,9 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
 import armenianlearningassistant_kmp.shared.generated.resources.no_results_found
+import armenianlearningassistant_kmp.shared.generated.resources.retry_button
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.search_results_title
 import armenianlearningassistant_kmp.shared.generated.resources.view_dialogue_details
@@ -128,6 +133,25 @@ private fun DialogueSearchContent(
                         onGetDialogueDetails = onGetDialogueDetails,
                         onPlayAudio = onPlayAudio
                     )
+                }
+
+                SearchState.Error -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.error_failed_to_search_dialogues),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = onSearch) {
+                            Text(stringResource(Res.string.retry_button))
+                        }
+                    }
                 }
             }
         }

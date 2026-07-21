@@ -47,7 +47,7 @@ class DialogueSearchViewModel(
                 _searchState.value = SearchState.Success(response.dialogues)
                 onSuccess()
             } catch (e: Throwable) {
-                _searchState.value = SearchState.Initial // TODO, WHY??? If user was on the chat screen, he stays there
+                _searchState.value = SearchState.Error
                 println(e)
                 globalErrorManager.showError(
                     UiText.from(Res.string.error_failed_to_search_dialogues), // Or a specific search error title

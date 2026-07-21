@@ -5,5 +5,6 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.DialogueSummaryRespon
 sealed class SearchState {
     data object Initial : SearchState()
     data object Loading : SearchState()
+    data object Error : SearchState()
     data class Success(val results: List<DialogueSummaryResponse>) : SearchState()
 }

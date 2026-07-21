@@ -24,4 +24,5 @@
     <string name="dismiss_button">Dismiss</string>
     <string name="error_failed_to_search_dialogues">Failed to search dialogues</string>
     <string name="error_failed_to_display_dialogue">Failed to display dialogue</string>
+    <string name="retry_button">Retry</string>
 </resources>
