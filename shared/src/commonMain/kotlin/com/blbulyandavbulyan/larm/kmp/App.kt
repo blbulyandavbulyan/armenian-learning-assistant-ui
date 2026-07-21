@@ -4,7 +4,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -18,6 +17,7 @@ import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearc
 import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.global.ScreenState
 import com.blbulyandavbulyan.larm.kmp.ui.common.ErrorBanner
+import com.blbulyandavbulyan.larm.kmp.ui.common.LoadingIndicator
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat.DialogueGeneratorScreen
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.detail.DialogueDetailScreen
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.DialogueSearchScreen
@@ -79,11 +79,7 @@ private fun Content(
                     )
                 }
 
-                is ScreenState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
+                is ScreenState.Loading -> LoadingIndicator()
 
                 is ScreenState.Search -> {
                     DialogueSearchScreen(

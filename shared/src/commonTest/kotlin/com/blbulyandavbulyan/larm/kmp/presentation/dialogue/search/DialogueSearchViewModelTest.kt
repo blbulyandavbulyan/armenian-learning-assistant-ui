@@ -46,13 +46,21 @@ class DialogueSearchViewModelTest {
     @Test
     fun `searchDialogues transitions to Loading and then Success`() = runTest {
         viewModel.searchState.test {
+            var onErrorWasCalled = false
+            var onSuccessWasCalled = false
             awaitItem() shouldBe SearchState.Initial
-            viewModel.searchDialogues("query")
+            viewModel.searchDialogues(
+                "query",
+                onError = { onErrorWasCalled = true },
+                onSuccess = { onSuccessWasCalled = true }
+            )
             awaitItem() shouldBe SearchState.Loading
             val successState = awaitItem() as SearchState.Success
             successState.results shouldBe emptyList()
             testScheduler.advanceUntilIdle()
             expectNoEvents()
+            onErrorWasCalled shouldBe false
+            onSuccessWasCalled shouldBe true
         }
     }
 
@@ -60,16 +68,24 @@ class DialogueSearchViewModelTest {
     fun `searchDialogues transitions to global Error on failure`() = runTest {
         fakeRepository.shouldFail = true
         viewModel.searchState.test {
+            var onErrorWasCalled = false
+            var onSuccessWasCalled = false
             awaitItem() shouldBe SearchState.Initial
-            viewModel.searchDialogues("query")
+            viewModel.searchDialogues(
+                "query",
+                onError = { onErrorWasCalled = true },
+                onSuccess = { onSuccessWasCalled = true }
+            )
             awaitItem() shouldBe SearchState.Loading
             awaitItem() shouldBe SearchState.Initial
             testScheduler.advanceUntilIdle()
             val error = globalErrorManager.currentError.value
             error.shouldNotBeNull()
             error.message shouldBe UiText.from("Fake Network Error")
-            error.title shouldBe UiText.Companion.from(Res.string.error_failed_to_search_dialogues)
+            error.title shouldBe UiText.from(Res.string.error_failed_to_search_dialogues)
             expectNoEvents()
+            onErrorWasCalled shouldBe true
+            onSuccessWasCalled shouldBe false
         }
     }
 
@@ -128,7 +144,11 @@ class DialogueSearchViewModelTest {
     fun `searchQuery updates when searchDialogues is called`() = runTest {
         viewModel.searchQuery.test {
             awaitItem() shouldBe ""
-            viewModel.searchDialogues("another query")
+            viewModel.searchDialogues(
+                "another query",
+                onSuccess = {},
+                onError = {}
+            )
             awaitItem() shouldBe "another query"
         }
     }

@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,9 +37,11 @@ import armenianlearningassistant_kmp.shared.generated.resources.search_results_t
 import armenianlearningassistant_kmp.shared.generated.resources.view_dialogue_details
 import armenianlearningassistant_kmp.shared.generated.resources.view_full_dialogue_button
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.DialogueSummaryResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.SearchState
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
+import com.blbulyandavbulyan.larm.kmp.ui.common.LoadingIndicator
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.DialogueTitle
@@ -52,11 +53,40 @@ import org.jetbrains.compose.resources.stringResource
 fun DialogueSearchScreen(
     viewModel: DialogueSearchViewModel,
     onBack: () -> Unit,
-    onNavigateToDetail: (com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse) -> Unit
+    onNavigateToDetail: (GetDialogueResponse) -> Unit
 ) {
     val searchState by viewModel.searchState.collectAsState()
     val query by viewModel.searchQuery.collectAsState()
 
+    DialogueSearchContent(
+        query = query,
+        onBack = onBack,
+        searchState = searchState,
+        onSearchQueryChange = {
+            viewModel.updateSearchQuery(it)
+        },
+        onSearch = {
+            viewModel.searchDialogues(
+                query,
+                onSuccess = {},
+                onError = {}
+            )
+        },
+        onGetDialogueDetails = { id -> viewModel.displayDialogue(id, onNavigateToDetail) },
+        onPlayAudio = viewModel::playAudio
+    )
+}
+
+@Composable
+private fun DialogueSearchContent(
+    query: String,
+    onBack: () -> Unit,
+    searchState: SearchState,
+    onSearchQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
+    onGetDialogueDetails: (String) -> Unit,
+    onPlayAudio: (String) -> Unit
+) {
     val appColors = AppTheme.colors
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(appColors.gradientTop, appColors.gradientBottom)
@@ -78,18 +108,14 @@ fun DialogueSearchScreen(
             SearchBarAndBackButton(
                 query = query,
                 onBack = onBack,
-                onValueChange = {
-                    viewModel.updateSearchQuery(it)
-                },
-                onSearch = {
-                    viewModel.searchDialogues(query)
-                }
+                onValueChange = onSearchQueryChange,
+                onSearch = onSearch
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Results Area
-            when (val state = searchState) {
+            when (searchState) {
                 is SearchState.Initial -> {
                     // empty state
                 }
@@ -98,9 +124,9 @@ fun DialogueSearchScreen(
 
                 is SearchState.Success -> {
                     DialogueSearchResults(
-                        state = state,
-                        onGetDialogueDetails = { id -> viewModel.displayDialogue(id, onNavigateToDetail) },
-                        onPlayAudio = viewModel::playAudio
+                        state = searchState,
+                        onGetDialogueDetails = onGetDialogueDetails,
+                        onPlayAudio = onPlayAudio
                     )
                 }
             }
@@ -209,13 +235,6 @@ private fun SearchResultsTitle() {
         style = MaterialTheme.typography.titleLarge,
         color = MaterialTheme.colorScheme.onBackground
     )
-}
-
-@Composable
-private fun LoadingIndicator() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
 }
 
 @Composable
