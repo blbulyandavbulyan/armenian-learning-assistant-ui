@@ -80,7 +80,11 @@ class DialogueSearchViewModel(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    fun displayDialogue(id: String, onDialogueReady: (GetDialogueResponse) -> Unit) {
+    fun displayDialogue(
+        id: String,
+        onDialogueReady: (GetDialogueResponse) -> Unit,
+        onError: () -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val fullDialogue = repository.getDialogue(id)
@@ -91,6 +95,7 @@ class DialogueSearchViewModel(
                     UiText.from(Res.string.error_failed_to_display_dialogue),
                     UiText.from(e.message, Res.string.error_unknown)
                 )
+                onError()
             }
         }
     }

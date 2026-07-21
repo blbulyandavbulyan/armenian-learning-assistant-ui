@@ -58,7 +58,7 @@ import org.jetbrains.compose.resources.stringResource
 fun DialogueSearchScreen(
     viewModel: DialogueSearchViewModel,
     onBack: () -> Unit,
-    onNavigateToDetail: (GetDialogueResponse) -> Unit
+    onGetDialogueDetails: (String) -> Unit
 ) {
     val searchState by viewModel.searchState.collectAsState()
     val query by viewModel.searchQuery.collectAsState()
@@ -77,7 +77,7 @@ fun DialogueSearchScreen(
                 onError = {}
             )
         },
-        onGetDialogueDetails = { id -> viewModel.displayDialogue(id, onNavigateToDetail) },
+        onGetDialogueDetails = onGetDialogueDetails,
         onPlayAudio = viewModel::playAudio
     )
 }

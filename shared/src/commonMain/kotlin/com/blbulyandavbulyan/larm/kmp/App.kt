@@ -85,7 +85,14 @@ private fun Content(
                     DialogueSearchScreen(
                         viewModel = searchViewModel,
                         onBack = appViewModel::navigateToGenerator,
-                        onNavigateToDetail = appViewModel::navigateToDetail
+                        onGetDialogueDetails = { id ->
+                            appViewModel.navigateToLoading()
+                            searchViewModel.displayDialogue(
+                                id = id,
+                                onDialogueReady = appViewModel::navigateToDetail,
+                                onError = appViewModel::navigateToSearch
+                            )
+                        }
                     )
                 }
 
