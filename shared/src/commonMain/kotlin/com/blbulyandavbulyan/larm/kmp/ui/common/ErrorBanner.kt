@@ -29,7 +29,7 @@ fun ErrorBanner(
     errorMessage: String,
     modifier: Modifier = Modifier,
     displayDuration: Duration = 7.seconds, // 7 seconds fully visible
-    fadeDuration: Duration = 3.seconds,      // 3 seconds fade out
+    fadeDuration: Duration = 3.seconds, // 3 seconds fade out
     onDismiss: () -> Unit
 ) {
     // Create an animatable float for alpha starting at 1f (fully visible)

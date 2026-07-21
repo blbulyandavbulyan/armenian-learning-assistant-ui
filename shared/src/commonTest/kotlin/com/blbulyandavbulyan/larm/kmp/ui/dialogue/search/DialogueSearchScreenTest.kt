@@ -66,7 +66,7 @@ class DialogueSearchScreenTest {
                 DialogueSearchScreen(
                     viewModel = viewModel,
                     onBack = { backPressed = true },
-                    onNavigateToDetail = {}
+                    onGetDialogueDetails = {}
                 )
             }
         }
@@ -270,7 +270,7 @@ class DialogueSearchScreenTest {
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
-                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onNavigateToDetail = {})
+                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
             }
         }
 

@@ -65,7 +65,7 @@ class DialogueSearchViewModelTest {
     }
 
     @Test
-    fun `searchDialogues transitions to global Error on failure`() = runTest {
+    fun `searchDialogues transitions to search error state on failure, and reports error to globalErrorManager`() = runTest {
         fakeRepository.shouldFail = true
         viewModel.searchState.test {
             var onErrorWasCalled = false
@@ -77,7 +77,7 @@ class DialogueSearchViewModelTest {
                 onSuccess = { onSuccessWasCalled = true }
             )
             awaitItem() shouldBe SearchState.Loading
-            awaitItem() shouldBe SearchState.Initial
+            awaitItem() shouldBe SearchState.Error
             testScheduler.advanceUntilIdle()
             val error = globalErrorManager.currentError.value
             error.shouldNotBeNull()
@@ -114,21 +114,31 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `displayDialogue calls callback on success`() = runTest {
-        var called = false
-        viewModel.displayDialogue("123") { called = true }
+        var onDialogueReadyCalled = false
+        var onErrorCalled = false
+        viewModel.displayDialogue(
+            "123",
+            onError = { onErrorCalled = true },
+            onDialogueReady = { onDialogueReadyCalled = true }
+        )
         testScheduler.advanceUntilIdle()
-        called shouldBe true
+        onDialogueReadyCalled shouldBe true
+        onErrorCalled shouldBe false
     }
 
     @Test
     fun `displayDialogue transitions to global Error on failure`() = runTest {
         fakeRepository.shouldFail = true
-        viewModel.displayDialogue("123") { }
+        var onErrorCalled = false
+        var onDialogueReadyCalled = false
+        viewModel.displayDialogue("123", { onDialogueReadyCalled = true }, { onErrorCalled = true })
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
         error.shouldNotBeNull()
         error.message shouldBe UiText.from("Fake Network Error")
         error.title shouldBe UiText.from(Res.string.error_failed_to_display_dialogue)
+        onErrorCalled shouldBe true
+        onDialogueReadyCalled shouldBe false
     }
 
     @Test
