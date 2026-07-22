@@ -18,6 +18,6 @@ sealed interface UiText {
         fun from(value: String): UiText = DynamicString(value)
         fun from(value: StringResource): UiText = Resource(value)
         fun from(value: String?, fallbackStringResource: StringResource): UiText =
-            value?.let { from(it) } ?: from(fallbackStringResource)
+            value?.let(::from) ?: from(fallbackStringResource)
     }
 }
