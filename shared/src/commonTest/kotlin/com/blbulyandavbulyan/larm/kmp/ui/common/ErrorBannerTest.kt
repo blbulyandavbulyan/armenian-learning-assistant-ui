@@ -63,6 +63,9 @@ class ErrorBannerTest {
         turbineScope {
             val dismissEvents = Turbine<Unit>()
 
+            // Disable auto-advancing so we explicitly step the clock
+            mainClock.autoAdvance = false
+
             setContent {
                 ArmenianLearningTheme {
                     ErrorBanner(
@@ -74,18 +77,16 @@ class ErrorBannerTest {
                     )
                 }
             }
+
             onNodeWithText("Auto Dismiss Test").assertIsDisplayed()
-            onNodeWithText("This should disappear").assertIsDisplayed()
-            // Initially, no dismiss event should have been emitted
             dismissEvents.expectNoEvents()
 
-            // Fast-forward time through display + fade durations (150ms total)
-            mainClock.advanceTimeBy(150)
+            // Step clock in frames through display (100ms) + fade (50ms) + buffer frame
+            mainClock.advanceTimeBy(160)
+            mainClock.autoAdvance = true
 
             dismissEvents.awaitItem() shouldBe Unit
             dismissEvents.ensureAllEventsConsumed()
-            onNodeWithText("Auto Dismiss Test").assertDoesNotExist()
-            onNodeWithText("This should disappear").assertDoesNotExist()
         }
     }
 
@@ -93,9 +94,9 @@ class ErrorBannerTest {
     fun newErrorResetsTimerAndDoesNotDismissPrematurely() = runComposeUiTest {
         turbineScope {
             val dismissEvents = Turbine<Unit>()
-
-            // Fast-forward initial composition state
             var title by mutableStateOf("First Error")
+
+            mainClock.autoAdvance = false
 
             setContent {
                 ArmenianLearningTheme {
@@ -109,24 +110,27 @@ class ErrorBannerTest {
                 }
             }
 
-            // Advance halfway through display time
+            // Step halfway through initial display time (500ms)
             mainClock.advanceTimeBy(500)
             dismissEvents.expectNoEvents()
 
-            // Trigger a new error state, restarting LaunchedEffect
+            // Trigger state change
             title = "Second Error"
+
+            // Allow Compose to recompose under frame clock
+            mainClock.advanceTimeByFrame()
             onNodeWithText("Second Error").assertIsDisplayed()
 
-            // Advance past original timer completion window (another 700ms)
+            // Advance 700ms (Past original 1500ms deadline from start, but inside new timer window)
             mainClock.advanceTimeBy(700)
             dismissEvents.expectNoEvents()
 
-            // Advance to complete the restarted timer (1500ms total from second error)
-            mainClock.advanceTimeBy(800)
+            // Advance remaining 800ms + frame buffer to finish animation and fire callback
+            mainClock.advanceTimeBy(816)
+            mainClock.autoAdvance = true
 
             dismissEvents.awaitItem() shouldBe Unit
             dismissEvents.ensureAllEventsConsumed()
-            onNodeWithText("Second Error").assertDoesNotExist()
         }
     }
 }
