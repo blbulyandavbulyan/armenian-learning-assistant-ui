@@ -20,7 +20,7 @@ actual class AudioPlayer actual constructor() {
         } catch (e: Exception) {
             println("Audio setup/playback failed: ${e.message}")
             clip?.close()
-            throw AudioPlayException(e.message ?: "Unknown audio error", e)
+            throw AudioPlayException(e)
         }
     }
 }

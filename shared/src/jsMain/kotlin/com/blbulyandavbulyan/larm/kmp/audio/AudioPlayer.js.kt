@@ -32,7 +32,7 @@ actual class AudioPlayer actual constructor() {
             println("Audio setup failed: ${e.message}")
             url?.let { URL.revokeObjectURL(it) }
             audio?.remove()
-            throw AudioPlayException(e.message ?: "Unknown audio error", e)
+            throw AudioPlayException(e)
         }
     }
 }

@@ -8,7 +8,6 @@ sealed interface UiText {
     data class DynamicString(val value: String) : UiText
     data class Resource(val resId: StringResource) : UiText
 
-    // Called inside @Composable UI to resolve the actual string
     @Composable
     fun asString(): String = when (this) {
         is DynamicString -> value

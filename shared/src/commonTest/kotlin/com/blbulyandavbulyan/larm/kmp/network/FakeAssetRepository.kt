@@ -9,7 +9,7 @@ class FakeAssetRepository : AssetRepository {
 
     override suspend fun getAssetBytes(url: String): ByteArray {
         requestedUrls.add(url)
-        if (shouldFailWithAudioException) throw AudioPlayException("Fake Audio Error")
+        if (shouldFailWithAudioException) throw AudioPlayException(message = "Fake Audio Error")
         if (shouldFail) throw AssetFetchException("Fake Network Error")
         return ByteArray(0)
     }

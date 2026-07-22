@@ -1,3 +1,3 @@
 package com.blbulyandavbulyan.larm.kmp.audio
 
-class AudioPlayException(message: String, cause: Throwable? = null) : Exception(message, cause)
+class AudioPlayException(cause: Throwable? = null, message: String? = cause?.message) : Exception(message, cause)

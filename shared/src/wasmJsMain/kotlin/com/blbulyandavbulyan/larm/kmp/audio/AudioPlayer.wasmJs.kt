@@ -56,14 +56,14 @@ actual class AudioPlayer actual constructor() {
                 jsPlayAudio(audio, {
                     cont.resume(Unit)
                 }, {
-                    cont.resumeWithException(AudioPlayException(it))
+                    cont.resumeWithException(AudioPlayException(message = it))
                 })
             }
         } catch (e: Throwable) {
             println("Audio setup failed: ${e.message}")
             url?.let { URL.revokeObjectURL(it) }
             audio?.remove()
-            throw AudioPlayException(e.message ?: "Unknown audio error", e)
+            throw AudioPlayException(e)
         }
     }
 }
