@@ -15,9 +15,9 @@ class NetworkAssetRepository(private val apiClient: ApiClient) : AssetRepository
         return try {
             apiClient.getAssetBytes(url)
         } catch (e: Throwable) {
-            throw AssetFetchException(e.message ?: "Unknown asset error", Exception(e))
+            throw AssetFetchException(e)
         }
     }
 }
 
-class AssetFetchException(message: String, cause: Exception? = null) : Exception(message, cause)
+class AssetFetchException(cause: Throwable? = null, message: String? = cause?.message) : Exception(message, cause)
