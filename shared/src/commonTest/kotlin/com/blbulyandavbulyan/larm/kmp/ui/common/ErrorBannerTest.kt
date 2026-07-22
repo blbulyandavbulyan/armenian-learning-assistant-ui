@@ -63,9 +63,6 @@ class ErrorBannerTest {
         turbineScope {
             val dismissEvents = Turbine<Unit>()
 
-            // Disable auto-advancing so we explicitly step the clock
-            mainClock.autoAdvance = false
-
             setContent {
                 ArmenianLearningTheme {
                     ErrorBanner(
@@ -81,9 +78,15 @@ class ErrorBannerTest {
             onNodeWithText("Auto Dismiss Test").assertIsDisplayed()
             dismissEvents.expectNoEvents()
 
-            // Step clock in frames through display (100ms) + fade (50ms) + buffer frame
-            mainClock.advanceTimeBy(160)
-            mainClock.autoAdvance = true
+            // 1. Advance past display duration delay (100ms)
+            mainClock.advanceTimeBy(100)
+            dismissEvents.expectNoEvents()
+
+            // 2. Advance past fade duration animation (50ms)
+            mainClock.advanceTimeBy(50)
+
+            // 3. Pump frames & idle scheduler so onDismiss() fires
+            waitForIdle()
 
             dismissEvents.awaitItem() shouldBe Unit
             dismissEvents.ensureAllEventsConsumed()
@@ -95,8 +98,6 @@ class ErrorBannerTest {
         turbineScope {
             val dismissEvents = Turbine<Unit>()
             var title by mutableStateOf("First Error")
-
-            mainClock.autoAdvance = false
 
             setContent {
                 ArmenianLearningTheme {
@@ -110,24 +111,23 @@ class ErrorBannerTest {
                 }
             }
 
-            // Step halfway through initial display time (500ms)
+            // T = 500ms
             mainClock.advanceTimeBy(500)
             dismissEvents.expectNoEvents()
 
-            // Trigger state change
+            // Restart LaunchedEffect timer (0 / 1500ms for "Second Error")
             title = "Second Error"
-
-            // Allow Compose to recompose under frame clock
-            mainClock.advanceTimeByFrame()
             onNodeWithText("Second Error").assertIsDisplayed()
 
-            // Advance 700ms (Past original 1500ms deadline from start, but inside new timer window)
-            mainClock.advanceTimeBy(700)
+            // Advance 1100ms:
+            // - Clock is now at 1600ms total test time (past original 1500ms finish line).
+            // - New timer is at 1100ms / 1500ms, so it should NOT have dismissed yet.
+            mainClock.advanceTimeBy(1100)
             dismissEvents.expectNoEvents()
 
-            // Advance remaining 800ms + frame buffer to finish animation and fire callback
-            mainClock.advanceTimeBy(816)
-            mainClock.autoAdvance = true
+            // Advance remaining 400ms to complete the new 1500ms cycle
+            mainClock.advanceTimeBy(400)
+            waitForIdle()
 
             dismissEvents.awaitItem() shouldBe Unit
             dismissEvents.ensureAllEventsConsumed()
