@@ -12,6 +12,15 @@
     <string name="error_failed_to_save_dialogue">Не удалось сохранить диалог</string>
     <string name="error_failed_to_generate_dialogue">Не удалось сгенерировать диалог</string>
     <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="search_dialogues_placeholder">Введите запрос для поиска диалога</string>
+    <string name="search_button_text">Поиск</string>
+    <string name="view_full_dialogue_button">Подробнее</string>
+    <string name="listen_title_button">Слушать заголовок</string>
+    <string name="search_results_title">Результаты поиска</string>
+    <string name="no_results_found">Диалоги не найдены.</string>
+    <string name="back_button_text">Назад</string>
+    <string name="listen_phrase_button">Слушать</string>
+    <string name="dismiss_button">Закрыть</string>
     <string name="audio_playback_error_title">Ошибка аудио</string>
     <string name="error_failed_to_search_dialogues">Поиск диалогов не удался</string>
     <string name="error_failed_to_display_dialogue">Не удалось показать диалог</string>
