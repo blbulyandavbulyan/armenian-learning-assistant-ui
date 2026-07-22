@@ -55,7 +55,7 @@ fun SearchField(
             Icon(
                 painter = painterResource(Res.drawable.ic_search_24px),
                 contentDescription = stringResource(Res.string.search_button_text),
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.fillMaxHeight()
                     .padding(4.dp)
                     .clickable { onSearch() }
