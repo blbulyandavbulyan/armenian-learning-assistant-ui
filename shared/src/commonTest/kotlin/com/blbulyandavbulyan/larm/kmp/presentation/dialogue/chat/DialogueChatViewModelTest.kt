@@ -10,7 +10,7 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueTitleResponse
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
-import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
+import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -28,7 +28,7 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class DialogueChatViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var fakeRepository: FakeDialogueRepository
+    private lateinit var fakeRepository: FakeDialogueChatRepository
     private lateinit var fakeAudioRepository: FakeAssetRepository
     private lateinit var globalErrorManager: GlobalErrorManager
     private lateinit var viewModel: DialogueChatViewModel
@@ -36,7 +36,7 @@ class DialogueChatViewModelTest {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        fakeRepository = FakeDialogueRepository()
+        fakeRepository = FakeDialogueChatRepository()
         fakeAudioRepository = FakeAssetRepository()
         globalErrorManager = GlobalErrorManager()
         viewModel = DialogueChatViewModel(fakeRepository, globalErrorManager)

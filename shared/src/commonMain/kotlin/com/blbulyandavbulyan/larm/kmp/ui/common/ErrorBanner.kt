@@ -3,7 +3,10 @@ package com.blbulyandavbulyan.larm.kmp.ui.common
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
@@ -11,6 +14,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
@@ -18,10 +22,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.dismiss_button
+import com.blbulyandavbulyan.larm.kmp.core.error.AppError
+import com.blbulyandavbulyan.larm.kmp.di.AppModule
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+
+@Composable
+fun OptionalErrorBanner(appError: AppError?) {
+    appError?.let { error ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            println("Error handler got error $error")
+            ErrorBanner(
+                errorTitle = error.title.asString(),
+                errorMessage = error.message.asString(),
+                onDismiss = { AppModule.globalErrorManager.dismissError() }
+            )
+        }
+    }
+}
 
 @Composable
 fun ErrorBanner(

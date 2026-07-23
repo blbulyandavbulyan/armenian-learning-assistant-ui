@@ -9,7 +9,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
+import com.blbulyandavbulyan.larm.kmp.network.DialogueChatRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
 class DialogueChatViewModel(
-    private val repository: DialogueRepository,
+    private val repository: DialogueChatRepository,
     private val globalErrorManager: GlobalErrorManager
 ) : ViewModel() {
     private val _conversation = MutableStateFlow<List<ConversationItem>>(emptyList())

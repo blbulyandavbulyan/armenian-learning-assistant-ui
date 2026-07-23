@@ -57,6 +57,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.noto_sans_armeni
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
@@ -65,7 +66,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DialogueGeneratorScreen(
-    viewModel: com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel,
+    viewModel: DialogueChatViewModel,
     onNavigateToSearch: (String) -> Unit
 ) {
     val conversation by viewModel.conversation.collectAsStateWithLifecycle()

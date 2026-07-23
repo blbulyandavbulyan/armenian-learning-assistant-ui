@@ -4,6 +4,7 @@ import com.blbulyandavbulyan.larm.kmp.BuildKonfig
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.network.ApiClient
 import com.blbulyandavbulyan.larm.kmp.network.NetworkAssetRepository
+import com.blbulyandavbulyan.larm.kmp.network.NetworkDialogueChatRepository
 import com.blbulyandavbulyan.larm.kmp.network.NetworkDialogueRepository
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -35,6 +36,7 @@ object AppModule {
 
     val apiClient by lazy { ApiClient(httpClient) }
     val dialogueRepository by lazy { NetworkDialogueRepository(apiClient) }
+    val dialogueChatRepository by lazy { NetworkDialogueChatRepository(apiClient) }
     val audioRepository by lazy { NetworkAssetRepository(apiClient) }
     val globalErrorManager by lazy { GlobalErrorManager() }
 }
