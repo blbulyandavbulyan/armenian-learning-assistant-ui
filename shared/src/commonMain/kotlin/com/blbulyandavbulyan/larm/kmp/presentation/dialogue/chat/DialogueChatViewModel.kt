@@ -3,31 +3,23 @@ package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import armenianlearningassistant_kmp.shared.generated.resources.Res
-import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_generate_dialogue
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
+import com.blbulyandavbulyan.larm.kmp.core.UiText
+import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
+import com.blbulyandavbulyan.larm.kmp.network.DialogueChatRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-sealed class ConversationItem {
-    data class UserMessage(val text: String) : ConversationItem()
-    data class AiResponse(
-        val response: DialogueChatResponse,
-        val isSaving: Boolean = false,
-        val isSaved: Boolean = false
-    ) : ConversationItem()
-    data class Error(val message: String) : ConversationItem()
-    data object Loading : ConversationItem()
-}
-
-@OptIn(ExperimentalUuidApi::class)
-class DialogueViewModel(private val repository: DialogueRepository) : ViewModel() {
+class DialogueChatViewModel(
+    private val repository: DialogueChatRepository,
+    private val globalErrorManager: GlobalErrorManager
+) : ViewModel() {
     private val _conversation = MutableStateFlow<List<ConversationItem>>(emptyList())
     val conversation: StateFlow<List<ConversationItem>> = _conversation.asStateFlow()
 
@@ -48,10 +40,14 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
                 val newConv = _conversation.value.filter { it !is ConversationItem.Loading }.toMutableList()
                 newConv.add(ConversationItem.AiResponse(response))
                 _conversation.value = newConv
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val newConv = _conversation.value.filter { it !is ConversationItem.Loading }.toMutableList()
-                newConv.add(ConversationItem.Error(e.message ?: getString(Res.string.error_unknown)))
                 _conversation.value = newConv
+                println(e)
+                globalErrorManager.showError(
+                    UiText.from(Res.string.error_failed_to_generate_dialogue),
+                    UiText.from(e.message, Res.string.error_unknown)
+                )
             }
         }
     }
@@ -76,7 +72,7 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
                         it
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 val currentConv = _conversation.value.map {
                     if (it is ConversationItem.AiResponse && it.response === dialogue) {
                         it.copy(isSaving = false)
@@ -84,8 +80,12 @@ class DialogueViewModel(private val repository: DialogueRepository) : ViewModel(
                         it
                     }
                 }.toMutableList()
-                currentConv.add(ConversationItem.Error(e.message ?: getString(Res.string.error_failed_to_save)))
                 _conversation.value = currentConv
+                println(e)
+                globalErrorManager.showError(
+                    UiText.from(Res.string.error_failed_to_save_dialogue),
+                    UiText.from(e.message, Res.string.error_unknown)
+                )
             }
         }
     }
