@@ -2,6 +2,7 @@ package com.blbulyandavbulyan.larm.kmp
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -97,6 +98,47 @@ class AppTest {
 
         // Assert we are back on search screen
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertIsDisplayed()
+    }
+
+    @Test
+    fun navigationFlow_generatorToSearch() = runComposeUiTest {
+        val fakeDialogueRepository = createFakeDialogueRepository()
+        val fakeAudioRepository = FakeAssetRepository()
+        val viewModel =
+            DialogueSearchViewModel(
+                fakeDialogueRepository,
+                fakeAudioRepository,
+                GlobalErrorManager()
+            )
+
+        val appViewModel = AppViewModel()
+        val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
+
+        setContent {
+            App(appViewModel = appViewModel, searchViewModel = viewModel, chatViewModel = chatViewModel)
+        }
+
+        // App initial state is Generator Screen
+        onNodeWithTag("dialogueGeneratorScreen").assertIsDisplayed()
+
+        // 1. Type something in the search bar on the generator screen
+        onNodeWithTag("searchInputField").performTextInput("Hello")
+
+        // 2. Press search button
+        onNodeWithTag("searchSubmitButton").performClick()
+        waitForIdle()
+
+        // Wait for search screen to appear
+        waitUntil(timeoutMillis = 5000) {
+            onAllNodesWithTag(
+                "viewFullDialogueButton_${GetDialogueResponseMother.FULL_DIALOGUE_1.id}"
+            ).fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Assert we are on search screen and search is completed
+        onNodeWithTag("viewFullDialogueButton_${GetDialogueResponseMother.FULL_DIALOGUE_1.id}").assertIsDisplayed()
+        onNodeWithTag("dialogueGeneratorScreen").assertDoesNotExist()
+        onNodeWithTag("searchInputField").assertTextEquals("Hello")
     }
 
     private fun createFakeDialogueRepository() = object : FakeDialogueRepository() {

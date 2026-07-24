@@ -303,7 +303,7 @@ private fun Header(onNavigateToSearch: (String) -> Unit) {
 
         SearchField(
             query = query,
-            Modifier.weight(1f).height(height = 60.dp),
+            Modifier.weight(1f).height(height = 60.dp).testTag("searchInputField"),
             onSearch = { onNavigateToSearch(query) },
             onValueChange = { query = it },
             placeholder = { Text(stringResource(Res.string.search_dialogues_placeholder)) }

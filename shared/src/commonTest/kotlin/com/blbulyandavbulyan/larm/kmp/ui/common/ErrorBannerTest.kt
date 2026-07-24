@@ -11,7 +11,10 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
 import app.cash.turbine.Turbine
 import app.cash.turbine.turbineScope
+import com.blbulyandavbulyan.larm.kmp.core.UiText
+import com.blbulyandavbulyan.larm.kmp.di.AppModule
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.milliseconds
@@ -132,5 +135,43 @@ class ErrorBannerTest {
             dismissEvents.awaitItem() shouldBe Unit
             dismissEvents.ensureAllEventsConsumed()
         }
+    }
+
+    @Test
+    fun optionalErrorBanner_whenErrorIsNull_doesNotShowBanner() = runComposeUiTest {
+        setContent {
+            ArmenianLearningTheme {
+                OptionalErrorBanner(appError = null)
+            }
+        }
+
+        onNodeWithTag("dismissErrorBannerButton").assertDoesNotExist()
+    }
+
+    @Test
+    fun optionalErrorBanner_whenErrorIsNotNull_showsBannerAndDismissesThroughGlobalErrorManager() = runComposeUiTest {
+        val testTitle = "Global Error Title"
+        val testMessage = "Global Error Message"
+
+        AppModule.globalErrorManager.showError(
+            title = UiText.DynamicString(testTitle),
+            message = UiText.DynamicString(testMessage)
+        )
+        val appError = AppModule.globalErrorManager.currentError.value
+
+        setContent {
+            ArmenianLearningTheme {
+                OptionalErrorBanner(appError = appError)
+            }
+        }
+
+        onNodeWithText(testTitle).assertIsDisplayed()
+        onNodeWithText(testMessage).assertIsDisplayed()
+
+        // Clicking dismiss should trigger the global error manager's dismissError
+        onNodeWithTag("dismissErrorBannerButton").performClick()
+
+        // Assert that global error manager cleared the error
+        AppModule.globalErrorManager.currentError.value.shouldBeNull()
     }
 }
