@@ -1,6 +1,8 @@
 package com.blbulyandavbulyan.larm.kmp.ui.dialogue.search
 
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -111,6 +113,82 @@ class DialogueSearchScreenTest {
         override suspend fun getDialogue(id: String): GetDialogueResponse {
             return GetDialogueResponseMother.FULL_DIALOGUE_1
         }
+    }
+
+    @Test
+    fun searchScreen_emptyResults_showsEmptyStateMessage() = runComposeUiTest {
+        val fakeDialogueRepository = object : FakeDialogueRepository() {
+            override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+                return SearchDialoguesResponse(emptyList())
+            }
+        }
+        val fakeAudioRepository = FakeAssetRepository()
+        val viewModel =
+            DialogueSearchViewModel(
+                fakeDialogueRepository,
+                fakeAudioRepository,
+                GlobalErrorManager()
+            )
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+            }
+        }
+
+        onNodeWithTag("emptyResultsMessage").assertDoesNotExist()
+
+        onNodeWithTag("searchInputField").performTextInput("Hello")
+        onNodeWithTag("searchSubmitButton").performClick()
+
+        waitUntil(timeoutMillis = 5000) {
+            onAllNodesWithTag("emptyResultsMessage").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        onNodeWithTag("emptyResultsMessage").assertExists()
+    }
+
+    @Test
+    fun searchScreen_error_showsRetryButtonAndTriggersRetry() = runComposeUiTest {
+        var callCount = 0
+        val fakeDialogueRepository = object : FakeDialogueRepository() {
+            @Suppress("TooGenericExceptionThrown")
+            override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+                callCount++
+                throw RuntimeException("Network Error")
+            }
+        }
+        val fakeAudioRepository = FakeAssetRepository()
+        val viewModel =
+            DialogueSearchViewModel(
+                fakeDialogueRepository,
+                fakeAudioRepository,
+                GlobalErrorManager()
+            )
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+            }
+        }
+
+        onNodeWithTag("searchInputField").performTextInput("Hello")
+        onNodeWithTag("searchSubmitButton").performClick()
+
+        // Wait for retry button to appear on error
+        waitUntil(timeoutMillis = 5000) {
+            onAllNodesWithTag("retryButton").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        onNodeWithTag("emptyResultsMessage").assertDoesNotExist()
+
+        onNodeWithTag("retryButton").assertIsDisplayed()
+        callCount shouldBe 1
+
+        onNodeWithTag("retryButton").performClick()
+        waitForIdle()
+
+        callCount shouldBe 2
     }
 
     // TODO YOU DROPPED THIS ENTIRE SECTION OF TODO COMMENTS, BUT I DONT BELIEVE YOU THAT YOU ACTUALLY FIXED THEM

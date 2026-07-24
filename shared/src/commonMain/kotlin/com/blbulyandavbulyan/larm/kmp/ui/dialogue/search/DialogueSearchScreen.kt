@@ -118,39 +118,56 @@ private fun DialogueSearchContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Results Area
-            when (searchState) {
-                is SearchState.Initial -> {
-                    // empty state
-                }
+            SearchResultsContent(
+                searchState = searchState,
+                onGetDialogueDetails = onGetDialogueDetails,
+                onPlayAudio = onPlayAudio,
+                onSearch = onSearch
+            )
+        }
+    }
+}
 
-                is SearchState.Loading -> LoadingIndicator()
+@Composable
+private fun SearchResultsContent(
+    searchState: SearchState,
+    onGetDialogueDetails: (String) -> Unit,
+    onPlayAudio: (String) -> Unit,
+    onSearch: () -> Unit
+) {
+    when (searchState) {
+        is SearchState.Initial -> {
+            // empty state
+        }
 
-                is SearchState.Success -> {
-                    DialogueSearchResults(
-                        state = searchState,
-                        onGetDialogueDetails = onGetDialogueDetails,
-                        onPlayAudio = onPlayAudio
-                    )
-                }
+        is SearchState.Loading -> LoadingIndicator()
 
-                SearchState.Error -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = stringResource(Res.string.error_failed_to_search_dialogues),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = onSearch) {
-                            Text(stringResource(Res.string.retry_button))
-                        }
-                    }
+        is SearchState.Success -> {
+            DialogueSearchResults(
+                state = searchState,
+                onGetDialogueDetails = onGetDialogueDetails,
+                onPlayAudio = onPlayAudio
+            )
+        }
+
+        SearchState.Error -> {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(Res.string.error_failed_to_search_dialogues),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onSearch,
+                    modifier = Modifier.testTag("retryButton")
+                ) {
+                    Text(stringResource(Res.string.retry_button))
                 }
             }
         }
@@ -165,6 +182,7 @@ private fun DialogueSearchResults(
 ) {
     if (state.results.isEmpty()) {
         Text(
+            modifier = Modifier.testTag("emptyResultsMessage"),
             text = stringResource(Res.string.no_results_found),
             style = MaterialTheme.typography.bodyLarge
         )
