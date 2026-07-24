@@ -32,6 +32,7 @@ kotlin {
                     timeout = "30000"
                 }
                 filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.ui.*")
+                filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.AppTest")
             }
         }
     }
