@@ -1,0 +1,25 @@
+{
+    "mcpServers": {
+        "sonarqube": {
+            "command": "docker",
+            "args": [
+                "run",
+                "--init",
+                "--pull=always",
+                "-i",
+                "--rm",
+                "--env-file",
+                ".env",
+                "-e",
+                "SONARQUBE_ORG",
+                "-e",
+                "SONARQUBE_PROJECT_KEY",
+                "sonarsource/sonarqube-mcp"
+            ],
+            "env": {
+                "SONARQUBE_ORG": "blbulyandavbulyan",
+                "SONARQUBE_PROJECT_KEY": "blbulyandavbulyan_armenian-learning-assistant-ui"
+            }
+        }
+    }
+}
