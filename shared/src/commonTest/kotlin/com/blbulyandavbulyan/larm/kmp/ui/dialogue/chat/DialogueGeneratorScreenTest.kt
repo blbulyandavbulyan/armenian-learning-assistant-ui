@@ -16,9 +16,12 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
+import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
+import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -258,5 +261,43 @@ class DialogueGeneratorScreenTest {
 
         savedDialogues.size shouldBe 1
         savedDialogues[0] shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
+    }
+
+    @Test
+    fun dialogueGeneratorScreen_withViewModel_delegatesToViewModel() = runComposeUiTest {
+        val fakeRepo = FakeDialogueChatRepository().apply {
+            dialoguesToReturn.add(DialogueChatResponseMother.FULL_DIALOGUE_1)
+        }
+        val viewModel = DialogueChatViewModel(fakeRepo, GlobalErrorManager())
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueGeneratorScreen(
+                    viewModel = viewModel,
+                    onNavigateToSearch = {}
+                )
+            }
+        }
+
+        // Type a prompt and send
+        val testPrompt = "Test prompt for viewmodel delegation"
+        onNodeWithTag("inputMessageField").performTextInput(testPrompt)
+        onNodeWithTag("sendButton").performClick()
+
+        waitForIdle()
+
+        // Verify that the viewModel received the prompt via its generateDialogue method
+        // which calls the repository under the hood
+        fakeRepo.lastPrompt shouldBe testPrompt
+
+        // Wait for the generated dialogue to appear
+        onAllNodesWithTag("saveButton")[0].assertIsDisplayed()
+
+        // Click the save button on the generated dialogue
+        onAllNodesWithTag("saveButton")[0].performClick()
+        waitForIdle()
+
+        // Verify that the viewModel delegated the save action to the repository
+        fakeRepo.lastSavedDialogue shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
     }
 }
