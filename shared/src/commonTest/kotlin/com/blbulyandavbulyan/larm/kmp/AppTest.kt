@@ -3,8 +3,10 @@ package com.blbulyandavbulyan.larm.kmp
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
@@ -48,9 +50,7 @@ class AppTest {
     }
 
     @Test
-    fun searchResults_areDisplayedCorrectly_whenQueryIsSubmitted() = runComposeUiTest {
-        // TODO rewrite this test to assert that only 'screens' are shown (by tags), like to test 'navigation'
-
+    fun navigationFlow_searchToDetailAndBack() = runComposeUiTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
         val fakeAudioRepository = FakeAssetRepository()
         val viewModel =
@@ -70,55 +70,37 @@ class AppTest {
             App(appViewModel = appViewModel, searchViewModel = viewModel, chatViewModel = chatViewModel)
         }
 
-        performSearchAndAssertResultsVisible()
-
-        val dialogueId1 = GetDialogueResponseMother.FULL_DIALOGUE_1.id
-        // Click View Full
-        onNodeWithTag("viewFullDialogueButton_$dialogueId1").performClick()
-
-        // Wait for animation to finish and detail screen to appear
-        waitUntil(timeoutMillis = 5000) {
-            onAllNodesWithTag("detailTitleText", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
-        }
-
-        // Ensure ViewModel navigation to detail is triggered
-        appViewModel.currentScreen.value::class.simpleName shouldBe "Detail"
-
-//        assertDetailScreenContentVisible()
-
-        onNodeWithTag("backButton").performClick()
-
-        waitUntil(timeoutMillis = 5000) { onAllNodesWithTag("searchInputField").fetchSemanticsNodes().isNotEmpty() }
-
-        viewModel.searchQuery.value shouldBe "Hello"
-    }
-
-    @OptIn(ExperimentalTestApi::class)
-    private fun androidx.compose.ui.test.ComposeUiTest.performSearchAndAssertResultsVisible() {
+        // 1. Search something -> go to search screen
         onNodeWithTag("searchInputField").performTextInput("Hello")
         onNodeWithTag("searchSubmitButton").performClick()
         waitForIdle()
 
         val dialogueId1 = GetDialogueResponseMother.FULL_DIALOGUE_1.id
-        val expectedPhrase1 = GetDialogueResponseMother.FULL_DIALOGUE_1.title.phrase
-        val expectedTranscription1 = GetDialogueResponseMother.FULL_DIALOGUE_1.title.transcription
 
-        val secondDialogue = SearchDialoguesResponseMother.SEARCH_RESPONSE_1.dialogues[1]
-        val dialogueId2 = secondDialogue.id
+        // Assert search completed
+        onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertIsDisplayed()
 
-        // Assert the first dialogue is visible
-        onNodeWithTag("searchResultCard_$dialogueId1").performScrollTo().assertIsDisplayed()
-        onNodeWithTag("searchResultPhrase_$dialogueId1", useUnmergedTree = true).assertIsDisplayed()
-            .assertTextEquals(expectedPhrase1)
-        onNodeWithTag("searchResultTranscription_$dialogueId1", useUnmergedTree = true).assertIsDisplayed()
-            .assertTextEquals(expectedTranscription1)
+        // 2. Press 'view details' button on the search result screen -> go to the details
+        onNodeWithTag("viewFullDialogueButton_$dialogueId1").performClick()
 
-        // Assert the second dialogue is visible
-        onNodeWithTag("searchResultCard_$dialogueId2").performScrollTo().assertIsDisplayed()
-        onNodeWithTag("searchResultPhrase_$dialogueId2", useUnmergedTree = true).assertIsDisplayed()
-            .assertTextEquals(secondDialogue.title.phrase)
-        onNodeWithTag("searchResultTranscription_$dialogueId2", useUnmergedTree = true).assertIsDisplayed()
-            .assertTextEquals(secondDialogue.title.transcription)
+        // Wait for detail screen to appear
+        waitUntil(timeoutMillis = 5000) {
+            onAllNodesWithTag("detailTitleText", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Assert some specific content on the detail screen to verify navigation (e.g. 1 phrase from the dialogue)
+        val expectedPhrase = GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases[0].phrase.phrase
+        onNodeWithText(expectedPhrase).assertIsDisplayed()
+        onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertDoesNotExist()
+
+        // 3. Press back -> go back
+        onNodeWithTag("backButton").performClick()
+
+        // Wait for search screen to reappear
+        waitUntil(timeoutMillis = 5000) { onAllNodesWithTag("searchInputField").fetchSemanticsNodes().isNotEmpty() }
+        
+        // Assert we are back on search screen
+        onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertIsDisplayed()
     }
 
     private fun createFakeDialogueRepository() = object : FakeDialogueRepository() {
