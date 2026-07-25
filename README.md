@@ -43,3 +43,12 @@ Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-mu
 
 We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
 If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+
+### MCP servers
+#### Sonar MCP Server
+To make it work, you have to create `.env` file in the root of the project with the following content:
+```
+SONARQUBE_TOKEN=<YOUR_SONAR_TOKEN>
+```
+
+And put instead of `<YOUR_SONAR_TOKEN>` your real sonar token

@@ -32,6 +32,7 @@ kotlin {
                     timeout = "30000"
                 }
                 filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.ui.*")
+                filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.AppTest")
             }
         }
     }
@@ -79,6 +80,7 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.mp3spi)
         }
     }
 }

@@ -22,5 +22,10 @@ We follow a Clean Architecture / MVVM separation style. Code should be separated
 
 *Rule of thumb:* If it draws pixels on the screen (Composables), it goes in `ui`. If it manages state and talks to repositories (ViewModels), it goes in `presentation`.
 
+## Strict Unidirectional Data Flow (UDF) & State Management
+- **CRITICAL: Never mutate pure UI components for asynchronous state**: Dumb, generic UI components (like a `SearchField`, custom buttons, etc.) must NEVER contain their own `isLoading` state or manage network feedback. They must remain pure inputs/outputs.
+- **Global Loading & Navigation State**: Screen-level asynchronous events (like waiting for a search request before navigating) must be lifted to the Route/Navigation layer (e.g., `AppViewModel` and `App.kt`). Do not take shortcuts by hacking loading spinners into leaf components.
+- **Strict Route/Screen Split**: `App.kt` (or route wrappers) are the ONLY places allowed to collect ViewModel state and orchestrate `ScreenState` (including `ScreenState.Loading`). Child composables should only receive primitive data types and callback lambdas.
+
 ## UI Guidelines
 - **No Hardcoded Strings**: Never hardcode UI display strings directly in Kotlin/Compose code. Always use Compose Multiplatform resources defined in `shared/src/commonMain/composeResources/values/strings.xml` (and appropriate localized files like `values-ru/strings.xml`) and reference them via `stringResource(Res.string.your_string_name)`.

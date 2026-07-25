@@ -1,7 +1,7 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueRequestMother
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponseMother
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponseMother
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
@@ -9,20 +9,19 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 import kotlin.test.Test
 
 class NetworkDialogueRepositoryTest {
 
     @Test
-    fun `generateDialogue delegates to ApiClient correctly`() = runTest {
+    fun `searchDialogues delegates to ApiClient correctly`() = runTest {
         val mockEngine = MockEngine { request ->
-            request.url.encodedPath shouldBe "/chat/dialogue"
-            request.method shouldBe HttpMethod.Post
+            request.url.encodedPath shouldBe "/dialogues/search"
+            request.url.parameters["query"] shouldBe "test-query"
+            request.method shouldBe HttpMethod.Get
             respond(
-                content = Json.encodeToString(DialogueChatResponseMother.FULL_DIALOGUE_1),
+                content = SearchDialoguesResponseMother.SearchResponse1.JSON_RESPONSE,
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -36,26 +35,18 @@ class NetworkDialogueRepositoryTest {
         val apiClient = ApiClient(client = mockClient)
         val repository = NetworkDialogueRepository(apiClient)
 
-        val response = repository.generateDialogue(prompt = "Test prompt", chatId = "chat456")
+        val response = repository.searchDialogues("test-query")
 
-        response shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
+        response shouldBe SearchDialoguesResponseMother.SearchResponse1.RESPONSE
     }
 
     @Test
-    fun `saveDialogue delegates to ApiClient correctly`() = runTest {
+    fun `searchDialogues delegates to ApiClient correctly for empty results`() = runTest {
         val mockEngine = MockEngine { request ->
-            request.url.encodedPath shouldBe "/dialogues"
-            request.method shouldBe HttpMethod.Post
-
-            val bodyBytes = request.body.toByteArray()
-            val bodyText = bodyBytes.decodeToString()
-
-            val expectedJson = Json.encodeToJsonElement(SaveDialogueRequestMother.FULL_REQUEST_1)
-            val actualJson = Json.parseToJsonElement(bodyText)
-            actualJson shouldBe expectedJson
-
+            request.url.encodedPath shouldBe "/dialogues/search"
+            request.url.parameters["query"] shouldBe "hello"
             respond(
-                content = """{"id": "fake-uuid-1234"}""",
+                content = """{"dialogues": []}""",
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -67,7 +58,34 @@ class NetworkDialogueRepositoryTest {
         }
         val apiClient = ApiClient(client = mockClient)
         val repository = NetworkDialogueRepository(apiClient)
-        val response = repository.saveDialogue(DialogueChatResponseMother.FULL_DIALOGUE_1)
-        response shouldBe "fake-uuid-1234"
+
+        val result = repository.searchDialogues("hello")
+        result.dialogues.size shouldBe 0
+    }
+
+    @Test
+    fun `getDialogue delegates to ApiClient correctly`() = runTest {
+        val dialogueId = "dialogue_id_123"
+
+        val mockEngine = MockEngine { request ->
+            request.url.encodedPath shouldBe "/dialogues/$dialogueId"
+            request.method shouldBe HttpMethod.Get
+            respond(
+                content = GetDialogueResponseMother.Dialogue1.JSON_RESPONSE,
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+
+        val mockClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val apiClient = ApiClient(client = mockClient)
+        val repository = NetworkDialogueRepository(apiClient)
+
+        val response = repository.getDialogue(dialogueId)
+        response shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE
     }
 }

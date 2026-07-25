@@ -1,0 +1,13 @@
+<!-- Modified from Google Material Icons (Apache License 2.0) -->
+<!-- Adjusted viewport and path to crop invisible padding -->
+<!--Original https://fonts.google.com/icons?icon.size=24&icon.color=%23e3e3e3&icon.platform=android&icon.query=arrow+right&selected=Material+Symbols+Outlined:arrow_right:FILL@0;wght@400;GRAD@0;opsz@24 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="6dp"
+        android:height="48dp"
+        android:viewportWidth="100"
+        android:viewportHeight="400"
+        android:autoMirrored="true">
+    <path
+            android:fillColor="#000000"
+            android:pathData="M0,400L0,0L100,200Z"/>
+</vector>
