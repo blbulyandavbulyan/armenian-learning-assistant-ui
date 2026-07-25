@@ -1,5 +1,6 @@
 package com.blbulyandavbulyan.larm.kmp.ui.dialogue.detail
 
+import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -7,7 +8,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runComposeUiTest
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponseMother
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
@@ -61,14 +65,8 @@ class DialogueDetailScreenTest {
     }
 
     @OptIn(ExperimentalTestApi::class)
-    private fun androidx.compose.ui.test.ComposeUiTest.assertDetailScreenContentVisible() {
-        val expectedPhrase1 = GetDialogueResponseMother.Dialogue1.RESPONSE.title.phrase
-        val expectedTranscription1 = GetDialogueResponseMother.Dialogue1.RESPONSE.title.transcription
-
-        // Assert the correct dialogue is shown in the detail screen
-        onNodeWithTag("detailTitleText", useUnmergedTree = true).assertIsDisplayed().assertTextEquals(expectedPhrase1)
-        onNodeWithTag("detailTranscriptionText", useUnmergedTree = true).assertIsDisplayed()
-            .assertTextEquals(expectedTranscription1)
+    private fun ComposeUiTest.assertDetailScreenContentVisible() {
+        assertDialogueTitle(GetDialogueResponseMother.Dialogue1.RESPONSE)
 
         val speaker1 = GetDialogueResponseMother.Dialogue1.RESPONSE.speakers[0]
         val phrase1 = GetDialogueResponseMother.Dialogue1.RESPONSE.dialoguePhrases[0].phrase
@@ -76,48 +74,59 @@ class DialogueDetailScreenTest {
         val speaker2 = GetDialogueResponseMother.Dialogue1.RESPONSE.speakers[1]
         val phrase2 = GetDialogueResponseMother.Dialogue1.RESPONSE.dialoguePhrases[1].phrase
 
-        // Assert the first speaker and phrase are shown using tags
-        onNodeWithTag("speakerName_${speaker1.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(speaker1.name.phrase)
-        onNodeWithTag(
-            "speakerTranscription_${speaker1.id}",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed()
-            .assertTextEquals("(${speaker1.name.transcription})")
-        onNodeWithTag(
-            "speakerTranslation_${speaker1.id}_0",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(speaker1.name.translations[0].translationText)
+        assertSpeakerAndPhrase(speaker1, phrase1)
+        assertSpeakerAndPhrase(speaker2, phrase2)
+    }
 
-        onNodeWithTag("phraseText_${phrase1.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(phrase1.phrase)
-        onNodeWithTag("phraseTranscription_${phrase1.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(phrase1.transcription)
-        // Assert phrase 1 translation is shown
-        onNodeWithTag("phraseTranslation_${phrase1.id}_0", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(phrase1.translations[0].translationText)
+    private fun ComposeUiTest.assertDialogueTitle(response: GetDialogueResponse) {
+        val expectedTitlePhrase = response.title.phrase
+        val expectedTitleTranscription = response.title.transcription
 
-        // Assert the second speaker and phrase are shown using tags
-        onNodeWithTag("speakerName_${speaker2.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(speaker2.name.phrase)
+        onNodeWithTag(testTag = "detailTitleText", useUnmergedTree = true).assertIsDisplayed()
+            .assertTextEquals(expectedTitlePhrase)
         onNodeWithTag(
-            "speakerTranscription_${speaker2.id}",
+            testTag = "detailTranscriptionText",
+            useUnmergedTree = true
+        ).assertIsDisplayed()
+            .assertTextEquals(expectedTitleTranscription)
+        response.title.translations.forEach { translation ->
+            onNodeWithTag(
+                "detailTranslationText_${translation.id}",
+                useUnmergedTree = true
+            ).performScrollTo().assertIsDisplayed()
+                .assertTextEquals(translation.translationText)
+        }
+    }
+
+    private fun ComposeUiTest.assertSpeakerAndPhrase(
+        speaker: GetDialogueSpeakerResponse,
+        phrase: PhraseResponse
+    ) {
+        onNodeWithTag("speakerName_${speaker.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(speaker.name.phrase)
+        onNodeWithTag(
+            "speakerTranscription_${speaker.id}",
             useUnmergedTree = true
         ).performScrollTo().assertIsDisplayed()
-            .assertTextEquals("(${speaker2.name.transcription})")
-        onNodeWithTag(
-            "speakerTranslation_${speaker2.id}_0",
-            useUnmergedTree = true
-        ).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(speaker2.name.translations[0].translationText)
+            .assertTextEquals("(${speaker.name.transcription})")
+        speaker.name.translations.forEachIndexed { index, translation ->
+            onNodeWithTag(
+                "speakerTranslation_${speaker.id}_$index",
+                useUnmergedTree = true
+            ).performScrollTo().assertIsDisplayed()
+                .assertTextEquals(translation.translationText)
+        }
 
-        onNodeWithTag("phraseText_${phrase2.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(phrase2.phrase)
-        onNodeWithTag("phraseTranscription_${phrase2.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(phrase2.transcription)
-        // Assert phrase 2 translation is shown
-        onNodeWithTag("phraseTranslation_${phrase2.id}_0", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
-            .assertTextEquals(phrase2.translations[0].translationText)
+        onNodeWithTag("phraseText_${phrase.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(phrase.phrase)
+        onNodeWithTag("phraseTranscription_${phrase.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            .assertTextEquals(phrase.transcription)
+        phrase.translations.forEachIndexed { index, translation ->
+            onNodeWithTag(
+                "phraseTranslation_${phrase.id}_$index",
+                useUnmergedTree = true
+            ).performScrollTo().assertIsDisplayed()
+                .assertTextEquals(translation.translationText)
+        }
     }
 }

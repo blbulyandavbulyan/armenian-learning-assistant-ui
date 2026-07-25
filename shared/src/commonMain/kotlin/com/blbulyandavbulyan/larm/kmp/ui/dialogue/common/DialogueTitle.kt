@@ -30,6 +30,7 @@ fun DialogueTitle(
     testTag: String? = null,
     phraseTestTag: String = "detailTitleText",
     transcriptionTestTag: String = "detailTranscriptionText",
+    translationTestTagPrefix: String = "detailTranslationText",
     onPlayAudio: (String) -> Unit
 ) {
     val headerShape = RoundedCutBottomRightShape(
@@ -68,7 +69,7 @@ fun DialogueTitle(
 
             DialogueTitleTranscription(dialogueTitle.transcription, testTag = transcriptionTestTag)
 
-            DialogueTitleTranslations(dialogueTitle.translations)
+            DialogueTitleTranslations(dialogueTitle.translations, testTagPrefix = translationTestTagPrefix)
         }
     }
 }
@@ -106,13 +107,14 @@ private fun DialogueTitleTranscription(transcription: String, testTag: String) {
 
 @Composable
 private fun DialogueTitleTranslations(
-    translations: List<PhraseTranslation>
+    translations: List<PhraseTranslation>,
+    testTagPrefix: String
 ) {
     translations.forEach { translation ->
         Text(
             text = translation.translationText,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(bottom = 4.dp).testTag("${testTagPrefix}_${translation.id}"),
             color = MaterialTheme.colorScheme.onBackground
         )
     }
