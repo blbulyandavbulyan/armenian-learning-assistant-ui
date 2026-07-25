@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Генератор Диалогов</string>
+    <string name="dialogue_generator_title">Генератор Диалогов</string>
     <string name="header_subtitle">Создавайте армянские диалоги с помощью ИИ</string>
     <string name="empty_conversation_message">Диалог еще не сгенерирован. Попросите меня создать его!</string>
     <string name="input_placeholder">Напр., Я хочу пойти в продуктовый магазин... (Enter для отправки, Shift+Enter для новой строки)</string>

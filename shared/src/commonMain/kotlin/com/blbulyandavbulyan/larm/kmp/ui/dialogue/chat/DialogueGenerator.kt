@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_send
-import armenianlearningassistant_kmp.shared.generated.resources.app_name
+import armenianlearningassistant_kmp.shared.generated.resources.dialogue_generator_title
 import armenianlearningassistant_kmp.shared.generated.resources.empty_conversation_message
 import armenianlearningassistant_kmp.shared.generated.resources.header_subtitle
 import armenianlearningassistant_kmp.shared.generated.resources.input_placeholder
@@ -288,7 +288,7 @@ private fun Header(onNavigateToSearch: (String) -> Unit) {
     ) {
         Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
             Text(
-                text = stringResource(Res.string.app_name),
+                text = stringResource(Res.string.dialogue_generator_title),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
