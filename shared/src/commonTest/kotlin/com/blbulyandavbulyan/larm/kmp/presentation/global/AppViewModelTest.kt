@@ -1,8 +1,7 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.global
 
 import app.cash.turbine.test
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponseMother
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
@@ -39,14 +38,9 @@ class AppViewModelTest {
             awaitItem().shouldBeInstanceOf<ScreenState.Search>()
             viewModel.navigateToLoading()
             awaitItem().shouldBeInstanceOf<ScreenState.Loading>()
-            val fakeDialogue = GetDialogueResponse(
-                id = "1",
-                title = PhraseResponse("1", "Title", "en", "Trans", emptyList(), emptyList()),
-                speakers = emptyList(),
-                dialoguePhrases = emptyList()
-            )
+            val fakeDialogue = GetDialogueResponseMother.Dialogue1.RESPONSE
             viewModel.navigateToDetail(fakeDialogue)
-            awaitItem().shouldBeInstanceOf<ScreenState.Detail>().dialogue.id shouldBe "1"
+            awaitItem().shouldBeInstanceOf<ScreenState.Detail>().dialogue shouldBe fakeDialogue
             viewModel.navigateToGenerator()
             awaitItem().shouldBeInstanceOf<ScreenState.Generator>()
         }
