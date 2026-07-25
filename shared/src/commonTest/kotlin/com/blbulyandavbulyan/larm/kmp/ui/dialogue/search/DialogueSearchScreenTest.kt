@@ -97,21 +97,21 @@ class DialogueSearchScreenTest {
         onNodeWithTag("searchInputField").performTextInput("Hello")
         onNodeWithTag("searchSubmitButton").performClick()
 
-        val dialogueId = GetDialogueResponseMother.FULL_DIALOGUE_1.id
+        val dialogueId = GetDialogueResponseMother.Dialogue1.RESPONSE.id
 
         // Test Case 4: Search screen listen button
         onNodeWithTag("listenButton_$dialogueId").performClick()
 
-        fakeAudioRepository.requestedUrls.last() shouldBe GetDialogueResponseMother.FULL_DIALOGUE_1.title.assets.first().url
+        fakeAudioRepository.requestedUrls.last() shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE.title.assets.first().url
     }
 
     private fun createFakeDialogueRepository() = object : FakeDialogueRepository() {
         override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
-            return SearchDialoguesResponseMother.SEARCH_RESPONSE_1
+            return SearchDialoguesResponseMother.SearchResponse1.RESPONSE
         }
 
         override suspend fun getDialogue(id: String): GetDialogueResponse {
-            return GetDialogueResponseMother.FULL_DIALOGUE_1
+            return GetDialogueResponseMother.Dialogue1.RESPONSE
         }
     }
 

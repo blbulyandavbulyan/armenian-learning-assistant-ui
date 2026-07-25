@@ -21,28 +21,28 @@ class DialogueDetailScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueDetailScreen(
-                    dialogue = GetDialogueResponseMother.FULL_DIALOGUE_1,
+                    dialogue = GetDialogueResponseMother.Dialogue1.RESPONSE,
                     onBack = { },
                     onPlayAudio = { playedUrls.add(it) }
                 )
             }
         }
 
-        val dialogueId = GetDialogueResponseMother.FULL_DIALOGUE_1.id
+        val dialogueId = GetDialogueResponseMother.Dialogue1.RESPONSE.id
 
         // Test Case 1: Title Listen Button
         onNodeWithTag("listenTitleButton_$dialogueId").performClick()
-        playedUrls.last() shouldBe GetDialogueResponseMother.FULL_DIALOGUE_1.title.assets.first().url
+        playedUrls.last() shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE.title.assets.first().url
 
         // Test Case 2: Speaker Listen Button
-        val speakerId = GetDialogueResponseMother.FULL_DIALOGUE_1.speakers.first().id
+        val speakerId = GetDialogueResponseMother.Dialogue1.RESPONSE.speakers.first().id
         onNodeWithTag("listenSpeakerButton_$speakerId").performScrollTo().performClick()
-        playedUrls.last() shouldBe GetDialogueResponseMother.FULL_DIALOGUE_1.speakers.first().name.assets.first().url
+        playedUrls.last() shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE.speakers.first().name.assets.first().url
 
         // Test Case 3: Phrase Listen Button
-        val phraseId = GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases.first().phrase.id
+        val phraseId = GetDialogueResponseMother.Dialogue1.RESPONSE.dialoguePhrases.first().phrase.id
         onNodeWithTag("listenPhraseButton_$phraseId").performScrollTo().performClick()
-        playedUrls.last() shouldBe GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases.first().phrase.assets.first().url
+        playedUrls.last() shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE.dialoguePhrases.first().phrase.assets.first().url
     }
 
     @Test
@@ -50,7 +50,7 @@ class DialogueDetailScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueDetailScreen(
-                    dialogue = GetDialogueResponseMother.FULL_DIALOGUE_1,
+                    dialogue = GetDialogueResponseMother.Dialogue1.RESPONSE,
                     onBack = { },
                     onPlayAudio = { }
                 )
@@ -62,19 +62,19 @@ class DialogueDetailScreenTest {
 
     @OptIn(ExperimentalTestApi::class)
     private fun androidx.compose.ui.test.ComposeUiTest.assertDetailScreenContentVisible() {
-        val expectedPhrase1 = GetDialogueResponseMother.FULL_DIALOGUE_1.title.phrase
-        val expectedTranscription1 = GetDialogueResponseMother.FULL_DIALOGUE_1.title.transcription
+        val expectedPhrase1 = GetDialogueResponseMother.Dialogue1.RESPONSE.title.phrase
+        val expectedTranscription1 = GetDialogueResponseMother.Dialogue1.RESPONSE.title.transcription
 
         // Assert the correct dialogue is shown in the detail screen
         onNodeWithTag("detailTitleText", useUnmergedTree = true).assertIsDisplayed().assertTextEquals(expectedPhrase1)
         onNodeWithTag("detailTranscriptionText", useUnmergedTree = true).assertIsDisplayed()
             .assertTextEquals(expectedTranscription1)
 
-        val speaker1 = GetDialogueResponseMother.FULL_DIALOGUE_1.speakers[0]
-        val phrase1 = GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases[0].phrase
+        val speaker1 = GetDialogueResponseMother.Dialogue1.RESPONSE.speakers[0]
+        val phrase1 = GetDialogueResponseMother.Dialogue1.RESPONSE.dialoguePhrases[0].phrase
 
-        val speaker2 = GetDialogueResponseMother.FULL_DIALOGUE_1.speakers[1]
-        val phrase2 = GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases[1].phrase
+        val speaker2 = GetDialogueResponseMother.Dialogue1.RESPONSE.speakers[1]
+        val phrase2 = GetDialogueResponseMother.Dialogue1.RESPONSE.dialoguePhrases[1].phrase
 
         // Assert the first speaker and phrase are shown using tags
         onNodeWithTag("speakerName_${speaker1.id}", useUnmergedTree = true).performScrollTo().assertIsDisplayed()

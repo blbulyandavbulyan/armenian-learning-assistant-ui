@@ -9,7 +9,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class AssetRepositoryTest {
+class NetworkAssetRepositoryTest {
     @Test
     fun testGetAudioBytes() = runTest {
         val mockEngine = MockEngine { _ ->

@@ -9,7 +9,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
@@ -22,7 +21,7 @@ class NetworkDialogueRepositoryTest {
             request.url.parameters["query"] shouldBe "test-query"
             request.method shouldBe HttpMethod.Get
             respond(
-                content = Json.encodeToString(SearchDialoguesResponseMother.SEARCH_RESPONSE_1),
+                content = SearchDialoguesResponseMother.SearchResponse1.JSON_RESPONSE,
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -38,17 +37,41 @@ class NetworkDialogueRepositoryTest {
 
         val response = repository.searchDialogues("test-query")
 
-        response shouldBe SearchDialoguesResponseMother.SEARCH_RESPONSE_1
+        response shouldBe SearchDialoguesResponseMother.SearchResponse1.JSON_RESPONSE
+    }
+
+    @Test
+    fun `searchDialogues delegates to ApiClient correctly for empty results`() = runTest {
+        val mockEngine = MockEngine { request ->
+            request.url.encodedPath shouldBe "/dialogues/search"
+            request.url.parameters["query"] shouldBe "hello"
+            respond(
+                content = """{"dialogues": []}""",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val mockClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val apiClient = ApiClient(client = mockClient)
+        val repository = NetworkDialogueRepository(apiClient)
+
+        val result = repository.searchDialogues("hello")
+        result.dialogues.size shouldBe 0
     }
 
     @Test
     fun `getDialogue delegates to ApiClient correctly`() = runTest {
         val dialogueId = "dialogue_id_123"
+
         val mockEngine = MockEngine { request ->
             request.url.encodedPath shouldBe "/dialogues/$dialogueId"
             request.method shouldBe HttpMethod.Get
             respond(
-                content = Json.encodeToString(GetDialogueResponseMother.FULL_DIALOGUE_1),
+                content = GetDialogueResponseMother.Dialogue1.JSON_RESPONSE,
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -63,6 +86,6 @@ class NetworkDialogueRepositoryTest {
         val repository = NetworkDialogueRepository(apiClient)
 
         val response = repository.getDialogue(dialogueId)
-        response shouldBe GetDialogueResponseMother.FULL_DIALOGUE_1
+        response shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE
     }
 }

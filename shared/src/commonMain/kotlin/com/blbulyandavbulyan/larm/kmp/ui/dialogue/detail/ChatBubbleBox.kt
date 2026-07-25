@@ -22,11 +22,17 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
+/**
+ * @property cornerRadius Rounded corners for the body
+ * @property tailWidth Width of the tail at the bubble base
+ * @property tailHeight How far down the tail points
+ * @property tailOffset Distance from the left edge to the tail
+ */
 private class ChatBubbleShape(
-    private val cornerRadius: Float = 45f, // Rounded corners for the body
-    private val tailWidth: Float = 35f, // Width of the tail at the bubble base
-    private val tailHeight: Float = 30f, // How far down the tail points
-    private val tailOffset: Float = 60f // Distance from the left edge to the tail
+    private val cornerRadius: Float = 45f,
+    private val tailWidth: Float = 35f,
+    private val tailHeight: Float = 30f,
+    private val tailOffset: Float = 60f
 ) : Shape {
 
     override fun createOutline(

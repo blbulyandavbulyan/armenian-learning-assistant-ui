@@ -72,7 +72,7 @@ class AppTest {
         onNodeWithTag("searchSubmitButton").performClick()
         waitForIdle()
 
-        val dialogueId1 = GetDialogueResponseMother.FULL_DIALOGUE_1.id
+        val dialogueId1 = GetDialogueResponseMother.Dialogue1.RESPONSE.id
 
         // Assert search completed
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertIsDisplayed()
@@ -86,7 +86,7 @@ class AppTest {
         }
 
         // Assert some specific content on the detail screen to verify navigation (e.g. 1 phrase from the dialogue)
-        val expectedPhrase = GetDialogueResponseMother.FULL_DIALOGUE_1.dialoguePhrases[0].phrase.phrase
+        val expectedPhrase = GetDialogueResponseMother.Dialogue1.RESPONSE.dialoguePhrases[0].phrase.phrase
         onNodeWithText(expectedPhrase).assertIsDisplayed()
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertDoesNotExist()
 
@@ -131,23 +131,23 @@ class AppTest {
         // Wait for search screen to appear
         waitUntil(timeoutMillis = 5000) {
             onAllNodesWithTag(
-                "viewFullDialogueButton_${GetDialogueResponseMother.FULL_DIALOGUE_1.id}"
+                "viewFullDialogueButton_${GetDialogueResponseMother.Dialogue1.RESPONSE.id}"
             ).fetchSemanticsNodes().isNotEmpty()
         }
 
         // Assert we are on search screen and search is completed
-        onNodeWithTag("viewFullDialogueButton_${GetDialogueResponseMother.FULL_DIALOGUE_1.id}").assertIsDisplayed()
+        onNodeWithTag("viewFullDialogueButton_${GetDialogueResponseMother.Dialogue1.RESPONSE.id}").assertIsDisplayed()
         onNodeWithTag("dialogueGeneratorScreen").assertDoesNotExist()
         onNodeWithTag("searchInputField").assertTextEquals("Hello")
     }
 
     private fun createFakeDialogueRepository() = object : FakeDialogueRepository() {
         override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
-            return SearchDialoguesResponseMother.SEARCH_RESPONSE_1
+            return SearchDialoguesResponseMother.SearchResponse1.RESPONSE
         }
 
         override suspend fun getDialogue(id: String): GetDialogueResponse {
-            return GetDialogueResponseMother.FULL_DIALOGUE_1
+            return GetDialogueResponseMother.Dialogue1.RESPONSE
         }
     }
 }
