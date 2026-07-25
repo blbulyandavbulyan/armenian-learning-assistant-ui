@@ -8,10 +8,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runComposeUiTest
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
+import com.blbulyandavbulyan.larm.kmp.ui.dialogue.assertDialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
@@ -66,7 +66,7 @@ class DialogueDetailScreenTest {
 
     @OptIn(ExperimentalTestApi::class)
     private fun ComposeUiTest.assertDetailScreenContentVisible() {
-        assertDialogueTitle(GetDialogueResponseMother.Dialogue1.RESPONSE)
+        assertDialogueTitle(GetDialogueResponseMother.Dialogue1.RESPONSE.title)
 
         val speaker1 = GetDialogueResponseMother.Dialogue1.RESPONSE.speakers[0]
         val phrase1 = GetDialogueResponseMother.Dialogue1.RESPONSE.dialoguePhrases[0].phrase
@@ -76,26 +76,6 @@ class DialogueDetailScreenTest {
 
         assertSpeakerAndPhrase(speaker1, phrase1)
         assertSpeakerAndPhrase(speaker2, phrase2)
-    }
-
-    private fun ComposeUiTest.assertDialogueTitle(response: GetDialogueResponse) {
-        val expectedTitlePhrase = response.title.phrase
-        val expectedTitleTranscription = response.title.transcription
-
-        onNodeWithTag(testTag = "detailTitleText", useUnmergedTree = true).assertIsDisplayed()
-            .assertTextEquals(expectedTitlePhrase)
-        onNodeWithTag(
-            testTag = "detailTranscriptionText",
-            useUnmergedTree = true
-        ).assertIsDisplayed()
-            .assertTextEquals(expectedTitleTranscription)
-        response.title.translations.forEach { translation ->
-            onNodeWithTag(
-                "detailTranslationText_${translation.id}",
-                useUnmergedTree = true
-            ).performScrollTo().assertIsDisplayed()
-                .assertTextEquals(translation.translationText)
-        }
     }
 
     private fun ComposeUiTest.assertSpeakerAndPhrase(

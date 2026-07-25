@@ -49,11 +49,11 @@ class AppTest {
     @Test
     fun navigationFlow_searchToDetailAndBack() = runComposeUiTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
-        val fakeAudioRepository = FakeAssetRepository()
+        val fakeAssetRepository = FakeAssetRepository()
         val viewModel =
             DialogueSearchViewModel(
                 fakeDialogueRepository,
-                fakeAudioRepository,
+                fakeAssetRepository,
                 GlobalErrorManager()
             )
 
@@ -103,11 +103,11 @@ class AppTest {
     @Test
     fun navigationFlow_generatorToSearch() = runComposeUiTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
-        val fakeAudioRepository = FakeAssetRepository()
+        val fakeAssetRepository = FakeAssetRepository()
         val viewModel =
             DialogueSearchViewModel(
                 fakeDialogueRepository,
-                fakeAudioRepository,
+                fakeAssetRepository,
                 GlobalErrorManager()
             )
 

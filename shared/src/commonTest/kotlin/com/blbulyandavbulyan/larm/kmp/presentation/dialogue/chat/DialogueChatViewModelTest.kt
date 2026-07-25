@@ -29,7 +29,7 @@ import kotlin.test.Test
 class DialogueChatViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var fakeRepository: FakeDialogueChatRepository
-    private lateinit var fakeAudioRepository: FakeAssetRepository
+    private lateinit var fakeAssetRepository: FakeAssetRepository
     private lateinit var globalErrorManager: GlobalErrorManager
     private lateinit var viewModel: DialogueChatViewModel
 
@@ -37,7 +37,7 @@ class DialogueChatViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeDialogueChatRepository()
-        fakeAudioRepository = FakeAssetRepository()
+        fakeAssetRepository = FakeAssetRepository()
         globalErrorManager = GlobalErrorManager()
         viewModel = DialogueChatViewModel(fakeRepository, globalErrorManager)
     }

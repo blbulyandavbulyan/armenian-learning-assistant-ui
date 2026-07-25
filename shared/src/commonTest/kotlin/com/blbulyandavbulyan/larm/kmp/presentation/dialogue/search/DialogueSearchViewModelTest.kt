@@ -25,7 +25,7 @@ import kotlin.test.Test
 class DialogueSearchViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var fakeRepository: FakeDialogueRepository
-    private lateinit var fakeAudioRepository: FakeAssetRepository
+    private lateinit var fakeAssetRepository: FakeAssetRepository
     private lateinit var globalErrorManager: GlobalErrorManager
     private lateinit var viewModel: DialogueSearchViewModel
 
@@ -33,9 +33,9 @@ class DialogueSearchViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeDialogueRepository()
-        fakeAudioRepository = FakeAssetRepository()
+        fakeAssetRepository = FakeAssetRepository()
         globalErrorManager = GlobalErrorManager()
-        viewModel = DialogueSearchViewModel(fakeRepository, fakeAudioRepository, globalErrorManager)
+        viewModel = DialogueSearchViewModel(fakeRepository, fakeAssetRepository, globalErrorManager)
     }
 
     @AfterTest
@@ -91,7 +91,7 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `playAudio transitions to Error on failure`() = runTest {
-        fakeAudioRepository.shouldFailWithAssetFetchException = true
+        fakeAssetRepository.shouldFailWithAssetFetchException = true
         viewModel.playAudio("http://example.com")
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
@@ -102,7 +102,7 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun playAudio_whenAudioPlayExceptionThrown_updatesAudioErrorStateAndDoesNotChangeSearchState() = runTest {
-        fakeAudioRepository.shouldFailWithAudioException = true
+        fakeAssetRepository.shouldFailWithAudioException = true
         viewModel.playAudio("url")
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value

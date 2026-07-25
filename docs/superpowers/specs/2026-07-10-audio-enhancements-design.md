@@ -77,7 +77,7 @@ dialoguePhrase.phrase.audioAssetUrl?.let { url ->
 We must implement the audio-related test cases described in the TODO comments at the bottom of `DialogueSearchScreenTest.kt`, specifically updating the mock data to include valid audio assets, and verifying the new audio buttons:
 
 *   **Test Mock Data Updates:** Replace `assets = emptyList() // TODO, not valid, there must be assets` with a valid mock audio asset `AssetResponse("audio/mpeg", "http://test.audio/1")`.
-*   **Test Case 2:** When 'Details' are shown, pressing the listen buttons for the Title, Speaker, and Phrases invokes the `fakeAudioRepository` with the right URL.
+*   **Test Case 2:** When 'Details' are shown, pressing the listen buttons for the Title, Speaker, and Phrases invokes the `fakeAssetRepository` with the right URL.
 *   **Test Case 3 (Audio Cache):** When 'Details' are shown, pressing the listen button multiple times ensures the caching works and the backend is invoked only once.
 *   **Test Case 4:** When the 'Dialogues search screen' is shown, pressing the 'listen' button near the dialogue invokes the correct backend endpoint with the right URL.
 

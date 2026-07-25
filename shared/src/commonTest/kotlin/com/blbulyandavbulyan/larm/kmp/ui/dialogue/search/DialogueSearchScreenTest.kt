@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
@@ -15,6 +16,7 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesRespon
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
+import com.blbulyandavbulyan.larm.kmp.ui.dialogue.assertDialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -46,11 +48,11 @@ class DialogueSearchScreenTest {
     @Test
     fun typingInSearchBar_updatesViewModelQuery_andPersistsWhenReturning() = runComposeUiTest {
         val fakeDialogueRepository = FakeDialogueRepository()
-        val fakeAudioRepository = FakeAssetRepository()
+        val fakeAssetRepository = FakeAssetRepository()
         val viewModel =
             DialogueSearchViewModel(
                 fakeDialogueRepository,
-                fakeAudioRepository,
+                fakeAssetRepository,
                 GlobalErrorManager()
             )
         var backPressed = false
@@ -80,11 +82,11 @@ class DialogueSearchScreenTest {
     @Test
     fun searchScreen_listenButtonInvokesCorrectAudioEndpoint() = runComposeUiTest {
         val fakeDialogueRepository = createFakeDialogueRepository()
-        val fakeAudioRepository = FakeAssetRepository()
+        val fakeAssetRepository = FakeAssetRepository()
         val viewModel =
             DialogueSearchViewModel(
                 fakeDialogueRepository,
-                fakeAudioRepository,
+                fakeAssetRepository,
                 GlobalErrorManager()
             )
 
@@ -102,7 +104,7 @@ class DialogueSearchScreenTest {
         // Test Case 4: Search screen listen button
         onNodeWithTag("listenButton_$dialogueId").performClick()
 
-        fakeAudioRepository.requestedUrls.last() shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE.title.assets.first().url
+        fakeAssetRepository.requestedUrls.last() shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE.title.assets.first().url
     }
 
     private fun createFakeDialogueRepository() = object : FakeDialogueRepository() {
@@ -122,11 +124,11 @@ class DialogueSearchScreenTest {
                 return SearchDialoguesResponse(emptyList())
             }
         }
-        val fakeAudioRepository = FakeAssetRepository()
+        val fakeAssetRepository = FakeAssetRepository()
         val viewModel =
             DialogueSearchViewModel(
                 fakeDialogueRepository,
-                fakeAudioRepository,
+                fakeAssetRepository,
                 GlobalErrorManager()
             )
 
@@ -158,11 +160,11 @@ class DialogueSearchScreenTest {
                 throw RuntimeException("Network Error")
             }
         }
-        val fakeAudioRepository = FakeAssetRepository()
+        val fakeAssetRepository = FakeAssetRepository()
         val viewModel =
             DialogueSearchViewModel(
                 fakeDialogueRepository,
-                fakeAudioRepository,
+                fakeAssetRepository,
                 GlobalErrorManager()
             )
 
@@ -191,15 +193,93 @@ class DialogueSearchScreenTest {
         callCount shouldBe 2
     }
 
-    // TODO YOU DROPPED THIS ENTIRE SECTION OF TODO COMMENTS, BUT I DONT BELIEVE YOU THAT YOU ACTUALLY FIXED THEM
-    //  WE SHOULD CHECK WHAT OF THEM ARE REALLY FIXED, AND WHAT OF THEM YOU JUST CASUALLY DROPPED THINKING THAT THERE WILL BE NO CONSEQUENCES FOR YOU
-    // TODO, implement tests
-    //  1. When search result returned more then one dialogue, then after pressing 'View details' the correct dialogue is shown in the detail screen,
-    //  and all the required information is present on the screen
-    //  2. When 'Details' are shown on the screen, then pressing listening buttons for each thing which could be 'listened',
-    //  invokes the correct endpoint with the RIGHT audi url on the backend
-    //  3. Audio cache testing, when 'Details' are shown on the screen,
-    //  and user presses listen button for some phrase several times -> then the caching works, and the backend endpoint is invoked only ONCE
-    //  4. When 'Dialogues search screen' is shown (not details one), and user presses 'listen' button near the dialogue,
-    //  the correct backend endpoint for the audio is invoked (with the right URL for this specific dialogue)
+    @Test
+    fun searchScreen_success_displaysAllInformationCorrectly() = runComposeUiTest {
+        val fakeDialogueRepository = createFakeDialogueRepository()
+        val fakeAssetRepository = FakeAssetRepository()
+        val viewModel =
+            DialogueSearchViewModel(
+                fakeDialogueRepository,
+                fakeAssetRepository,
+                GlobalErrorManager()
+            )
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+            }
+        }
+
+        onNodeWithTag("searchInputField").performTextInput("Hello")
+        onNodeWithTag("searchSubmitButton").performClick()
+
+        val response = SearchDialoguesResponseMother.SearchResponse1.RESPONSE
+
+        response.dialogues.forEach { dialogue ->
+            assertDialogueTitle(
+                title = dialogue.title,
+                phraseTestTag = "searchResultPhrase_${dialogue.id}",
+                transcriptionTestTag = "searchResultTranscription_${dialogue.id}"
+            )
+        }
+    }
+
+    @Test
+    fun searchScreen_viewDetailsButton_navigatesToDetailScreen() = runComposeUiTest {
+        val fakeDialogueRepository = createFakeDialogueRepository()
+        val fakeAssetRepository = FakeAssetRepository()
+        val viewModel =
+            DialogueSearchViewModel(
+                fakeDialogueRepository,
+                fakeAssetRepository,
+                GlobalErrorManager()
+            )
+
+        var navigateToDialogueId: String? = null
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueSearchScreen(
+                    viewModel = viewModel,
+                    onBack = { },
+                    onGetDialogueDetails = { navigateToDialogueId = it }
+                )
+            }
+        }
+
+        onNodeWithTag("searchInputField").performTextInput("Hello")
+        onNodeWithTag("searchSubmitButton").performClick()
+
+        val secondDialogue = SearchDialoguesResponseMother.SearchResponse1.RESPONSE.dialogues[1]
+
+        onNodeWithTag("viewFullDialogueButton_${secondDialogue.id}").performScrollTo().performClick()
+
+        navigateToDialogueId shouldBe secondDialogue.id
+    }
+
+    @Test
+    fun searchScreen_listenButton_invokesCorrectAudioEndpoint() = runComposeUiTest {
+        val fakeDialogueRepository = createFakeDialogueRepository()
+        val fakeAssetRepository = FakeAssetRepository()
+        val viewModel =
+            DialogueSearchViewModel(
+                fakeDialogueRepository,
+                fakeAssetRepository,
+                GlobalErrorManager()
+            )
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+            }
+        }
+
+        onNodeWithTag("searchInputField").performTextInput("Hello")
+        onNodeWithTag("searchSubmitButton").performClick()
+
+        val secondDialogue = SearchDialoguesResponseMother.SearchResponse1.RESPONSE.dialogues[1]
+
+        onNodeWithTag("listenButton_${secondDialogue.id}").performScrollTo().performClick()
+
+        fakeAssetRepository.requestedUrls.last() shouldBe secondDialogue.title.assets.first().url
+    }
 }
