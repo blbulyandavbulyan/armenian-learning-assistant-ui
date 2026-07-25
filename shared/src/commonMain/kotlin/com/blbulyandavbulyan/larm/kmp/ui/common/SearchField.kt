@@ -31,6 +31,8 @@ fun SearchField(
     onValueChange: (String) -> Unit,
     placeholder: @Composable (() -> Unit)
 ) {
+    val isQueryValid = query.isNotBlank()
+
     OutlinedTextField(
         value = query,
         onValueChange = onValueChange,
@@ -49,7 +51,11 @@ fun SearchField(
             imeAction = ImeAction.Search
         ),
         keyboardActions = KeyboardActions(
-            onSearch = { onSearch() }
+            onSearch = {
+                if (isQueryValid) {
+                    onSearch()
+                }
+            }
         ),
         trailingIcon = {
             Icon(
@@ -58,7 +64,7 @@ fun SearchField(
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.fillMaxHeight()
                     .padding(4.dp)
-                    .clickable { onSearch() }
+                    .clickable(enabled = isQueryValid) { onSearch() }
                     .testTag(searchButtonTestTag)
             )
         }

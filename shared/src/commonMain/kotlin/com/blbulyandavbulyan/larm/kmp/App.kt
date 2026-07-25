@@ -64,15 +64,13 @@ private fun Content(
                     DialogueGeneratorScreen(
                         viewModel = chatViewModel,
                         onNavigateToSearch = { query ->
-                            if (query.isNotBlank()) {
-                                appViewModel.navigateToLoading()
-                                searchViewModel.updateSearchQuery(query)
-                                searchViewModel.searchDialogues(
-                                    query = query,
-                                    onSuccess = appViewModel::navigateToSearch,
-                                    onError = appViewModel::navigateToGenerator
-                                )
-                            }
+                            appViewModel.navigateToLoading()
+                            searchViewModel.updateSearchQuery(query)
+                            searchViewModel.searchDialogues(
+                                query = query,
+                                onSuccess = appViewModel::navigateToSearch,
+                                onError = appViewModel::navigateToGenerator
+                            )
                         }
                     )
                 }
