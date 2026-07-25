@@ -9,11 +9,11 @@ import javax.sound.sampled.LineEvent
 
 actual class AudioPlayer actual constructor() {
     @Suppress("TooGenericExceptionCaught", "kotlin:S6310")
-    actual suspend fun play(audioBytes: ByteArray) {
+    actual suspend fun play(audio: Audio) {
         var clip: Clip? = null
         try {
             withContext(Dispatchers.IO) {
-                val audioInputStream = AudioSystem.getAudioInputStream(ByteArrayInputStream(audioBytes))
+                val audioInputStream = AudioSystem.getAudioInputStream(ByteArrayInputStream(audio.data))
                 clip = AudioSystem.getClip()
                 clip.addLineListener { if (it.type == LineEvent.Type.STOP) clip?.close() }
                 clip.open(audioInputStream)

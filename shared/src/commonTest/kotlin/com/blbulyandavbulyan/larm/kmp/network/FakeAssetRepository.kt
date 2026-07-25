@@ -7,10 +7,10 @@ class FakeAssetRepository : AssetRepository {
     var shouldFailWithAudioException = false
     val requestedUrls = mutableListOf<String>()
 
-    override suspend fun getAssetBytes(url: String): ByteArray {
+    override suspend fun getAsset(url: String): AssetData {
         requestedUrls.add(url)
         if (shouldFailWithAudioException) throw AudioPlayException(message = "Fake Audio Error")
         if (shouldFailWithAssetFetchException) throw AssetFetchException(message = "Fake Network Error")
-        return ByteArray(0)
+        return AssetData(ByteArray(0), "audio/wav")
     }
 }

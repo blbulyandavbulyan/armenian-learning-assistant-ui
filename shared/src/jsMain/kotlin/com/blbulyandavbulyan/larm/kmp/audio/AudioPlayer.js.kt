@@ -9,29 +9,29 @@ import org.w3c.files.BlobPropertyBag
 
 actual class AudioPlayer actual constructor() {
     @Suppress("TooGenericExceptionCaught")
-    actual suspend fun play(audioBytes: ByteArray) {
+    actual suspend fun play(audio: Audio) {
         var url: String? = null
-        var audio: HTMLAudioElement? = null
+        var audioEl: HTMLAudioElement? = null
         try {
-            val blob = Blob(arrayOf(audioBytes), BlobPropertyBag(type = "audio/wav"))
+            val blob = Blob(arrayOf(audio.data), BlobPropertyBag(type = audio.mimeType))
             url = URL.createObjectURL(blob)
-            audio = document.createElement("audio") as HTMLAudioElement
-            audio.src = url
-            document.body?.append(audio)
-            audio.addEventListener("ended") {
+            audioEl = document.createElement("audio") as HTMLAudioElement
+            audioEl.src = url
+            document.body?.append(audioEl)
+            audioEl.addEventListener("ended") {
                 url.let { URL.revokeObjectURL(it) }
-                audio.remove()
+                audioEl.remove()
             }
-            audio.addEventListener("error") {
+            audioEl.addEventListener("error") {
                 println("Audio playback error event")
                 url.let { URL.revokeObjectURL(it) }
-                audio.remove()
+                audioEl.remove()
             }
-            audio.play().await()
+            audioEl.play().await()
         } catch (e: Throwable) {
             println("Audio setup failed: ${e.message}")
             url?.let { URL.revokeObjectURL(it) }
-            audio?.remove()
+            audioEl?.remove()
             throw AudioPlayException(e)
         }
     }

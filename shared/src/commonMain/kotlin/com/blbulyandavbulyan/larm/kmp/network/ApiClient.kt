@@ -44,8 +44,9 @@ class ApiClient(private val client: HttpClient) {
         return response.body()
     }
 
-    suspend fun getAssetBytes(url: String): ByteArray {
+    suspend fun getAsset(url: String): AssetData {
         val response = client.get(url)
-        return response.readRawBytes()
+        val mimeType = response.headers[HttpHeaders.ContentType] ?: throw AssetHasNoContentTypeException()
+        return AssetData(response.readRawBytes(), mimeType)
     }
 }

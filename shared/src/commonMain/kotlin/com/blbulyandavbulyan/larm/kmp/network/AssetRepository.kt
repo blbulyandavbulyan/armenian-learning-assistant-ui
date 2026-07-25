@@ -6,18 +6,19 @@ fun interface AssetRepository {
      * @return asset content
      * @throws AssetFetchException if an error occurs during audio initialization or playback.
      */
-    suspend fun getAssetBytes(url: String): ByteArray
+    suspend fun getAsset(url: String): AssetData
 }
 
 class NetworkAssetRepository(private val apiClient: ApiClient) : AssetRepository {
     @Suppress("TooGenericExceptionCaught")
-    override suspend fun getAssetBytes(url: String): ByteArray {
+    override suspend fun getAsset(url: String): AssetData {
         return try {
-            apiClient.getAssetBytes(url)
+            apiClient.getAsset(url)
         } catch (e: Throwable) {
             throw AssetFetchException(e)
         }
     }
 }
 
-class AssetFetchException(cause: Throwable? = null, message: String? = cause?.message) : Exception(message, cause)
+open class AssetFetchException(cause: Throwable? = null, message: String? = cause?.message) : Exception(message, cause)
+class AssetHasNoContentTypeException : Exception("Asset response is missing Content-Type header")

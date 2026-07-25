@@ -11,7 +11,7 @@ class AudioPlayerTest {
         val invalidBytes = byteArrayOf(1, 2, 3, 4, 5)
 
         shouldThrow<AudioPlayException> {
-            player.play(invalidBytes)
+            player.play(Audio(invalidBytes, "audio/wav"))
         }
     }
 }

@@ -26,34 +26,34 @@ private external fun jsPlayAudio(audio: HTMLAudioElement, onSuccess: () -> Unit,
 
 actual class AudioPlayer actual constructor() {
     @Suppress("TooGenericExceptionCaught")
-    actual suspend fun play(audioBytes: ByteArray) {
+    actual suspend fun play(audio: Audio) {
         var url: String? = null
-        var audio: HTMLAudioElement? = null
+        var audioEl: HTMLAudioElement? = null
         try {
-            val uint8Array = createUint8Array(audioBytes.size)
-            for (i in audioBytes.indices) {
-                setUint8Array(uint8Array, i, audioBytes[i])
+            val uint8Array = createUint8Array(audio.data.size)
+            for (i in audio.data.indices) {
+                setUint8Array(uint8Array, i, audio.data[i])
             }
 
             val jsArray = wrapInArray(uint8Array)
-            val blobPropertyBag = BlobPropertyBag(type = "audio/wav")
+            val blobPropertyBag = BlobPropertyBag(type = audio.mimeType)
             val blob = Blob(jsArray, blobPropertyBag)
 
             url = URL.createObjectURL(blob)
-            audio = document.createElement("audio") as HTMLAudioElement
-            audio.src = url
-            document.body?.append(audio)
-            audio.addEventListener("ended") {
+            audioEl = document.createElement("audio") as HTMLAudioElement
+            audioEl.src = url
+            document.body?.append(audioEl)
+            audioEl.addEventListener("ended") {
                 url.let { URL.revokeObjectURL(it) }
-                audio.remove()
+                audioEl.remove()
             }
-            audio.addEventListener("error") {
+            audioEl.addEventListener("error") {
                 println("Audio playback error event")
                 url.let { URL.revokeObjectURL(it) }
-                audio.remove()
+                audioEl.remove()
             }
             suspendCancellableCoroutine<Unit> { cont ->
-                jsPlayAudio(audio, {
+                jsPlayAudio(audioEl, {
                     cont.resume(Unit)
                 }, {
                     cont.resumeWithException(AudioPlayException(message = it))
@@ -62,7 +62,7 @@ actual class AudioPlayer actual constructor() {
         } catch (e: Throwable) {
             println("Audio setup failed: ${e.message}")
             url?.let { URL.revokeObjectURL(it) }
-            audio?.remove()
+            audioEl?.remove()
             throw AudioPlayException(e)
         }
     }

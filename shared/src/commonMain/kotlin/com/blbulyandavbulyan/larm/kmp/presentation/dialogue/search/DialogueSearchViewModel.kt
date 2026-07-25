@@ -7,6 +7,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.audio_playback_e
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_display_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
+import com.blbulyandavbulyan.larm.kmp.audio.Audio
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayer
 import com.blbulyandavbulyan.larm.kmp.core.UiText
@@ -61,22 +62,22 @@ class DialogueSearchViewModel(
     fun playAudio(url: String) {
         viewModelScope.launch {
             try {
-                val bytes = assetRepository.getAssetBytes(url)
-                audioPlayer.play(bytes)
+                val asset = assetRepository.getAsset(url)
+                audioPlayer.play(Audio(asset.data, asset.mimeType))
             } catch (e: AudioPlayException) {
-                println(e)
-                globalErrorManager.showError(
-                    UiText.from(Res.string.audio_playback_error_title),
-                    UiText.from(e.message, Res.string.error_unknown)
-                )
+                handleAudioError(e)
             } catch (e: AssetFetchException) {
-                println(e)
-                globalErrorManager.showError(
-                    UiText.from(Res.string.audio_playback_error_title),
-                    UiText.from(e.message, Res.string.error_unknown)
-                )
+                handleAudioError(e)
             }
         }
+    }
+
+    private fun handleAudioError(e: Exception) {
+        println(e)
+        globalErrorManager.showError(
+            UiText.from(Res.string.audio_playback_error_title),
+            UiText.from(e.message, Res.string.error_unknown)
+        )
     }
 
     @Suppress("TooGenericExceptionCaught")
