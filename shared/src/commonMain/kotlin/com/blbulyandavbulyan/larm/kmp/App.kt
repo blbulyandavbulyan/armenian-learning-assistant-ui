@@ -1,12 +1,14 @@
 package com.blbulyandavbulyan.larm.kmp
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.blbulyandavbulyan.larm.kmp.core.error.AppError
 import com.blbulyandavbulyan.larm.kmp.di.AppModule
@@ -19,6 +21,7 @@ import com.blbulyandavbulyan.larm.kmp.ui.common.OptionalErrorBanner
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.chat.DialogueGeneratorScreen
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.detail.DialogueDetailScreen
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.DialogueSearchScreen
+import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 
 @Composable
@@ -57,7 +60,12 @@ private fun Content(
     searchViewModel: DialogueSearchViewModel,
     appError: AppError?
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    val appColors = AppTheme.colors
+    val gradientBackground = Brush.verticalGradient(
+        colors = listOf(appColors.gradientTop, appColors.gradientBottom)
+    )
+
+    Box(modifier = Modifier.fillMaxSize().background(gradientBackground)) {
         Crossfade(targetState = currentScreen) { state ->
             when (state) {
                 is ScreenState.Generator -> {
