@@ -66,7 +66,6 @@ fun ChatBubbleBox(
     onClick: () -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
-    // You can tweak these values to perfectly match your UI scale
     val bubbleShape = ChatBubbleShape(
         cornerRadius = 32f,
         tailWidth = 40f,

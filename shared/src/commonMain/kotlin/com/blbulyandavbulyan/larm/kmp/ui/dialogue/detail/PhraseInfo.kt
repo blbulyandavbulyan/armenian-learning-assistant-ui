@@ -69,7 +69,6 @@ private fun PhraseInfo(
     Column(
         modifier = modifier
     ) {
-        // The Chat Bubble Box
         val phraseAudio = dialoguePhrase.phrase.audioAssetUrl
 
         ChatBubbleBox(

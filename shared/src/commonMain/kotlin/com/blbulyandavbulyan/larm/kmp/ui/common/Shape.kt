@@ -8,9 +8,13 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
+/**
+ * @property cornerRadius How round the 3 normal corners are
+ * @property cutOffset How far inward the slant starts
+ */
 class RoundedCutBottomRightShape(
-    private val cornerRadius: Float = 32f, // How round the 3 normal corners are
-    private val cutOffset: Float = 40f // How far inward the slant starts
+    private val cornerRadius: Float = 32f,
+    private val cutOffset: Float = 40f
 ) : Shape {
 
     override fun createOutline(
@@ -63,9 +67,13 @@ class RoundedCutBottomRightShape(
     }
 }
 
+/**
+ * @property cornerRadius Matches your title rounding
+ * @property cutOffset Sleek cut accent
+ */
 class RoundedTopLeftCutShape(
-    private val cornerRadius: Float = 24f, // Matches your title rounding
-    private val cutOffset: Float = 30f // Sleek cut accent
+    private val cornerRadius: Float = 24f,
+    private val cutOffset: Float = 30f
 ) : Shape {
 
     override fun createOutline(
