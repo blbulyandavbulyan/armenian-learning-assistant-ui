@@ -25,15 +25,15 @@ import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.action_saved_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DraftPhrasesResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SpeakerResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DraftPhrase
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DraftSpeaker
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun GeneratedDialogueView(
-    dialogue: DialogueChatResponse,
+    dialogue: GeneratedDialogue,
     fontFamily: FontFamily,
     isSaving: Boolean = false,
     isSaved: Boolean = false,
@@ -64,15 +64,15 @@ fun GeneratedDialogueView(
 
 @Composable
 private fun DialoguePhrasesContent(
-    dialogue: DialogueChatResponse,
-    speakersMap: Map<String, SpeakerResponse>,
+    dialogue: GeneratedDialogue,
+    speakersMap: Map<String, DraftSpeaker>,
     fontFamily: FontFamily
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        dialogue.dialoguePhrases.forEach { phraseObj ->
+        dialogue.phrases.forEach { phraseObj ->
             val speaker = speakersMap[phraseObj.speakerId]
             Card(
                 shape = RoundedCornerShape(
@@ -98,10 +98,10 @@ private fun DialoguePhrasesContent(
 @Composable
 private fun PhraseInfo(
     fontFamily: FontFamily,
-    response: DraftPhrasesResponse
+    response: DraftPhrase
 ) {
     Text(
-        text = response.phrase,
+        text = response.text,
         style = MaterialTheme.typography.bodyLarge.copy(
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
@@ -132,12 +132,12 @@ private fun PhraseInfo(
 
 @Composable
 private fun SpeakerInfo(
-    speaker: SpeakerResponse?,
+    speaker: DraftSpeaker?,
     fontFamily: FontFamily
 ) {
     val speakerText = speaker?.let { spk ->
         val translations = spk.translations.joinToString(" | ") { it.translationText }
-        if (translations.isNotEmpty()) "${spk.title} | $translations" else spk.title
+        if (translations.isNotEmpty()) "${spk.name} | $translations" else spk.name
     } ?: stringResource(Res.string.unknown_speaker)
 
     Text(
@@ -153,7 +153,7 @@ private fun SpeakerInfo(
 
 @Composable
 private fun DialogueInfoContent(
-    dialogue: DialogueChatResponse,
+    dialogue: GeneratedDialogue,
     fontFamily: FontFamily
 ) {
     Row(
@@ -164,7 +164,7 @@ private fun DialogueInfoContent(
         Column(modifier = Modifier.weight(1f)) {
             val titleTranslations = dialogue.info.translations.joinToString(" | ") { it.translationText }
             val titleText =
-                if (titleTranslations.isNotEmpty()) "${dialogue.info.title} | $titleTranslations" else dialogue.info.title
+                if (titleTranslations.isNotEmpty()) "${dialogue.info.text} | $titleTranslations" else dialogue.info.text
 
             Text(
                 text = titleText,

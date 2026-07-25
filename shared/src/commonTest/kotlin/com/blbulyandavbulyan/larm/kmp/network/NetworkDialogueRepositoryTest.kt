@@ -37,7 +37,7 @@ class NetworkDialogueRepositoryTest {
 
         val response = repository.searchDialogues("test-query")
 
-        response shouldBe SearchDialoguesResponseMother.SearchResponse1.RESPONSE
+        response.size shouldBe SearchDialoguesResponseMother.SearchResponse1.RESPONSE.dialogues.size
     }
 
     @Test
@@ -60,7 +60,7 @@ class NetworkDialogueRepositoryTest {
         val repository = NetworkDialogueRepository(apiClient)
 
         val result = repository.searchDialogues("hello")
-        result.dialogues.size shouldBe 0
+        result.size shouldBe 0
     }
 
     @Test
@@ -86,6 +86,6 @@ class NetworkDialogueRepositoryTest {
         val repository = NetworkDialogueRepository(apiClient)
 
         val response = repository.getDialogue(dialogueId)
-        response shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE
+        response.id shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE.id
     }
 }

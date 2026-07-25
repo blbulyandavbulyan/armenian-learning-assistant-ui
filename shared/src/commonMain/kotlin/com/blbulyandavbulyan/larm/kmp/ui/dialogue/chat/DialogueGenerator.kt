@@ -55,7 +55,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.header_subtitle
 import armenianlearningassistant_kmp.shared.generated.resources.input_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.noto_sans_armenian
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
@@ -83,7 +83,7 @@ fun DialogueGeneratorScreen(
     conversation: List<ConversationItem>,
     emptyMessage: String = stringResource(Res.string.empty_conversation_message),
     onGenerateDialogue: (String) -> Unit,
-    onSaveDialogue: (DialogueChatResponse) -> Unit,
+    onSaveDialogue: (GeneratedDialogue) -> Unit,
     onNavigateToSearch: (String) -> Unit
 ) {
     var prompt by remember { mutableStateOf("") }
@@ -214,7 +214,7 @@ private fun BoxScope.EmptyConversationScreen(message: String) {
 private fun ConversationScreen(
     conversation: List<ConversationItem>,
     notoArmenian: FontFamily,
-    onSaveDialogue: (DialogueChatResponse) -> Unit
+    onSaveDialogue: (GeneratedDialogue) -> Unit
 ) {
     val scrollState = rememberScrollState()
 

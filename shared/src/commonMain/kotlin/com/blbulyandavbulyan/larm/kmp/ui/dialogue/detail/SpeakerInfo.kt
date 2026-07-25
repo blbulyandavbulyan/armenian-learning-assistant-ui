@@ -22,15 +22,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseTranslation
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Speaker
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.PhraseTranslation
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 import com.blbulyandavbulyan.larm.kmp.ui.common.RoundedTopLeftCutShape
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SpeakerInfo(
-    speaker: GetDialogueSpeakerResponse?,
+    speaker: Speaker?,
     modifier: Modifier,
     onPlayAudio: (String) -> Unit
 ) {
@@ -66,7 +66,7 @@ fun SpeakerInfo(
         Column {
             SpeakerName(
                 id = speaker.id,
-                name = speaker.name.phrase,
+                name = speaker.name.text,
                 showListenIcon = audioAssetUrl != null
             )
 

@@ -1,33 +1,35 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Phrase
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 open class FakeDialogueRepository : DialogueRepository {
     var shouldFail = false
 
     @Suppress("TooGenericExceptionThrown")
-    override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+    override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
         if (shouldFail) throw Exception("Fake Network Error")
-        return SearchDialoguesResponse(emptyList())
+        return persistentListOf()
     }
 
     @Suppress("TooGenericExceptionThrown")
-    override suspend fun getDialogue(id: String): GetDialogueResponse {
+    override suspend fun getDialogue(id: String): Dialogue {
         if (shouldFail) throw Exception("Fake Network Error")
-        return GetDialogueResponse(
+        return Dialogue(
             id = id,
-            title = PhraseResponse(
+            title = Phrase(
                 id = "1",
-                phrase = "Title",
+                text = "Title",
                 isoLanguageCode = "en",
                 transcription = "Transcription",
-                translations = emptyList(),
-                assets = emptyList()
+                translations = persistentListOf(),
+                assets = persistentListOf()
             ),
-            speakers = emptyList(),
-            dialoguePhrases = emptyList()
+            speakers = persistentListOf(),
+            phrases = persistentListOf()
         )
     }
 }

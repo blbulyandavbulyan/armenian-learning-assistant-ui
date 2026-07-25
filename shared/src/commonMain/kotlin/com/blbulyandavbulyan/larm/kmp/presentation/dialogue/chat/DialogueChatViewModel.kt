@@ -8,11 +8,16 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.network.DialogueChatRepository
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
@@ -20,8 +25,8 @@ class DialogueChatViewModel(
     private val repository: DialogueChatRepository,
     private val globalErrorManager: GlobalErrorManager
 ) : ViewModel() {
-    private val _conversation = MutableStateFlow<List<ConversationItem>>(emptyList())
-    val conversation: StateFlow<List<ConversationItem>> = _conversation.asStateFlow()
+    private val _conversation = MutableStateFlow<PersistentList<ConversationItem>>(persistentListOf())
+    val conversation: StateFlow<ImmutableList<ConversationItem>> = _conversation.asStateFlow()
 
     private val chatId = Uuid.random().toString()
 
@@ -29,20 +34,22 @@ class DialogueChatViewModel(
     fun generateDialogue(prompt: String) {
         if (prompt.isBlank()) return
 
-        val current = _conversation.value.toMutableList()
-        current.add(ConversationItem.UserMessage(prompt))
-        current.add(ConversationItem.Loading)
-        _conversation.value = current
+        _conversation.update { current ->
+            current.adding(ConversationItem.UserMessage(prompt))
+                .adding(ConversationItem.Loading)
+        }
 
         viewModelScope.launch {
             try {
                 val response = repository.generateDialogue(prompt, chatId)
-                val newConv = _conversation.value.filter { it !is ConversationItem.Loading }.toMutableList()
-                newConv.add(ConversationItem.AiResponse(response))
-                _conversation.value = newConv
+                _conversation.update { current ->
+                    current.removingAll { it is ConversationItem.Loading }
+                        .adding(ConversationItem.AiResponse(response))
+                }
             } catch (e: Throwable) {
-                val newConv = _conversation.value.filter { it !is ConversationItem.Loading }.toMutableList()
-                _conversation.value = newConv
+                _conversation.update { current ->
+                    current.removingAll { it is ConversationItem.Loading }
+                }
                 println(e)
                 globalErrorManager.showError(
                     UiText.from(Res.string.error_failed_to_generate_dialogue),
@@ -53,7 +60,7 @@ class DialogueChatViewModel(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    fun saveDialogue(dialogue: DialogueChatResponse) {
+    fun saveDialogue(dialogue: GeneratedDialogue) {
         changeConversationState(dialogue) {
             it.copy(isSaving = true)
         }
@@ -78,15 +85,17 @@ class DialogueChatViewModel(
     }
 
     private fun changeConversationState(
-        dialogue: DialogueChatResponse,
+        dialogue: GeneratedDialogue,
         newDialogueConversationItem: (ConversationItem.AiResponse) -> ConversationItem.AiResponse
     ) {
-        _conversation.value = _conversation.value.map {
-            if (it is ConversationItem.AiResponse && it.response === dialogue) {
-                newDialogueConversationItem(it)
-            } else {
-                it
-            }
+        _conversation.update { current ->
+            current.map {
+                if (it is ConversationItem.AiResponse && it.response === dialogue) {
+                    newDialogueConversationItem(it)
+                } else {
+                    it
+                }
+            }.toPersistentList()
         }
     }
 }

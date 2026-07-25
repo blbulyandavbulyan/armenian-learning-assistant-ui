@@ -1,11 +1,11 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
 
 sealed class ConversationItem {
     data class UserMessage(val text: String) : ConversationItem()
     data class AiResponse(
-        val response: DialogueChatResponse,
+        val response: GeneratedDialogue,
         val isSaving: Boolean = false,
         val isSaved: Boolean = false
     ) : ConversationItem()

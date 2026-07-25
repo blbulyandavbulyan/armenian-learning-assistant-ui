@@ -6,9 +6,10 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save_dialogue
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueTitleResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DialogueTitle
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogueMother
+import kotlinx.collections.immutable.persistentListOf
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -99,11 +100,11 @@ class DialogueChatViewModelTest {
 
     @Test
     fun `saveDialogue adds Error to global error on failure`() = runTest {
-        val dialogue = DialogueChatResponse(
+        val dialogue = GeneratedDialogue(
             message = "Test",
-            info = DialogueTitleResponse("T", "T", emptyList()),
-            speakers = emptyList(),
-            dialoguePhrases = emptyList()
+            info = DialogueTitle("T", "T", persistentListOf()),
+            speakers = persistentListOf(),
+            phrases = persistentListOf()
         )
         fakeRepository.shouldFail = true
         viewModel.conversation.test {
@@ -119,7 +120,7 @@ class DialogueChatViewModelTest {
 
     @Test
     fun `saveDialogue updates state correctly on single success`() = runTest {
-        val fakeResponse = DialogueChatResponseMother.FULL_DIALOGUE_1
+        val fakeResponse = GeneratedDialogueMother.FULL_DIALOGUE_1
         fakeRepository.dialoguesToReturn.add(fakeResponse)
         fakeRepository.saveCompletable = CompletableDeferred()
         viewModel.generateDialogue("prompt")
@@ -144,8 +145,8 @@ class DialogueChatViewModelTest {
 
     @Test
     fun `saveDialogue multiple saves concurrent states`() = runTest {
-        val dialogue1 = DialogueChatResponseMother.FULL_DIALOGUE_1
-        val dialogue2 = DialogueChatResponseMother.FULL_DIALOGUE_2
+        val dialogue1 = GeneratedDialogueMother.FULL_DIALOGUE_1
+        val dialogue2 = GeneratedDialogueMother.FULL_DIALOGUE_2
         fakeRepository.dialoguesToReturn.add(dialogue1)
         fakeRepository.dialoguesToReturn.add(dialogue2)
         viewModel.generateDialogue("p1")
@@ -182,8 +183,8 @@ class DialogueChatViewModelTest {
 
     @Test
     fun `saveDialogue concurrent saves with one success and one failure`() = runTest {
-        val dialogue1 = DialogueChatResponseMother.FULL_DIALOGUE_1
-        val dialogue2 = DialogueChatResponseMother.FULL_DIALOGUE_2
+        val dialogue1 = GeneratedDialogueMother.FULL_DIALOGUE_1
+        val dialogue2 = GeneratedDialogueMother.FULL_DIALOGUE_2
         fakeRepository.dialoguesToReturn.add(dialogue1)
         fakeRepository.dialoguesToReturn.add(dialogue2)
         viewModel.generateDialogue("p1")

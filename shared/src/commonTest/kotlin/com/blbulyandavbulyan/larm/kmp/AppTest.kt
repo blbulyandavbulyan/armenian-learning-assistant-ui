@@ -12,8 +12,13 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponseMother
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponseMother
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DomainMothers
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
@@ -182,14 +187,14 @@ class AppTest {
         var searchCompletable: CompletableDeferred<Unit>? = null
         var getDialogueCompletable: CompletableDeferred<Unit>? = null
 
-        override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+        override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
             searchCompletable?.await()
-            return SearchDialoguesResponseMother.SearchResponse1.RESPONSE
+            return persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
         }
 
-        override suspend fun getDialogue(id: String): GetDialogueResponse {
+        override suspend fun getDialogue(id: String): Dialogue {
             getDialogueCompletable?.await()
-            return GetDialogueResponseMother.Dialogue1.RESPONSE
+            return DomainMothers.DIALOGUE_1
         }
     }
 }

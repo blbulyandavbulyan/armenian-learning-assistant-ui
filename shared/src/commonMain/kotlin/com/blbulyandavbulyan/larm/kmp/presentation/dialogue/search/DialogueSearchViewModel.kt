@@ -12,10 +12,11 @@ import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException
 import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayer
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.network.AssetFetchException
 import com.blbulyandavbulyan.larm.kmp.network.AssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,7 +46,7 @@ class DialogueSearchViewModel(
         viewModelScope.launch {
             try {
                 val response = repository.searchDialogues(query)
-                _searchState.value = SearchState.Success(response.dialogues)
+                _searchState.value = SearchState.Success(response)
                 onSuccess()
             } catch (e: Throwable) {
                 _searchState.value = SearchState.Error
@@ -83,7 +84,7 @@ class DialogueSearchViewModel(
     @Suppress("TooGenericExceptionCaught")
     fun displayDialogue(
         id: String,
-        onDialogueReady: (GetDialogueResponse) -> Unit,
+        onDialogueReady: (Dialogue) -> Unit,
         onError: () -> Unit
     ) {
         viewModelScope.launch {

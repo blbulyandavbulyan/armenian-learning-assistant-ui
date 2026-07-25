@@ -17,16 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialoguePhraseResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialoguePhrase
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 
 @Composable
 fun DialoguePhrases(
-    dialogue: GetDialogueResponse,
+    dialogue: Dialogue,
     onPlayAudio: (String) -> Unit
 ) {
-    dialogue.dialoguePhrases.forEach { dialoguePhrase ->
+    dialogue.phrases.forEach { dialoguePhrase ->
         val speaker = dialogue.speakers.find { it.id == dialoguePhrase.speakerId }
 
         Card(
@@ -62,7 +62,7 @@ fun DialoguePhrases(
 
 @Composable
 private fun PhraseInfo(
-    dialoguePhrase: GetDialoguePhraseResponse,
+    dialoguePhrase: DialoguePhrase,
     modifier: Modifier,
     onPlayAudio: (String) -> Unit
 ) {
@@ -91,7 +91,7 @@ private fun PhraseInfo(
 }
 
 @Composable
-private fun PhraseTranslations(dialoguePhrase: GetDialoguePhraseResponse) {
+private fun PhraseTranslations(dialoguePhrase: DialoguePhrase) {
     dialoguePhrase.phrase.translations.forEachIndexed { index, translation ->
         Text(
             text = translation.translationText,
@@ -105,7 +105,7 @@ private fun PhraseTranslations(dialoguePhrase: GetDialoguePhraseResponse) {
 }
 
 @Composable
-private fun PhraseTranscription(dialoguePhrase: GetDialoguePhraseResponse) {
+private fun PhraseTranscription(dialoguePhrase: DialoguePhrase) {
     Text(
         text = dialoguePhrase.phrase.transcription,
         style = MaterialTheme.typography.bodyMedium,
@@ -118,7 +118,7 @@ private fun PhraseTranscription(dialoguePhrase: GetDialoguePhraseResponse) {
 
 @Composable
 private fun MainPhrase(
-    dialoguePhrase: GetDialoguePhraseResponse,
+    dialoguePhrase: DialoguePhrase,
     displayListenIcon: Boolean
 ) {
     Row {
@@ -128,7 +128,7 @@ private fun MainPhrase(
         }
 
         Text(
-            text = dialoguePhrase.phrase.phrase,
+            text = dialoguePhrase.phrase.text,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,

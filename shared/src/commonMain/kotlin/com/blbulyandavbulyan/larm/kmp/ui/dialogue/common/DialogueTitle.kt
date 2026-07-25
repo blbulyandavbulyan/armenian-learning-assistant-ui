@@ -19,14 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseTranslation
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.PhraseTranslation
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 import com.blbulyandavbulyan.larm.kmp.ui.common.RoundedCutBottomRightShape
 
 @Composable
 fun DialogueTitle(
-    dialogueTitle: PhraseResponse,
+    dialogueTitle: Phrase,
     testTag: String? = null,
     phraseTestTag: String = "detailTitleText",
     transcriptionTestTag: String = "detailTranscriptionText",
@@ -63,7 +63,7 @@ fun DialogueTitle(
         Column {
             DialogueTitlePhrase(
                 shouldShowListenButton = audioAssetUrl != null,
-                phrase = dialogueTitle.phrase,
+                phrase = dialogueTitle.text,
                 testTag = phraseTestTag
             )
 
