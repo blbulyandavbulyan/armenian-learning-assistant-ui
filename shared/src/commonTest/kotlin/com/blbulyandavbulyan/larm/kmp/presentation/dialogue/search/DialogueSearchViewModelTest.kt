@@ -91,7 +91,7 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `playAudio transitions to Error on failure`() = runTest {
-        fakeAudioRepository.shouldFail = true
+        fakeAudioRepository.shouldFailWithAssetFetchException = true
         viewModel.playAudio("http://example.com")
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value

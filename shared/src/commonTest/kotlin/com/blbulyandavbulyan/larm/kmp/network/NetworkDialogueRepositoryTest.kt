@@ -37,7 +37,7 @@ class NetworkDialogueRepositoryTest {
 
         val response = repository.searchDialogues("test-query")
 
-        response shouldBe SearchDialoguesResponseMother.SearchResponse1.JSON_RESPONSE
+        response shouldBe SearchDialoguesResponseMother.SearchResponse1.RESPONSE
     }
 
     @Test

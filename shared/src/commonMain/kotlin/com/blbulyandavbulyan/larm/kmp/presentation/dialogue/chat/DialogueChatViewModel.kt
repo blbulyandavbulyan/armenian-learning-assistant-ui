@@ -54,38 +54,38 @@ class DialogueChatViewModel(
 
     @Suppress("TooGenericExceptionCaught")
     fun saveDialogue(dialogue: DialogueChatResponse) {
-        _conversation.value = _conversation.value.map {
-            if (it is ConversationItem.AiResponse && it.response === dialogue) {
-                it.copy(isSaving = true)
-            } else {
-                it
-            }
+        changeConversationState(dialogue) {
+            it.copy(isSaving = true)
         }
 
         viewModelScope.launch {
             try {
                 repository.saveDialogue(dialogue)
-                _conversation.value = _conversation.value.map {
-                    if (it is ConversationItem.AiResponse && it.response === dialogue) {
-                        it.copy(isSaving = false, isSaved = true)
-                    } else {
-                        it
-                    }
+                changeConversationState(dialogue) {
+                    it.copy(isSaving = false, isSaved = true)
                 }
             } catch (e: Throwable) {
-                val currentConv = _conversation.value.map {
-                    if (it is ConversationItem.AiResponse && it.response === dialogue) {
-                        it.copy(isSaving = false)
-                    } else {
-                        it
-                    }
-                }.toMutableList()
-                _conversation.value = currentConv
+                changeConversationState(dialogue) {
+                    it.copy(isSaving = false)
+                }
                 println(e)
                 globalErrorManager.showError(
                     UiText.from(Res.string.error_failed_to_save_dialogue),
                     UiText.from(e.message, Res.string.error_unknown)
                 )
+            }
+        }
+    }
+
+    private fun changeConversationState(
+        dialogue: DialogueChatResponse,
+        newDialogueConversationItem: (ConversationItem.AiResponse) -> ConversationItem.AiResponse
+    ) {
+        _conversation.value = _conversation.value.map {
+            if (it is ConversationItem.AiResponse && it.response === dialogue) {
+                newDialogueConversationItem(it)
+            } else {
+                it
             }
         }
     }
