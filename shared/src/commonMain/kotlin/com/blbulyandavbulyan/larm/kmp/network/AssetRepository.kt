@@ -21,4 +21,3 @@ class NetworkAssetRepository(private val apiClient: ApiClient) : AssetRepository
 }
 
 open class AssetFetchException(cause: Throwable? = null, message: String? = cause?.message) : Exception(message, cause)
-class AssetHasNoContentTypeException : Exception("Asset response is missing Content-Type header")

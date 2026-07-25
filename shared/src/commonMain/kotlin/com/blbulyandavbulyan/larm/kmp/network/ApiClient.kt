@@ -50,3 +50,5 @@ class ApiClient(private val client: HttpClient) {
         return AssetData(response.readRawBytes(), mimeType)
     }
 }
+
+class AssetHasNoContentTypeException : Exception("Asset response is missing Content-Type header")
