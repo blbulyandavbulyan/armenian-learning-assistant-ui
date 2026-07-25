@@ -282,4 +282,31 @@ class DialogueSearchScreenTest {
 
         fakeAssetRepository.requestedUrls.last() shouldBe secondDialogue.title.assets.first().url
     }
+
+    @Test
+    fun searchScreen_whenLoading_showsLoadingIndicator() = runComposeUiTest {
+        val fakeDialogueRepository = object : FakeDialogueRepository() {
+            override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+                kotlinx.coroutines.awaitCancellation()
+            }
+        }
+        val fakeAssetRepository = FakeAssetRepository()
+        val viewModel =
+            DialogueSearchViewModel(
+                fakeDialogueRepository,
+                fakeAssetRepository,
+                GlobalErrorManager()
+            )
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+            }
+        }
+
+        onNodeWithTag("searchInputField").performTextInput("Hello")
+        onNodeWithTag("searchSubmitButton").performClick()
+
+        onNodeWithTag("loadingIndicator").assertIsDisplayed()
+    }
 }

@@ -20,6 +20,7 @@ import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -48,7 +49,7 @@ class AppTest {
 
     @Test
     fun navigationFlow_searchToDetailAndBack() = runComposeUiTest {
-        val fakeDialogueRepository = createFakeDialogueRepository()
+        val fakeDialogueRepository = TestFakeDialogueRepository()
         val fakeAssetRepository = FakeAssetRepository()
         val viewModel =
             DialogueSearchViewModel(
@@ -78,7 +79,12 @@ class AppTest {
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertIsDisplayed()
 
         // 2. Press 'view details' button on the search result screen -> go to the details
+        fakeDialogueRepository.getDialogueCompletable = CompletableDeferred()
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").performClick()
+
+        onNodeWithTag("loadingIndicator").assertIsDisplayed()
+
+        fakeDialogueRepository.getDialogueCompletable?.complete(Unit)
 
         // Wait for detail screen to appear
         waitUntil(timeoutMillis = 5000) {
@@ -102,7 +108,7 @@ class AppTest {
 
     @Test
     fun navigationFlow_generatorToSearch() = runComposeUiTest {
-        val fakeDialogueRepository = createFakeDialogueRepository()
+        val fakeDialogueRepository = TestFakeDialogueRepository()
         val fakeAssetRepository = FakeAssetRepository()
         val viewModel =
             DialogueSearchViewModel(
@@ -125,7 +131,12 @@ class AppTest {
         onNodeWithTag("searchInputField").performTextInput("Hello")
 
         // 2. Press search button
+        fakeDialogueRepository.searchCompletable = CompletableDeferred()
         onNodeWithTag("searchSubmitButton").performClick()
+
+        onNodeWithTag("loadingIndicator").assertIsDisplayed()
+
+        fakeDialogueRepository.searchCompletable?.complete(Unit)
         waitForIdle()
 
         // Wait for search screen to appear
@@ -141,12 +152,43 @@ class AppTest {
         onNodeWithTag("searchInputField").assertTextEquals("Hello")
     }
 
-    private fun createFakeDialogueRepository() = object : FakeDialogueRepository() {
+    @Test
+    fun app_showsLoadingIndicator_whenStateIsLoading() = runComposeUiTest {
+        val appViewModel = AppViewModel()
+        val searchViewModel = DialogueSearchViewModel(
+            FakeDialogueRepository(),
+            FakeAssetRepository(),
+            GlobalErrorManager()
+        )
+        val chatViewModel = DialogueChatViewModel(
+            FakeDialogueChatRepository(),
+            GlobalErrorManager()
+        )
+
+        setContent {
+            App(
+                appViewModel = appViewModel,
+                searchViewModel = searchViewModel,
+                chatViewModel = chatViewModel
+            )
+        }
+
+        appViewModel.navigateToLoading()
+
+        onNodeWithTag("loadingIndicator").assertIsDisplayed()
+    }
+
+    class TestFakeDialogueRepository : FakeDialogueRepository() {
+        var searchCompletable: CompletableDeferred<Unit>? = null
+        var getDialogueCompletable: CompletableDeferred<Unit>? = null
+
         override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+            searchCompletable?.await()
             return SearchDialoguesResponseMother.SearchResponse1.RESPONSE
         }
 
         override suspend fun getDialogue(id: String): GetDialogueResponse {
+            getDialogueCompletable?.await()
             return GetDialogueResponseMother.Dialogue1.RESPONSE
         }
     }
