@@ -50,7 +50,7 @@ class DialogueSearchViewModel(
                 _searchState.value = SearchState.Error
                 println(e)
                 globalErrorManager.showError(
-                    UiText.from(Res.string.error_failed_to_search_dialogues), // Or a specific search error title
+                    UiText.from(Res.string.error_failed_to_search_dialogues),
                     UiText.from(e.message, Res.string.error_unknown)
                 )
                 onError()
