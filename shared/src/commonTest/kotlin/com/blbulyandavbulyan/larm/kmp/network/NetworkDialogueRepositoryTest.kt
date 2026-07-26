@@ -35,6 +35,7 @@ class NetworkDialogueRepositoryTest {
         }
         val apiClient = ApiClient(client = mockClient)
         val repository = NetworkDialogueRepository(apiClient)
+        val response = repository.searchDialogues("test-query")
 
         response shouldBe listOf(
             DomainMothers.DIALOGUE_SUMMARY_1,

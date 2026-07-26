@@ -9,12 +9,12 @@ import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DialogueTitle
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogueMother
-import kotlinx.collections.immutable.persistentListOf
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

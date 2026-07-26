@@ -1,7 +1,17 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.*
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.*
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.AssetResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.DialogueSummaryResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialoguePhraseResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Asset
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialoguePhrase
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Speaker
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.PhraseTranslation as DomainPhraseTranslation

@@ -16,7 +16,6 @@ import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.network.AssetFetchException
 import com.blbulyandavbulyan.larm.kmp.network.AssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
