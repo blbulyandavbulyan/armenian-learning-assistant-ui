@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -27,34 +28,36 @@ fun DialoguePhrases(
     onPlayAudio: (String) -> Unit
 ) {
     dialogue.phrases.forEach { dialoguePhrase ->
-        val speaker = dialogue.speakers.find { it.id == dialoguePhrase.speakerId }
+        key(dialoguePhrase.phrase.id) {
+            val speaker = dialogue.speakers.find { it.id == dialoguePhrase.speakerId }
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+                    .padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                SpeakerInfo(
-                    speaker = speaker,
-                    modifier = Modifier,
-                    onPlayAudio = onPlayAudio
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+                ) {
+                    SpeakerInfo(
+                        speaker = speaker,
+                        modifier = Modifier,
+                        onPlayAudio = onPlayAudio
+                    )
 
-                PhraseInfo(
-                    dialoguePhrase = dialoguePhrase,
-                    modifier = Modifier,
-                    onPlayAudio = onPlayAudio
-                )
+                    PhraseInfo(
+                        dialoguePhrase = dialoguePhrase,
+                        modifier = Modifier,
+                        onPlayAudio = onPlayAudio
+                    )
+                }
             }
         }
     }
@@ -63,7 +66,7 @@ fun DialoguePhrases(
 @Composable
 private fun PhraseInfo(
     dialoguePhrase: DialoguePhrase,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onPlayAudio: (String) -> Unit
 ) {
     Column(
@@ -93,14 +96,16 @@ private fun PhraseInfo(
 @Composable
 private fun PhraseTranslations(dialoguePhrase: DialoguePhrase) {
     dialoguePhrase.phrase.translations.forEachIndexed { index, translation ->
-        Text(
-            text = translation.translationText,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .padding(bottom = 4.dp)
-                .testTag("phraseTranslation_${dialoguePhrase.phrase.id}_$index")
-        )
+        key(translation.id) {
+            Text(
+                text = translation.translationText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .padding(bottom = 4.dp)
+                    .testTag("phraseTranslation_${dialoguePhrase.phrase.id}_$index")
+            )
+        }
     }
 }
 

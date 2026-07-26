@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -73,22 +74,24 @@ private fun DialoguePhrasesContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         dialogue.phrases.forEach { phraseObj ->
-            val speaker = speakersMap[phraseObj.speakerId]
-            Card(
-                shape = RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 16.dp,
-                    bottomEnd = 16.dp,
-                    bottomStart = 4.dp
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = AppTheme.colors.saveButton.copy(alpha = 0.8f)
-                ),
-                modifier = Modifier.fillMaxWidth(fraction = 0.9f)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    SpeakerInfo(speaker, fontFamily)
-                    PhraseInfo(fontFamily, phraseObj.phrase)
+            key(phraseObj) {
+                val speaker = speakersMap[phraseObj.speakerId]
+                Card(
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomEnd = 16.dp,
+                        bottomStart = 4.dp
+                    ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = AppTheme.colors.saveButton.copy(alpha = 0.8f)
+                    ),
+                    modifier = Modifier.fillMaxWidth(fraction = 0.9f)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        SpeakerInfo(speaker, fontFamily)
+                        PhraseInfo(fontFamily, phraseObj.phrase)
+                    }
                 }
             }
         }
@@ -98,7 +101,8 @@ private fun DialoguePhrasesContent(
 @Composable
 private fun PhraseInfo(
     fontFamily: FontFamily,
-    response: DraftPhrase
+    response: DraftPhrase,
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = response.text,
@@ -107,7 +111,7 @@ private fun PhraseInfo(
             fontSize = 18.sp,
             fontFamily = fontFamily
         ),
-        modifier = Modifier.testTag("dialoguePhraseText")
+        modifier = modifier.testTag("dialoguePhraseText")
     )
     Text(
         text = response.transcription,
@@ -133,7 +137,8 @@ private fun PhraseInfo(
 @Composable
 private fun SpeakerInfo(
     speaker: DraftSpeaker?,
-    fontFamily: FontFamily
+    fontFamily: FontFamily,
+    modifier: Modifier = Modifier
 ) {
     val speakerText = speaker?.let { spk ->
         val translations = spk.translations.joinToString(" | ") { it.translationText }
@@ -147,7 +152,7 @@ private fun SpeakerInfo(
             fontWeight = FontWeight.Bold,
             fontFamily = fontFamily
         ),
-        modifier = Modifier.padding(bottom = 4.dp).testTag("dialogueSpeaker")
+        modifier = modifier.padding(bottom = 4.dp).testTag("dialogueSpeaker")
     )
 }
 

@@ -24,6 +24,7 @@ import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 @Composable
 fun DialogueDetailScreen(
     dialogue: Dialogue,
+    modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onPlayAudio: (String) -> Unit
 ) {
@@ -32,7 +33,7 @@ fun DialogueDetailScreen(
         colors = listOf(appColors.gradientTop, appColors.gradientBottom)
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

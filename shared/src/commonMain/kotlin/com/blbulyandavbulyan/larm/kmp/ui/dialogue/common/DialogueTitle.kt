@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +28,7 @@ import com.blbulyandavbulyan.larm.kmp.ui.common.RoundedCutBottomRightShape
 @Composable
 fun DialogueTitle(
     dialogueTitle: Phrase,
+    modifier: Modifier = Modifier,
     testTag: String? = null,
     phraseTestTag: String = "detailTitleText",
     transcriptionTestTag: String = "detailTranscriptionText",
@@ -40,7 +42,7 @@ fun DialogueTitle(
 
     val audioAssetUrl = dialogueTitle.audioAssetUrl
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
@@ -111,11 +113,13 @@ private fun DialogueTitleTranslations(
     testTagPrefix: String
 ) {
     translations.forEach { translation ->
-        Text(
-            text = translation.translationText,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 4.dp).testTag("${testTagPrefix}_${translation.id}"),
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        key(translation.id) {
+            Text(
+                text = translation.translationText,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 4.dp).testTag("${testTagPrefix}_${translation.id}"),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
     }
 }
