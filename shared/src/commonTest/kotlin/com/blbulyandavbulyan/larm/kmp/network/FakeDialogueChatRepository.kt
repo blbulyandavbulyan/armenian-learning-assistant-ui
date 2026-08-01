@@ -1,18 +1,19 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueTitleResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DialogueTitle
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CompletableDeferred
 
 class FakeDialogueChatRepository : DialogueChatRepository {
     var shouldFail = false
     var lastPrompt = ""
     var saveCompletable: CompletableDeferred<String>? = null
-    var lastSavedDialogue: DialogueChatResponse? = null
-    var dialoguesToReturn = mutableListOf<DialogueChatResponse>()
+    var lastSavedDialogue: GeneratedDialogue? = null
+    var dialoguesToReturn = mutableListOf<GeneratedDialogue>()
 
     @Suppress("TooGenericExceptionThrown")
-    override suspend fun generateDialogue(prompt: String, chatId: String): DialogueChatResponse {
+    override suspend fun generateDialogue(prompt: String, chatId: String): GeneratedDialogue {
         lastPrompt = prompt
         if (shouldFail) {
             throw Exception("Fake Network Error")
@@ -22,17 +23,17 @@ class FakeDialogueChatRepository : DialogueChatRepository {
         return if (dialoguesToReturn.isNotEmpty()) {
             dialoguesToReturn.removeAt(0)
         } else {
-            DialogueChatResponse(
+            GeneratedDialogue(
                 message = "Here is your dialogue",
-                info = DialogueTitleResponse("Title", "Transcription", emptyList()),
-                speakers = emptyList(),
-                dialoguePhrases = emptyList()
+                info = DialogueTitle("Title", "Transcription", persistentListOf()),
+                speakers = persistentListOf(),
+                phrases = persistentListOf()
             )
         }
     }
 
     @Suppress("TooGenericExceptionThrown")
-    override suspend fun saveDialogue(dialogue: DialogueChatResponse): String {
+    override suspend fun saveDialogue(dialogue: GeneratedDialogue): String {
         lastSavedDialogue = dialogue
         if (shouldFail) {
             throw Exception("Fake Network Error")

@@ -2,6 +2,7 @@ package com.blbulyandavbulyan.larm.kmp.network
 
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponseMother
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DomainMothers
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
@@ -34,10 +35,12 @@ class NetworkDialogueRepositoryTest {
         }
         val apiClient = ApiClient(client = mockClient)
         val repository = NetworkDialogueRepository(apiClient)
-
         val response = repository.searchDialogues("test-query")
 
-        response shouldBe SearchDialoguesResponseMother.SearchResponse1.RESPONSE
+        response shouldBe listOf(
+            DomainMothers.DIALOGUE_SUMMARY_1,
+            DomainMothers.DIALOGUE_SUMMARY_2
+        )
     }
 
     @Test
@@ -60,7 +63,7 @@ class NetworkDialogueRepositoryTest {
         val repository = NetworkDialogueRepository(apiClient)
 
         val result = repository.searchDialogues("hello")
-        result.dialogues.size shouldBe 0
+        result.size shouldBe 0
     }
 
     @Test
@@ -86,6 +89,6 @@ class NetworkDialogueRepositoryTest {
         val repository = NetworkDialogueRepository(apiClient)
 
         val response = repository.getDialogue(dialogueId)
-        response shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE
+        response shouldBe DomainMothers.DIALOGUE_1
     }
 }

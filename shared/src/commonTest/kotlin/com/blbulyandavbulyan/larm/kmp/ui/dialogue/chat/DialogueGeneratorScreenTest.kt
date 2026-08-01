@@ -17,8 +17,8 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogueMother
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
@@ -194,7 +194,7 @@ class DialogueGeneratorScreenTest {
 
     @Test
     fun aiResponse_displaysFullDialogueDataCorrectly() = runComposeUiTest {
-        val mockAiResponse = DialogueChatResponseMother.FULL_DIALOGUE_1
+        val mockAiResponse = GeneratedDialogueMother.FULL_DIALOGUE_1
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
@@ -231,10 +231,10 @@ class DialogueGeneratorScreenTest {
 
     @Test
     fun saveButton_triggersCallbackCorrectly_andShowsLoading() = runComposeUiTest {
-        val savedDialogues = mutableListOf<DialogueChatResponse>()
+        val savedDialogues = mutableListOf<GeneratedDialogue>()
         val conversation = listOf(
-            ConversationItem.AiResponse(DialogueChatResponseMother.FULL_DIALOGUE_1, isSaving = false, isSaved = false),
-            ConversationItem.AiResponse(DialogueChatResponseMother.FULL_DIALOGUE_2, isSaving = true, isSaved = false)
+            ConversationItem.AiResponse(GeneratedDialogueMother.FULL_DIALOGUE_1, isSaving = false, isSaved = false),
+            ConversationItem.AiResponse(GeneratedDialogueMother.FULL_DIALOGUE_2, isSaving = true, isSaved = false)
         )
 
         setContent {
@@ -260,13 +260,13 @@ class DialogueGeneratorScreenTest {
         onAllNodesWithTag("saveButton")[0].performClick()
 
         savedDialogues.size shouldBe 1
-        savedDialogues[0] shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
+        savedDialogues[0] shouldBe GeneratedDialogueMother.FULL_DIALOGUE_1
     }
 
     @Test
     fun dialogueGeneratorScreen_withViewModel_delegatesToViewModel() = runComposeUiTest {
         val fakeRepo = FakeDialogueChatRepository().apply {
-            dialoguesToReturn.add(DialogueChatResponseMother.FULL_DIALOGUE_1)
+            dialoguesToReturn.add(GeneratedDialogueMother.FULL_DIALOGUE_1)
         }
         val viewModel = DialogueChatViewModel(fakeRepo, GlobalErrorManager())
 
@@ -298,6 +298,6 @@ class DialogueGeneratorScreenTest {
         waitForIdle()
 
         // Verify that the viewModel delegated the save action to the repository
-        fakeRepo.lastSavedDialogue shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
+        fakeRepo.lastSavedDialogue shouldBe GeneratedDialogueMother.FULL_DIALOGUE_1
     }
 }

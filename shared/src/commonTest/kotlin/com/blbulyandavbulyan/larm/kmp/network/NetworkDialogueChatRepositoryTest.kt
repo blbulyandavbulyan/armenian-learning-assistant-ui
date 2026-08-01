@@ -2,6 +2,7 @@ package com.blbulyandavbulyan.larm.kmp.network
 
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponseMother
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SaveDialogueRequestMother
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogueMother
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
@@ -37,7 +38,7 @@ class NetworkDialogueChatRepositoryTest {
 
         val response = repository.generateDialogue(prompt = "Test prompt", chatId = "chat456")
 
-        response shouldBe DialogueChatResponseMother.FULL_DIALOGUE_1
+        response shouldBe GeneratedDialogueMother.FULL_DIALOGUE_1
     }
 
     @Test
@@ -66,7 +67,7 @@ class NetworkDialogueChatRepositoryTest {
         }
         val apiClient = ApiClient(client = mockClient)
         val repository = NetworkDialogueChatRepository(apiClient)
-        val response = repository.saveDialogue(DialogueChatResponseMother.FULL_DIALOGUE_1)
+        val response = repository.saveDialogue(GeneratedDialogueMother.FULL_DIALOGUE_1)
         response shouldBe "fake-uuid-1234"
     }
 }

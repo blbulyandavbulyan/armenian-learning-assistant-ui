@@ -127,7 +127,7 @@ object GetDialogueResponseMother {
                 isoLanguageCode = "hy",
                 transcription = "Barev Dzez",
                 translations = listOf(
-                    PhraseTranslation("1", "en", "Hello")
+                    PhraseTranslationResponse("1", "en", "Hello")
                 ),
                 assets = listOf(
                     AssetResponse("audio/mpeg", "http://test.audio/title")
@@ -142,7 +142,7 @@ object GetDialogueResponseMother {
                         isoLanguageCode = "hy",
                         transcription = "Anun",
                         translations = listOf(
-                            PhraseTranslation("t_sp_1", "en", "Name")
+                            PhraseTranslationResponse("t_sp_1", "en", "Name")
                         ),
                         assets = listOf(
                             AssetResponse("audio/mpeg", "http://test.audio/speaker")
@@ -157,7 +157,7 @@ object GetDialogueResponseMother {
                         isoLanguageCode = "hy",
                         transcription = "Anun 2",
                         translations = listOf(
-                            PhraseTranslation("t_sp_2", "en", "Name 2")
+                            PhraseTranslationResponse("t_sp_2", "en", "Name 2")
                         ),
                         assets = listOf(
                             AssetResponse("audio/mpeg", "http://test.audio/speaker2")
@@ -174,7 +174,7 @@ object GetDialogueResponseMother {
                         isoLanguageCode = "hy",
                         transcription = "Inchpes ek",
                         translations = listOf(
-                            PhraseTranslation("t_ph_1", "en", "How are you?")
+                            PhraseTranslationResponse("t_ph_1", "en", "How are you?")
                         ),
                         assets = listOf(
                             AssetResponse("audio/mpeg", "http://test.audio/phrase")
@@ -189,7 +189,7 @@ object GetDialogueResponseMother {
                         isoLanguageCode = "hy",
                         transcription = "Lav em",
                         translations = listOf(
-                            PhraseTranslation("t_ph_2", "en", "I am fine")
+                            PhraseTranslationResponse("t_ph_2", "en", "I am fine")
                         ),
                         assets = listOf(
                             AssetResponse("audio/mpeg", "http://test.audio/phrase2")

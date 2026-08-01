@@ -9,16 +9,17 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponseMother
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.SearchDialoguesResponseMother
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DomainMothers
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.assertDialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -99,29 +100,29 @@ class DialogueSearchScreenTest {
         onNodeWithTag("searchInputField").performTextInput("Hello")
         onNodeWithTag("searchSubmitButton").performClick()
 
-        val dialogueId = GetDialogueResponseMother.Dialogue1.RESPONSE.id
+        val dialogueId = DomainMothers.DIALOGUE_1.id
 
         // Test Case 4: Search screen listen button
         onNodeWithTag("listenButton_$dialogueId").performClick()
 
-        fakeAssetRepository.requestedUrls.last() shouldBe GetDialogueResponseMother.Dialogue1.RESPONSE.title.assets.first().url
+        fakeAssetRepository.requestedUrls.last() shouldBe DomainMothers.DIALOGUE_1.title.assets.first().url
     }
 
     private fun createFakeDialogueRepository() = object : FakeDialogueRepository() {
-        override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
-            return SearchDialoguesResponseMother.SearchResponse1.RESPONSE
+        override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
+            return persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
         }
 
-        override suspend fun getDialogue(id: String): GetDialogueResponse {
-            return GetDialogueResponseMother.Dialogue1.RESPONSE
+        override suspend fun getDialogue(id: String): Dialogue {
+            return DomainMothers.DIALOGUE_1
         }
     }
 
     @Test
     fun searchScreen_emptyResults_showsEmptyStateMessage() = runComposeUiTest {
         val fakeDialogueRepository = object : FakeDialogueRepository() {
-            override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
-                return SearchDialoguesResponse(emptyList())
+            override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
+                return persistentListOf()
             }
         }
         val fakeAssetRepository = FakeAssetRepository()
@@ -155,7 +156,7 @@ class DialogueSearchScreenTest {
         var callCount = 0
         val fakeDialogueRepository = object : FakeDialogueRepository() {
             @Suppress("TooGenericExceptionThrown")
-            override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+            override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
                 callCount++
                 throw RuntimeException("Network Error")
             }
@@ -213,9 +214,9 @@ class DialogueSearchScreenTest {
         onNodeWithTag("searchInputField").performTextInput("Hello")
         onNodeWithTag("searchSubmitButton").performClick()
 
-        val response = SearchDialoguesResponseMother.SearchResponse1.RESPONSE
+        val response = listOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
 
-        response.dialogues.forEach { dialogue ->
+        response.forEach { dialogue ->
             assertDialogueTitle(
                 title = dialogue.title,
                 phraseTestTag = "searchResultPhrase_${dialogue.id}",
@@ -249,7 +250,7 @@ class DialogueSearchScreenTest {
         onNodeWithTag("searchInputField").performTextInput("Hello")
         onNodeWithTag("searchSubmitButton").performClick()
 
-        val secondDialogue = SearchDialoguesResponseMother.SearchResponse1.RESPONSE.dialogues[1]
+        val secondDialogue = DomainMothers.DIALOGUE_SUMMARY_2
 
         onNodeWithTag("viewFullDialogueButton_${secondDialogue.id}").performScrollTo().performClick()
 
@@ -276,7 +277,7 @@ class DialogueSearchScreenTest {
         onNodeWithTag("searchInputField").performTextInput("Hello")
         onNodeWithTag("searchSubmitButton").performClick()
 
-        val secondDialogue = SearchDialoguesResponseMother.SearchResponse1.RESPONSE.dialogues[1]
+        val secondDialogue = DomainMothers.DIALOGUE_SUMMARY_2
 
         onNodeWithTag("listenButton_${secondDialogue.id}").performScrollTo().performClick()
 
@@ -286,7 +287,7 @@ class DialogueSearchScreenTest {
     @Test
     fun searchScreen_whenLoading_showsLoadingIndicator() = runComposeUiTest {
         val fakeDialogueRepository = object : FakeDialogueRepository() {
-            override suspend fun searchDialogues(query: String): SearchDialoguesResponse {
+            override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
                 kotlinx.coroutines.awaitCancellation()
             }
         }

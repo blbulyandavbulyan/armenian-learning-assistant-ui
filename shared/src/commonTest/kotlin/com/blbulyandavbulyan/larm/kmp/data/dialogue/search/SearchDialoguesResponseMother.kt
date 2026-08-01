@@ -52,29 +52,5 @@ object SearchDialoguesResponseMother {
               ]
             }
         """.trimIndent()
-
-        val RESPONSE = SearchDialoguesResponse(
-            dialogues = listOf(
-                DialogueSummaryResponse(
-                    id = GetDialogueResponseMother.Dialogue1.RESPONSE.id,
-                    title = GetDialogueResponseMother.Dialogue1.RESPONSE.title
-                ),
-                DialogueSummaryResponse(
-                    id = "dialogue_id_456",
-                    title = PhraseResponse(
-                        id = "title_2",
-                        phrase = "Ինչպես եք",
-                        isoLanguageCode = "hy",
-                        transcription = "Inchpes ek",
-                        translations = listOf(
-                            PhraseTranslation("2", "en", "How are you")
-                        ),
-                        assets = listOf(
-                            AssetResponse("audio/mpeg", "http://test.audio/title_2")
-                        )
-                    )
-                )
-            )
-        )
     }
 }

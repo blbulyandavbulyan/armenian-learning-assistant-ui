@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.DialogueTitle
@@ -23,7 +23,8 @@ import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 
 @Composable
 fun DialogueDetailScreen(
-    dialogue: GetDialogueResponse,
+    dialogue: Dialogue,
+    modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onPlayAudio: (String) -> Unit
 ) {
@@ -32,7 +33,7 @@ fun DialogueDetailScreen(
         colors = listOf(appColors.gradientTop, appColors.gradientBottom)
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

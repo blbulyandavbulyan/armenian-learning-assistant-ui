@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class AssetResponse(val contentType: String, val url: String)
 
 @Serializable
-data class PhraseTranslation(val id: String, val isoLanguageCode: String, val translationText: String)
+data class PhraseTranslationResponse(val id: String, val isoLanguageCode: String, val translationText: String)
 
 @Serializable
 data class PhraseResponse(
@@ -14,12 +14,9 @@ data class PhraseResponse(
     val phrase: String,
     val isoLanguageCode: String,
     val transcription: String,
-    val translations: List<PhraseTranslation>,
+    val translations: List<PhraseTranslationResponse>,
     val assets: List<AssetResponse>
-) {
-    val audioAssetUrl: String?
-        get() = assets.firstOrNull { it.contentType.startsWith("audio/") }?.url
-}
+)
 
 @Serializable
 data class DialogueSummaryResponse(val id: String, val title: PhraseResponse)

@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -25,15 +26,15 @@ import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.action_saved_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DialogueChatResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.DraftPhrasesResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.chat.SpeakerResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DraftPhrase
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DraftSpeaker
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun GeneratedDialogueView(
-    dialogue: DialogueChatResponse,
+    dialogue: GeneratedDialogue,
     fontFamily: FontFamily,
     isSaving: Boolean = false,
     isSaved: Boolean = false,
@@ -64,31 +65,33 @@ fun GeneratedDialogueView(
 
 @Composable
 private fun DialoguePhrasesContent(
-    dialogue: DialogueChatResponse,
-    speakersMap: Map<String, SpeakerResponse>,
+    dialogue: GeneratedDialogue,
+    speakersMap: Map<String, DraftSpeaker>,
     fontFamily: FontFamily
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        dialogue.dialoguePhrases.forEach { phraseObj ->
-            val speaker = speakersMap[phraseObj.speakerId]
-            Card(
-                shape = RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 16.dp,
-                    bottomEnd = 16.dp,
-                    bottomStart = 4.dp
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = AppTheme.colors.saveButton.copy(alpha = 0.8f)
-                ),
-                modifier = Modifier.fillMaxWidth(fraction = 0.9f)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    SpeakerInfo(speaker, fontFamily)
-                    PhraseInfo(fontFamily, phraseObj.phrase)
+        dialogue.phrases.forEach { phraseObj ->
+            key(phraseObj) {
+                val speaker = speakersMap[phraseObj.speakerId]
+                Card(
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomEnd = 16.dp,
+                        bottomStart = 4.dp
+                    ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = AppTheme.colors.saveButton.copy(alpha = 0.8f)
+                    ),
+                    modifier = Modifier.fillMaxWidth(fraction = 0.9f)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        SpeakerInfo(speaker, fontFamily)
+                        PhraseInfo(fontFamily, phraseObj.phrase)
+                    }
                 }
             }
         }
@@ -98,16 +101,17 @@ private fun DialoguePhrasesContent(
 @Composable
 private fun PhraseInfo(
     fontFamily: FontFamily,
-    response: DraftPhrasesResponse
+    response: DraftPhrase,
+    modifier: Modifier = Modifier
 ) {
     Text(
-        text = response.phrase,
+        text = response.text,
         style = MaterialTheme.typography.bodyLarge.copy(
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontFamily = fontFamily
         ),
-        modifier = Modifier.testTag("dialoguePhraseText")
+        modifier = modifier.testTag("dialoguePhraseText")
     )
     Text(
         text = response.transcription,
@@ -132,12 +136,13 @@ private fun PhraseInfo(
 
 @Composable
 private fun SpeakerInfo(
-    speaker: SpeakerResponse?,
-    fontFamily: FontFamily
+    speaker: DraftSpeaker?,
+    fontFamily: FontFamily,
+    modifier: Modifier = Modifier
 ) {
     val speakerText = speaker?.let { spk ->
         val translations = spk.translations.joinToString(" | ") { it.translationText }
-        if (translations.isNotEmpty()) "${spk.title} | $translations" else spk.title
+        if (translations.isNotEmpty()) "${spk.name} | $translations" else spk.name
     } ?: stringResource(Res.string.unknown_speaker)
 
     Text(
@@ -147,13 +152,13 @@ private fun SpeakerInfo(
             fontWeight = FontWeight.Bold,
             fontFamily = fontFamily
         ),
-        modifier = Modifier.padding(bottom = 4.dp).testTag("dialogueSpeaker")
+        modifier = modifier.padding(bottom = 4.dp).testTag("dialogueSpeaker")
     )
 }
 
 @Composable
 private fun DialogueInfoContent(
-    dialogue: DialogueChatResponse,
+    dialogue: GeneratedDialogue,
     fontFamily: FontFamily
 ) {
     Row(
@@ -164,7 +169,7 @@ private fun DialogueInfoContent(
         Column(modifier = Modifier.weight(1f)) {
             val titleTranslations = dialogue.info.translations.joinToString(" | ") { it.translationText }
             val titleText =
-                if (titleTranslations.isNotEmpty()) "${dialogue.info.title} | $titleTranslations" else dialogue.info.title
+                if (titleTranslations.isNotEmpty()) "${dialogue.info.text} | $titleTranslations" else dialogue.info.text
 
             Text(
                 text = titleText,

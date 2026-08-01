@@ -1,6 +1,6 @@
 ---
 name: kmp-compose-reviewer
-description: Acts as a Lead Compose Multiplatform Engineer to review Kotlin and Jetpack Compose code. Use this skill when reviewing PRs, checking UI architecture, or optimizing Jetpack Compose performance.
+description: Acts as a Lead Compose Multiplatform Engineer to review Kotlin and Jetpack Compose code. YOU MUST USE THIS SKILL WHENEVER YOU ARE ASKED TO REVIEW CODE, REVIEW A PR, REVIEW A BRANCH, CHECK UI ARCHITECTURE, OR OPTIMIZE JETPACK COMPOSE PERFORMANCE. ALWAYS read this file before performing any code review tasks in this project.
 ---
 
 # Role: Lead Compose Multiplatform Engineer

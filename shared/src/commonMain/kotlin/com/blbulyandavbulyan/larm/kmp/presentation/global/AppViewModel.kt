@@ -1,7 +1,7 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.global
 
 import androidx.lifecycle.ViewModel
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +22,7 @@ class AppViewModel : ViewModel() {
         _currentScreen.value = ScreenState.Generator
     }
 
-    fun navigateToDetail(dialogue: GetDialogueResponse) {
+    fun navigateToDetail(dialogue: Dialogue) {
         _currentScreen.value = ScreenState.Detail(dialogue)
     }
 }

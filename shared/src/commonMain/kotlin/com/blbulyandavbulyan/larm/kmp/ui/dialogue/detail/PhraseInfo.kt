@@ -13,48 +13,51 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialoguePhraseResponse
-import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialoguePhrase
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 
 @Composable
 fun DialoguePhrases(
-    dialogue: GetDialogueResponse,
+    dialogue: Dialogue,
     onPlayAudio: (String) -> Unit
 ) {
-    dialogue.dialoguePhrases.forEach { dialoguePhrase ->
-        val speaker = dialogue.speakers.find { it.id == dialoguePhrase.speakerId }
+    dialogue.phrases.forEach { dialoguePhrase ->
+        key(dialoguePhrase.phrase.id) {
+            val speaker = dialogue.speakers.find { it.id == dialoguePhrase.speakerId }
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+                    .padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                SpeakerInfo(
-                    speaker = speaker,
-                    modifier = Modifier,
-                    onPlayAudio = onPlayAudio
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+                ) {
+                    SpeakerInfo(
+                        speaker = speaker,
+                        modifier = Modifier,
+                        onPlayAudio = onPlayAudio
+                    )
 
-                PhraseInfo(
-                    dialoguePhrase = dialoguePhrase,
-                    modifier = Modifier,
-                    onPlayAudio = onPlayAudio
-                )
+                    PhraseInfo(
+                        dialoguePhrase = dialoguePhrase,
+                        modifier = Modifier,
+                        onPlayAudio = onPlayAudio
+                    )
+                }
             }
         }
     }
@@ -62,8 +65,8 @@ fun DialoguePhrases(
 
 @Composable
 private fun PhraseInfo(
-    dialoguePhrase: GetDialoguePhraseResponse,
-    modifier: Modifier,
+    dialoguePhrase: DialoguePhrase,
+    modifier: Modifier = Modifier,
     onPlayAudio: (String) -> Unit
 ) {
     Column(
@@ -91,21 +94,23 @@ private fun PhraseInfo(
 }
 
 @Composable
-private fun PhraseTranslations(dialoguePhrase: GetDialoguePhraseResponse) {
+private fun PhraseTranslations(dialoguePhrase: DialoguePhrase) {
     dialoguePhrase.phrase.translations.forEachIndexed { index, translation ->
-        Text(
-            text = translation.translationText,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .padding(bottom = 4.dp)
-                .testTag("phraseTranslation_${dialoguePhrase.phrase.id}_$index")
-        )
+        key(translation.id) {
+            Text(
+                text = translation.translationText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .padding(bottom = 4.dp)
+                    .testTag("phraseTranslation_${dialoguePhrase.phrase.id}_$index")
+            )
+        }
     }
 }
 
 @Composable
-private fun PhraseTranscription(dialoguePhrase: GetDialoguePhraseResponse) {
+private fun PhraseTranscription(dialoguePhrase: DialoguePhrase) {
     Text(
         text = dialoguePhrase.phrase.transcription,
         style = MaterialTheme.typography.bodyMedium,
@@ -118,7 +123,7 @@ private fun PhraseTranscription(dialoguePhrase: GetDialoguePhraseResponse) {
 
 @Composable
 private fun MainPhrase(
-    dialoguePhrase: GetDialoguePhraseResponse,
+    dialoguePhrase: DialoguePhrase,
     displayListenIcon: Boolean
 ) {
     Row {
@@ -128,7 +133,7 @@ private fun MainPhrase(
         }
 
         Text(
-            text = dialoguePhrase.phrase.phrase,
+            text = dialoguePhrase.phrase.text,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
