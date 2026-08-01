@@ -6,15 +6,16 @@ import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialoguePhraseResp
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.GetDialogueSpeakerResponse
 import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseResponse
+import com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseTranslationResponse
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Asset
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialoguePhrase
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.PhraseTranslation
 import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Speaker
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.PhraseTranslation as DomainPhraseTranslation
 
 interface DialogueRepository {
     suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary>
@@ -49,8 +50,8 @@ private fun PhraseResponse.toDomain(): Phrase {
     )
 }
 
-private fun com.blbulyandavbulyan.larm.kmp.data.dialogue.search.PhraseTranslation.toDomain(): DomainPhraseTranslation {
-    return DomainPhraseTranslation(
+private fun PhraseTranslationResponse.toDomain(): PhraseTranslation {
+    return PhraseTranslation(
         id = id,
         isoLanguageCode = isoLanguageCode,
         translationText = translationText
