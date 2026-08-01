@@ -8,13 +8,19 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.buildkonfig)
     alias(libs.plugins.kover)
+    alias(libs.plugins.mokkery)
 }
 
 buildkonfig {
     packageName = "com.blbulyandavbulyan.larm.kmp"
     defaultConfigs {
         val baseUrl = project.findProperty("apiUrl")?.toString() ?: "http://localhost:8080"
+        val supabaseUrl = project.findProperty("supabaseUrl")?.toString() ?: ""
+        val supabaseAnonKey = project.findProperty("supabaseAnonKey")?.toString() ?: ""
+
         buildConfigField(FieldSpec.Type.STRING, "API_URL", baseUrl)
+        buildConfigField(FieldSpec.Type.STRING, "SUPABASE_URL", supabaseUrl)
+        buildConfigField(FieldSpec.Type.STRING, "SUPABASE_ANON_KEY", supabaseAnonKey)
     }
 }
 
@@ -27,9 +33,9 @@ kotlin {
             testTask {
                 useKarma {
                     useChromeHeadless()
-                }
-                useMocha {
-                    timeout = "30000"
+                    useMocha {
+                        timeout = "30000"
+                    }
                 }
                 filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.ui.*")
                 filter.excludeTestsMatching("com.blbulyandavbulyan.larm.kmp.AppTest")
@@ -43,9 +49,9 @@ kotlin {
             testTask {
                 useKarma {
                     useChromeHeadless()
-                }
-                useMocha {
-                    timeout = "30000"
+                    useMocha {
+                        timeout = "30000"
+                    }
                 }
             }
         }
@@ -53,6 +59,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(project.dependencies.platform(libs.supabase.bom))
+            implementation(libs.supabase.auth)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -66,6 +74,8 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.collections.immutable)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor3)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -77,6 +87,7 @@ kotlin {
         }
         jsMain.dependencies {
             implementation(libs.wrappers.browser)
+            implementation(libs.ktor.client.js)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)

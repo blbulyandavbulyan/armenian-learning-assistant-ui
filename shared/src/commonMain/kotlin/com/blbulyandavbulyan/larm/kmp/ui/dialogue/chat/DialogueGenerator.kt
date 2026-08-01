@@ -49,17 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_send
-import armenianlearningassistant_kmp.shared.generated.resources.dialogue_generator_title
 import armenianlearningassistant_kmp.shared.generated.resources.empty_conversation_message
-import armenianlearningassistant_kmp.shared.generated.resources.header_subtitle
 import armenianlearningassistant_kmp.shared.generated.resources.input_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.noto_sans_armenian
-import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
-import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
@@ -67,24 +63,24 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun DialogueGeneratorScreen(
     viewModel: DialogueChatViewModel,
-    onNavigateToSearch: (String) -> Unit
+    modifier: Modifier = Modifier
 ) {
     val conversation by viewModel.conversation.collectAsStateWithLifecycle()
     DialogueGeneratorScreen(
         conversation = conversation,
+        modifier = modifier,
         onGenerateDialogue = viewModel::generateDialogue,
-        onSaveDialogue = viewModel::saveDialogue,
-        onNavigateToSearch = onNavigateToSearch
+        onSaveDialogue = viewModel::saveDialogue
     )
 }
 
 @Composable
 fun DialogueGeneratorScreen(
     conversation: List<ConversationItem>,
+    modifier: Modifier = Modifier,
     emptyMessage: String = stringResource(Res.string.empty_conversation_message),
     onGenerateDialogue: (String) -> Unit,
-    onSaveDialogue: (GeneratedDialogue) -> Unit,
-    onNavigateToSearch: (String) -> Unit
+    onSaveDialogue: (GeneratedDialogue) -> Unit
 ) {
     var prompt by remember { mutableStateOf("") }
 
@@ -106,15 +102,12 @@ fun DialogueGeneratorScreen(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(gradientBackground)
             .padding(16.dp)
             .testTag("dialogueGeneratorScreen")
     ) {
-        // Header
-        Header(onNavigateToSearch = onNavigateToSearch)
-
         // Main content area
         Box(
             modifier = Modifier
@@ -274,40 +267,6 @@ private fun SendButton(onClick: () -> Unit) {
         modifier = Modifier.testTag("sendButton")
     ) {
         Text(stringResource(Res.string.action_send), fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-private fun Header(onNavigateToSearch: (String) -> Unit) {
-    var query by remember { mutableStateOf("") }
-
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
-    ) {
-        Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
-            Text(
-                text = stringResource(Res.string.dialogue_generator_title),
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                ),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = stringResource(Res.string.header_subtitle),
-                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-            )
-        }
-
-        SearchField(
-            query = query,
-            Modifier.weight(1f).height(height = 60.dp).testTag("searchInputField"),
-            onSearch = { onNavigateToSearch(query) },
-            onValueChange = { query = it },
-            placeholder = { Text(stringResource(Res.string.search_dialogues_placeholder)) }
-        )
     }
 }
 

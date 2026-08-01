@@ -59,8 +59,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
                     onGenerateDialogue = { generatedPrompt = it },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -84,8 +83,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
                     onGenerateDialogue = { callbackTriggered = true },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -105,8 +103,7 @@ class DialogueGeneratorScreenTest {
                     conversation = emptyList(),
                     emptyMessage = "No conversation yet",
                     onGenerateDialogue = { },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -123,8 +120,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
                     onGenerateDialogue = { generatedPrompt = it },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -143,8 +139,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
                     onGenerateDialogue = { generatedPrompt = it },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -166,8 +161,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.UserMessage("Hello user message")),
                     onGenerateDialogue = { },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -183,8 +177,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.Loading),
                     onGenerateDialogue = { },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -201,8 +194,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.AiResponse(mockAiResponse)),
                     onGenerateDialogue = { },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -242,8 +234,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = conversation,
                     onGenerateDialogue = {},
-                    onSaveDialogue = { savedDialogues.add(it) },
-                    onNavigateToSearch = {}
+                    onSaveDialogue = { savedDialogues.add(it) }
                 )
             }
         }
@@ -273,8 +264,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    viewModel = viewModel,
-                    onNavigateToSearch = {}
+                    viewModel = viewModel
                 )
             }
         }

@@ -18,6 +18,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.kotlinJvm) apply false
+    alias(libs.plugins.mokkery) apply false
     alias(libs.plugins.detekt)
     alias(libs.plugins.sonarqube)
 }

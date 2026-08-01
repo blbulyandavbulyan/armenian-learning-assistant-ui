@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
-import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.DialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
@@ -25,7 +23,6 @@ import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 fun DialogueDetailScreen(
     dialogue: Dialogue,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit,
     onPlayAudio: (String) -> Unit
 ) {
     val appColors = AppTheme.colors
@@ -39,13 +36,6 @@ fun DialogueDetailScreen(
                 .fillMaxSize()
                 .background(gradientBackground)
         ) {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    GoBackButton(width = 50.dp, height = 50.dp, onClick = onBack)
-                }
-            )
-
             val scrollState = rememberScrollState()
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(

@@ -6,16 +6,15 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.FakeAssetRepository
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.SearchState
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.assertDialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
@@ -48,105 +47,33 @@ class DialogueSearchScreenTest {
     }
 
     @Test
-    fun typingInSearchBar_updatesViewModelQuery_andPersistsWhenReturning() = runComposeUiTest {
-        val fakeDialogueRepository = FakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
-        var backPressed = false
-
+    fun searchScreen_whenLoading_showsLoadingIndicator() = runComposeUiTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueSearchScreen(
-                    viewModel = viewModel,
-                    onBack = { backPressed = true },
-                    onGetDialogueDetails = {}
+                    searchState = SearchState.Loading,
+                    onSearch = {},
+                    onGetDialogueDetails = {},
+                    onPlayAudio = {}
                 )
             }
         }
 
-        // Type into search bar
-        onNodeWithTag("searchInputField").performTextInput("Armenian Query")
-
-        // Check if query is synced with ViewModel
-        viewModel.searchQuery.value shouldBe "Armenian Query"
-
-        // Verify back button triggers callback
-        onNodeWithTag("backButton").performClick()
-        backPressed shouldBe true
-        viewModel.searchQuery.value shouldBe "Armenian Query"
-    }
-
-    @Test
-    fun searchScreen_listenButtonInvokesCorrectAudioEndpoint() = runComposeUiTest {
-        val fakeDialogueRepository = createFakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
-
-        setContent {
-            ArmenianLearningTheme(darkTheme = true) {
-                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
-            }
-        }
-
-        onNodeWithTag("searchInputField").performTextInput("Hello")
-        onNodeWithTag("searchSubmitButton").performClick()
-
-        val dialogueId = DomainMothers.DIALOGUE_1.id
-
-        // Test Case 4: Search screen listen button
-        onNodeWithTag("listenButton_$dialogueId").performClick()
-
-        fakeAssetRepository.requestedUrls.last() shouldBe DomainMothers.DIALOGUE_1.title.assets.first().url
-    }
-
-    private fun createFakeDialogueRepository() = object : FakeDialogueRepository() {
-        override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
-            return persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
-        }
-
-        override suspend fun getDialogue(id: String): Dialogue {
-            return DomainMothers.DIALOGUE_1
-        }
+        onNodeWithTag("loadingIndicator").assertIsDisplayed()
     }
 
     @Test
     fun searchScreen_emptyResults_showsEmptyStateMessage() = runComposeUiTest {
-        val fakeDialogueRepository = object : FakeDialogueRepository() {
-            override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
-                return persistentListOf()
-            }
-        }
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
-
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
-                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+                DialogueSearchScreen(
+                    searchState = SearchState.Success(persistentListOf()),
+                    onSearch = {},
+                    onGetDialogueDetails = {},
+                    onPlayAudio = {}
+                )
             }
         }
-
-        onNodeWithTag("emptyResultsMessage").assertDoesNotExist()
-
-        onNodeWithTag("searchInputField").performTextInput("Hello")
-        onNodeWithTag("searchSubmitButton").performClick()
 
         waitUntil(timeoutMillis = 5000) {
             onAllNodesWithTag("emptyResultsMessage").fetchSemanticsNodes().isNotEmpty()
@@ -157,72 +84,40 @@ class DialogueSearchScreenTest {
 
     @Test
     fun searchScreen_error_showsRetryButtonAndTriggersRetry() = runComposeUiTest {
-        var callCount = 0
-        val fakeDialogueRepository = object : FakeDialogueRepository() {
-            @Suppress("TooGenericExceptionThrown")
-            override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
-                callCount++
-                throw RuntimeException("Network Error")
-            }
-        }
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
-
+        var searchTriggered = false
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
-                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+                DialogueSearchScreen(
+                    searchState = SearchState.Error,
+                    onSearch = { searchTriggered = true },
+                    onGetDialogueDetails = {},
+                    onPlayAudio = {}
+                )
             }
         }
 
-        onNodeWithTag("searchInputField").performTextInput("Hello")
-        onNodeWithTag("searchSubmitButton").performClick()
-
-        // Wait for retry button to appear on error
-        waitUntil(timeoutMillis = 5000) {
-            onAllNodesWithTag("retryButton").fetchSemanticsNodes().isNotEmpty()
-        }
-
-        onNodeWithTag("emptyResultsMessage").assertDoesNotExist()
-
         onNodeWithTag("retryButton").assertIsDisplayed()
-        callCount shouldBe 1
-
         onNodeWithTag("retryButton").performClick()
-        waitForIdle()
 
-        callCount shouldBe 2
+        searchTriggered shouldBe true
     }
 
     @Test
     fun searchScreen_success_displaysAllInformationCorrectly() = runComposeUiTest {
-        val fakeDialogueRepository = createFakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
+        val results = persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
-                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+                DialogueSearchScreen(
+                    searchState = SearchState.Success(results),
+                    onSearch = {},
+                    onGetDialogueDetails = {},
+                    onPlayAudio = {}
+                )
             }
         }
 
-        onNodeWithTag("searchInputField").performTextInput("Hello")
-        onNodeWithTag("searchSubmitButton").performClick()
-
-        val response = listOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
-
-        response.forEach { dialogue ->
+        results.forEach { dialogue ->
             assertDialogueTitle(
                 title = dialogue.title,
                 phraseTestTag = "searchResultPhrase_${dialogue.id}",
@@ -233,32 +128,21 @@ class DialogueSearchScreenTest {
 
     @Test
     fun searchScreen_viewDetailsButton_navigatesToDetailScreen() = runComposeUiTest {
-        val fakeDialogueRepository = createFakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
-
+        val results = persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
         var navigateToDialogueId: String? = null
+
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueSearchScreen(
-                    viewModel = viewModel,
-                    onBack = { },
-                    onGetDialogueDetails = { navigateToDialogueId = it }
+                    searchState = SearchState.Success(results),
+                    onSearch = {},
+                    onGetDialogueDetails = { navigateToDialogueId = it },
+                    onPlayAudio = {}
                 )
             }
         }
 
-        onNodeWithTag("searchInputField").performTextInput("Hello")
-        onNodeWithTag("searchSubmitButton").performClick()
-
         val secondDialogue = DomainMothers.DIALOGUE_SUMMARY_2
-
         onNodeWithTag("viewFullDialogueButton_${secondDialogue.id}").performScrollTo().performClick()
 
         navigateToDialogueId shouldBe secondDialogue.id
@@ -266,57 +150,54 @@ class DialogueSearchScreenTest {
 
     @Test
     fun searchScreen_listenButton_invokesCorrectAudioEndpoint() = runComposeUiTest {
-        val fakeDialogueRepository = createFakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
+        val results = persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
+        var playedAudio: String? = null
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
-                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+                DialogueSearchScreen(
+                    searchState = SearchState.Success(results),
+                    onSearch = {},
+                    onGetDialogueDetails = {},
+                    onPlayAudio = { playedAudio = it }
+                )
             }
         }
 
-        onNodeWithTag("searchInputField").performTextInput("Hello")
-        onNodeWithTag("searchSubmitButton").performClick()
-
         val secondDialogue = DomainMothers.DIALOGUE_SUMMARY_2
-
         onNodeWithTag("listenButton_${secondDialogue.id}").performScrollTo().performClick()
 
-        fakeAssetRepository.requestedUrls.last() shouldBe secondDialogue.title.assets.first().url
+        playedAudio shouldBe secondDialogue.title.assets.first().url
     }
 
     @Test
-    fun searchScreen_whenLoading_showsLoadingIndicator() = runComposeUiTest {
-        val fakeDialogueRepository = object : FakeDialogueRepository() {
+    fun searchScreen_withViewModel_delegatesCorrectly() = runComposeUiTest {
+        val fakeRepo = object : FakeDialogueRepository() {
             override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
-                kotlinx.coroutines.awaitCancellation()
+                return persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1)
             }
         }
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
+        val viewModel = DialogueSearchViewModel(
+            fakeRepo,
+            FakeAssetRepository(),
+            GlobalErrorManager(),
+            FakeAudioPlayer()
+        )
+        viewModel.updateSearchQuery("test query")
+        viewModel.searchDialogues("test query", {}, {})
 
+        var navigateToId: String? = null
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
-                DialogueSearchScreen(viewModel = viewModel, onBack = { }, onGetDialogueDetails = {})
+                DialogueSearchScreen(
+                    viewModel = viewModel,
+                    onGetDialogueDetails = { navigateToId = it }
+                )
             }
         }
 
-        onNodeWithTag("searchInputField").performTextInput("Hello")
-        onNodeWithTag("searchSubmitButton").performClick()
-
-        onNodeWithTag("loadingIndicator").assertIsDisplayed()
+        val dialogue = DomainMothers.DIALOGUE_SUMMARY_1
+        onNodeWithTag("viewFullDialogueButton_${dialogue.id}").performScrollTo().performClick()
+        navigateToId shouldBe dialogue.id
     }
 }

@@ -13,7 +13,7 @@ composeMultiplatform = "1.11.1"
 junit = "4.13.2"
 kotlin = "2.4.0"
 kotlin-wrappers = "2026.6.11"
-ktor = "3.0.0"
+ktor = "3.4.3"
 kotlinxSerialization = "1.7.3"
 material3 = "1.11.0-alpha07"
 buildkonfig = "0.15.2"
@@ -23,11 +23,17 @@ turbine = "1.1.0"
 kover = "0.9.8"
 detekt = "1.23.8"
 sonarqube = "7.3.1.8318"
+supabase = "3.6.0"
 mp3spi = "1.9.5.4"
 kotlinxCollectionsImmutable = "0.5.1"
-
+coil = "3.5.0"
+mokkery = "3.4.2"
 
 [libraries]
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase" }
+supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
+
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -60,7 +66,8 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version.ref = "mp3spi" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
-
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -74,3 +81,4 @@ kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
