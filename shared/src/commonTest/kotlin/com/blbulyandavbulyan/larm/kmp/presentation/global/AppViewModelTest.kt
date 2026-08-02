@@ -1,7 +1,7 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.global
 
 import app.cash.turbine.test
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DomainMothers
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers

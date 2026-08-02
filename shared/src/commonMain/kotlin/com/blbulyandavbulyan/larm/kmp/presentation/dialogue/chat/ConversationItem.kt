@@ -1,6 +1,6 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat
 
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 
 sealed class ConversationItem {
     data class UserMessage(val text: String) : ConversationItem()

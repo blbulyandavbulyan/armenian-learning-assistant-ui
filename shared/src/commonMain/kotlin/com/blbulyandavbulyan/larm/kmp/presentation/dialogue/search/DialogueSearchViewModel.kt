@@ -7,15 +7,15 @@ import armenianlearningassistant_kmp.shared.generated.resources.audio_playback_e
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_display_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
-import com.blbulyandavbulyan.larm.kmp.audio.Audio
-import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayException
-import com.blbulyandavbulyan.larm.kmp.audio.AudioPlayer
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
-import com.blbulyandavbulyan.larm.kmp.network.AssetFetchException
-import com.blbulyandavbulyan.larm.kmp.network.AssetRepository
-import com.blbulyandavbulyan.larm.kmp.network.DialogueRepository
+import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetFetchException
+import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.DialogueRepository
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.Audio
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.AudioPlayException
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.AudioPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +24,9 @@ import kotlinx.coroutines.launch
 class DialogueSearchViewModel(
     private val repository: DialogueRepository,
     private val assetRepository: AssetRepository,
-    private val globalErrorManager: GlobalErrorManager
+    private val globalErrorManager: GlobalErrorManager,
+    private val audioPlayer: AudioPlayer,
 ) : ViewModel() {
-    private val audioPlayer = AudioPlayer()
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 

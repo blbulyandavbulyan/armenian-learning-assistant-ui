@@ -41,7 +41,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues
 import armenianlearningassistant_kmp.shared.generated.resources.search_results_title
 import armenianlearningassistant_kmp.shared.generated.resources.view_dialogue_details
 import armenianlearningassistant_kmp.shared.generated.resources.view_full_dialogue_button
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.SearchState
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton

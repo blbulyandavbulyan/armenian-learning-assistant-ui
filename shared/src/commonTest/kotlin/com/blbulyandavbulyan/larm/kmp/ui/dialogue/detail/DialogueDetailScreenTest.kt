@@ -8,9 +8,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runComposeUiTest
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DomainMothers
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Phrase
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Speaker
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Speaker
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.assertDialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe

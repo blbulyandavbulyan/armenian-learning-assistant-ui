@@ -17,9 +17,9 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogueMother
-import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogueMother
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.FakeDialogueChatRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme

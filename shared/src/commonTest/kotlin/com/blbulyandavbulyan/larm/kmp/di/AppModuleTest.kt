@@ -11,7 +11,7 @@ class AppModuleTest {
         AppModule.apiClient.shouldNotBeNull()
         AppModule.dialogueRepository.shouldNotBeNull()
         AppModule.dialogueChatRepository.shouldNotBeNull()
-        AppModule.audioRepository.shouldNotBeNull()
+        AppModule.assetRepository.shouldNotBeNull()
         AppModule.globalErrorManager.shouldNotBeNull()
     }
 }

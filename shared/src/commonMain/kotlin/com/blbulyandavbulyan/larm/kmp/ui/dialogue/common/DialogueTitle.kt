@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Phrase
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.PhraseTranslation
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.PhraseTranslation
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 import com.blbulyandavbulyan.larm.kmp.ui.common.RoundedCutBottomRightShape
 

@@ -8,8 +8,8 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_unknown
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
-import com.blbulyandavbulyan.larm.kmp.network.DialogueChatRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.DialogueChatRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf

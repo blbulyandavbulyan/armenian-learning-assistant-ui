@@ -7,8 +7,9 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
-import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
+import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.FakeAssetRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.FakeDialogueRepository
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +27,7 @@ class DialogueSearchViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var fakeRepository: FakeDialogueRepository
     private lateinit var fakeAssetRepository: FakeAssetRepository
+    private lateinit var fakeAudioPlayer: FakeAudioPlayer
     private lateinit var globalErrorManager: GlobalErrorManager
     private lateinit var viewModel: DialogueSearchViewModel
 
@@ -35,7 +37,8 @@ class DialogueSearchViewModelTest {
         fakeRepository = FakeDialogueRepository()
         fakeAssetRepository = FakeAssetRepository()
         globalErrorManager = GlobalErrorManager()
-        viewModel = DialogueSearchViewModel(fakeRepository, fakeAssetRepository, globalErrorManager)
+        fakeAudioPlayer = FakeAudioPlayer()
+        viewModel = DialogueSearchViewModel(fakeRepository, fakeAssetRepository, globalErrorManager, fakeAudioPlayer)
     }
 
     @AfterTest
@@ -91,7 +94,7 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `playAudio transitions to Error on failure`() = runTest {
-        fakeAssetRepository.shouldFailWithAssetFetchException = true
+        fakeAssetRepository.shouldFail = true
         viewModel.playAudio("http://example.com")
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
@@ -102,7 +105,7 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun playAudio_whenAudioPlayExceptionThrown_updatesAudioErrorStateAndDoesNotChangeSearchState() = runTest {
-        fakeAssetRepository.shouldFailWithAudioException = true
+        fakeAudioPlayer.shouldFail = true
         viewModel.playAudio("url")
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
