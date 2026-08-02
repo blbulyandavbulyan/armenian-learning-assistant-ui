@@ -1,6 +1,6 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.global
 
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
 
 sealed class ScreenState {
     data object Generator : ScreenState()

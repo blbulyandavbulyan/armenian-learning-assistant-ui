@@ -1,6 +1,6 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search
 
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
 import kotlinx.collections.immutable.ImmutableList
 
 sealed class SearchState {

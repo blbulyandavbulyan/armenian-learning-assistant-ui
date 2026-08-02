@@ -6,7 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollTo
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Phrase
 
 @OptIn(ExperimentalTestApi::class)
 fun ComposeUiTest.assertDialogueTitle(

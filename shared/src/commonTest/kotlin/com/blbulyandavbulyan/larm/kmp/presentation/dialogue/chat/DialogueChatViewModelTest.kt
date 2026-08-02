@@ -6,9 +6,9 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save_dialogue
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DialogueTitle
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogueMother
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.DialogueTitle
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogueMother
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
 import io.kotest.matchers.nulls.shouldNotBeNull

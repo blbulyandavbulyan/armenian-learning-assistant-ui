@@ -32,8 +32,9 @@ fun App(
     searchViewModel: DialogueSearchViewModel = remember {
         DialogueSearchViewModel(
             AppModule.dialogueRepository,
-            AppModule.audioRepository,
-            AppModule.globalErrorManager
+            AppModule.assetRepository,
+            AppModule.globalErrorManager,
+            AppModule.audioPlayer
         )
     },
     chatViewModel: DialogueChatViewModel = remember {

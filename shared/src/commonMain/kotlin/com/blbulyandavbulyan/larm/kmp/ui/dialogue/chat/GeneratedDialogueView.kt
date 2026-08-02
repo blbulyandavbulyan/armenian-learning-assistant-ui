@@ -26,9 +26,9 @@ import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_save_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.action_saved_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DraftPhrase
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DraftSpeaker
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.DraftPhrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.DraftSpeaker
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 

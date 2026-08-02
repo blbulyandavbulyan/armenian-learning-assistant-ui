@@ -1,7 +1,7 @@
 # Audio MP3 Support Design
 
 ## Purpose
-Enable the KMP `AudioPlayer` to support playing MP3s (and potentially other formats) sent by the backend, reducing the heavy payload sizes of uncompressed WAV files. The backend will return compressed audio and provide the MIME type in the `Content-Type` header.
+Enable the KMP `PlatformAudioPlayer` to support playing MP3s (and potentially other formats) sent by the backend, reducing the heavy payload sizes of uncompressed WAV files. The backend will return compressed audio and provide the MIME type in the `Content-Type` header.
 
 ## Architecture & Interface Changes
 1. **New Data Class**: Create a new class `Audio` in the `com.blbulyandavbulyan.larm.kmp.audio` package:
@@ -13,7 +13,7 @@ Enable the KMP `AudioPlayer` to support playing MP3s (and potentially other form
        val mimeType: String
    )
    ```
-2. **AudioPlayer Update**: Update the `AudioPlayer` interface (and all expected/actual platform declarations) to accept the new data class:
+2. **AudioPlayer Update**: Update the `PlatformAudioPlayer` interface (and all expected/actual platform declarations) to accept the new data class:
    ```kotlin
    suspend fun play(audio: Audio)
    ```
@@ -21,7 +21,7 @@ Enable the KMP `AudioPlayer` to support playing MP3s (and potentially other form
 ## Platform-Specific Implementations
 
 ### JS and WasmJS
-- **Implementation**: The JS and WasmJS implementations of `AudioPlayer` currently create a `Blob` hardcoded to `"audio/wav"`. This will be updated to dynamically use `audio.mimeType`.
+- **Implementation**: The JS and WasmJS implementations of `PlatformAudioPlayer` currently create a `Blob` hardcoded to `"audio/wav"`. This will be updated to dynamically use `audio.mimeType`.
 - **Browser Support**: Modern browsers natively support playing MP3 via `HTMLAudioElement`. No additional dependencies are required.
 
 ### JVM (Desktop)

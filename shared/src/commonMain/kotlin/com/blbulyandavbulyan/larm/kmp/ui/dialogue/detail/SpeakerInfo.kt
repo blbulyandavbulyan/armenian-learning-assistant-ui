@@ -22,8 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.unknown_speaker
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.PhraseTranslation
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Speaker
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.PhraseTranslation
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Speaker
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 import com.blbulyandavbulyan.larm.kmp.ui.common.RoundedTopLeftCutShape
 import org.jetbrains.compose.resources.stringResource

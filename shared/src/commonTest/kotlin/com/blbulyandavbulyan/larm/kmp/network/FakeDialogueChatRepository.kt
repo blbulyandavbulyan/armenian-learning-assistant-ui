@@ -1,7 +1,8 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.DialogueTitle
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.DialogueTitle
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.DialogueChatRepository
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CompletableDeferred
 

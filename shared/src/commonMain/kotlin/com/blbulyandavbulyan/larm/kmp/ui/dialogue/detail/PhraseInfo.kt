@@ -18,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialoguePhrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialoguePhrase
 import com.blbulyandavbulyan.larm.kmp.ui.common.ListenIcon
 
 @Composable

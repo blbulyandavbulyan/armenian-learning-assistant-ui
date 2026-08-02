@@ -1,8 +1,9 @@
 package com.blbulyandavbulyan.larm.kmp.network
 
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.DialogueRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

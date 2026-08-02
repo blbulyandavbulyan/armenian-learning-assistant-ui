@@ -9,9 +9,10 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DialogueSummary
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.DomainMothers
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
 import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
@@ -54,7 +55,8 @@ class DialogueSearchScreenTest {
             DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAssetRepository,
-                GlobalErrorManager()
+                GlobalErrorManager(),
+                FakeAudioPlayer()
             )
         var backPressed = false
 
@@ -88,7 +90,8 @@ class DialogueSearchScreenTest {
             DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAssetRepository,
-                GlobalErrorManager()
+                GlobalErrorManager(),
+                FakeAudioPlayer()
             )
 
         setContent {
@@ -130,7 +133,8 @@ class DialogueSearchScreenTest {
             DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAssetRepository,
-                GlobalErrorManager()
+                GlobalErrorManager(),
+                FakeAudioPlayer()
             )
 
         setContent {
@@ -166,7 +170,8 @@ class DialogueSearchScreenTest {
             DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAssetRepository,
-                GlobalErrorManager()
+                GlobalErrorManager(),
+                FakeAudioPlayer()
             )
 
         setContent {
@@ -202,7 +207,8 @@ class DialogueSearchScreenTest {
             DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAssetRepository,
-                GlobalErrorManager()
+                GlobalErrorManager(),
+                FakeAudioPlayer()
             )
 
         setContent {
@@ -233,7 +239,8 @@ class DialogueSearchScreenTest {
             DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAssetRepository,
-                GlobalErrorManager()
+                GlobalErrorManager(),
+                FakeAudioPlayer()
             )
 
         var navigateToDialogueId: String? = null
@@ -265,7 +272,8 @@ class DialogueSearchScreenTest {
             DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAssetRepository,
-                GlobalErrorManager()
+                GlobalErrorManager(),
+                FakeAudioPlayer()
             )
 
         setContent {
@@ -296,7 +304,8 @@ class DialogueSearchScreenTest {
             DialogueSearchViewModel(
                 fakeDialogueRepository,
                 fakeAssetRepository,
-                GlobalErrorManager()
+                GlobalErrorManager(),
+                FakeAudioPlayer()
             )
 
         setContent {

@@ -55,7 +55,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.header_subtitle
 import armenianlearningassistant_kmp.shared.generated.resources.input_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.noto_sans_armenian
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.chat.GeneratedDialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar

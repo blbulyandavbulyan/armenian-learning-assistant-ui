@@ -1,14 +1,14 @@
 # Audio Playback Error Handling Design
 
 ## Purpose
-Currently, audio playback exceptions in `AudioPlayer` are swallowed and simply printed to the console via `printStackTrace()`. Because of this, the UI is unaware of specific audio failures. Even when the `DialogueViewModel` manually catches a generic exception, it updates the main `_searchState` to `Error`, which completely breaks the UI by replacing the entire screen with an error state. This design outlines how to properly propagate audio playback errors and display them non-disruptively in the UI, complete with localized user-facing titles.
+Currently, audio playback exceptions in `PlatformAudioPlayer` are swallowed and simply printed to the console via `printStackTrace()`. Because of this, the UI is unaware of specific audio failures. Even when the `DialogueViewModel` manually catches a generic exception, it updates the main `_searchState` to `Error`, which completely breaks the UI by replacing the entire screen with an error state. This design outlines how to properly propagate audio playback errors and display them non-disruptively in the UI, complete with localized user-facing titles.
 
 ## 1. Exception Definition and Contract
 - **`AudioPlayException`**: Create a custom exception `class AudioPlayException(message: String, cause: Throwable? = null) : Exception(message, cause)` inside the `com.blbulyandavbulyan.larm.kmp.audio` package.
 - **Interface Contract**: Update `AudioPlayer.play(audioBytes: ByteArray)` with KDoc clearly specifying that it `@throws AudioPlayException` when an error occurs during audio initialization or playback.
 
 ## 2. AudioPlayer Implementations
-In all platform-specific `AudioPlayer` implementations (`wasmJs`, `js`, `jvm`):
+In all platform-specific `PlatformAudioPlayer` implementations (`wasmJs`, `js`, `jvm`):
 - Wrap internal playback logic with a `try/catch` block catching generic `Throwable` or `Exception`.
 - Inside the `catch` block, properly log the original exception (using standard `println` or any existing Logger utility).
 - Wrap the original exception and throw the newly created `AudioPlayException(e.message, e)`.

@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.DialogueTitle

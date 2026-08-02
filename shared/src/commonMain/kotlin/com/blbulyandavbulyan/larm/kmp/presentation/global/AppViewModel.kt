@@ -1,7 +1,7 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.global
 
 import androidx.lifecycle.ViewModel
-import com.blbulyandavbulyan.larm.kmp.domain.model.dialogue.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
