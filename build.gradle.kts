@@ -53,5 +53,12 @@ sonarqube {
             "${it.layout.buildDirectory.get()}/reports/kover/report.xml"
         }
         property("sonar.coverage.jacoco.xmlReportPaths", koverReports)
+
+        property(
+            "sonar.coverage.exclusions",
+            listOf(
+                "**/PlatformAudioPlayer.kt",
+            ).joinToString(",")
+        )
     }
 }
