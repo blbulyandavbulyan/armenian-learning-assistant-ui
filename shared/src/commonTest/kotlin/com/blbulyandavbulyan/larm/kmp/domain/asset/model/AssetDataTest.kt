@@ -38,11 +38,11 @@ class AssetDataTest {
     }
 
     @Test
-    @Suppress("EqualsNullCall") // suppressed, because this is the point of this test
     fun equals_null() {
         val asset = AssetData(byteArrayOf(1, 2, 3), "audio/mpeg")
+        val other: Any? = null
 
-        asset.equals(null) shouldBe false
+        (asset == other) shouldBe false
     }
 
     @Test
