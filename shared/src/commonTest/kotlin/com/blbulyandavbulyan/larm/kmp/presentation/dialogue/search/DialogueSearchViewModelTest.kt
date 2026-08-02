@@ -7,9 +7,9 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
+import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.FakeAssetRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
-import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
-import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers

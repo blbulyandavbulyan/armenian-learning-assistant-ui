@@ -10,14 +10,14 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
+import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.FakeDialogueChatRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.infrastructure.appbackend.client.data.dialogue.search.GetDialogueResponseMother
 import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
-import com.blbulyandavbulyan.larm.kmp.network.FakeAssetRepository
-import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueChatRepository
-import com.blbulyandavbulyan.larm.kmp.network.FakeDialogueRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel

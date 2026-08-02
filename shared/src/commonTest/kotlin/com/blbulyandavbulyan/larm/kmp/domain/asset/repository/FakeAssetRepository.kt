@@ -1,8 +1,6 @@
-package com.blbulyandavbulyan.larm.kmp.network
+package com.blbulyandavbulyan.larm.kmp.domain.asset.repository
 
 import com.blbulyandavbulyan.larm.kmp.domain.asset.model.AssetData
-import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetFetchException
-import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetRepository
 
 class FakeAssetRepository : AssetRepository {
     var shouldFail = false
