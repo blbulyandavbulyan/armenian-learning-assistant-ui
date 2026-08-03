@@ -11,8 +11,8 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.FakeAssetRepository
+import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthRepository
 import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthState
-import com.blbulyandavbulyan.larm.kmp.domain.auth.FakeAuthRepository
 import com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
@@ -24,11 +24,17 @@ import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
+import dev.mokkery.answering.calls
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -54,10 +60,11 @@ class AppTest {
     }
 
     private fun createAuthenticatedAppViewModel(): AppViewModel {
-        val fakeAuthRepository = FakeAuthRepository().apply {
-            authStateFlow.value = AuthState.AUTHENTICATED
-        }
-        return AppViewModel(fakeAuthRepository)
+        val authRepository = mock<AuthRepository>()
+        every { authRepository.observeAuthState() } returns MutableStateFlow(AuthState.AUTHENTICATED)
+        every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
+        everySuspend { authRepository.signOut() } returns Unit
+        return AppViewModel(authRepository)
     }
 
     @Test
@@ -293,10 +300,10 @@ class AppTest {
 
     @Test
     fun app_showsLoginScreen_whenUnauthenticated() = runComposeUiTest {
-        val fakeAuthRepository = FakeAuthRepository().apply {
-            authStateFlow.value = AuthState.UNAUTHENTICATED
-        }
-        val appViewModel = AppViewModel(fakeAuthRepository)
+        val authRepository = mock<AuthRepository>()
+        every { authRepository.observeAuthState() } returns MutableStateFlow(AuthState.UNAUTHENTICATED)
+        every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
+        val appViewModel = AppViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
             FakeAssetRepository(),
@@ -321,16 +328,23 @@ class AppTest {
 
     @Test
     fun app_showsTopBarAndDrawer_whenAuthenticated() = runComposeUiTest {
-        val fakeAuthRepository = FakeAuthRepository().apply {
-            authStateFlow.value = AuthState.AUTHENTICATED
-            userProfileFlow.value = UserProfile(
+        val authRepository = mock<AuthRepository>()
+        val authStateFlow = MutableStateFlow(AuthState.AUTHENTICATED)
+        val userProfileFlow = MutableStateFlow<UserProfile?>(
+            UserProfile(
                 id = "user-123",
                 email = "user@example.com",
                 displayName = "David Bulyan",
                 avatarUrl = null
             )
+        )
+        every { authRepository.observeAuthState() } returns authStateFlow
+        every { authRepository.observeUserProfile() } returns userProfileFlow
+        everySuspend { authRepository.signOut() } calls {
+            authStateFlow.value = AuthState.UNAUTHENTICATED
+            userProfileFlow.value = null
         }
-        val appViewModel = AppViewModel(fakeAuthRepository)
+        val appViewModel = AppViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
             FakeAssetRepository(),
@@ -376,10 +390,10 @@ class AppTest {
 
     @Test
     fun app_hidesTopBar_whenUnauthenticated() = runComposeUiTest {
-        val fakeAuthRepository = FakeAuthRepository().apply {
-            authStateFlow.value = AuthState.UNAUTHENTICATED
-        }
-        val appViewModel = AppViewModel(fakeAuthRepository)
+        val authRepository = mock<AuthRepository>()
+        every { authRepository.observeAuthState() } returns MutableStateFlow(AuthState.UNAUTHENTICATED)
+        every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
+        val appViewModel = AppViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
             FakeAssetRepository(),

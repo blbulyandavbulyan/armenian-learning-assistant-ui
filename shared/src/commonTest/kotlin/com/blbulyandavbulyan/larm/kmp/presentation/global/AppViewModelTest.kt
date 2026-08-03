@@ -1,13 +1,21 @@
 package com.blbulyandavbulyan.larm.kmp.presentation.global
 
 import app.cash.turbine.test
+import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthRepository
 import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthState
-import com.blbulyandavbulyan.larm.kmp.domain.auth.FakeAuthRepository
+import com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
+import dev.mokkery.answering.calls
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -19,14 +27,21 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var fakeAuthRepository: FakeAuthRepository
+    private val authRepository = mock<AuthRepository>()
+    private val authStateFlow = MutableStateFlow(AuthState.UNAUTHENTICATED)
+    private val userProfileFlow = MutableStateFlow<UserProfile?>(null)
     private lateinit var viewModel: AppViewModel
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        fakeAuthRepository = FakeAuthRepository()
-        viewModel = AppViewModel(fakeAuthRepository)
+        every { authRepository.observeAuthState() } returns authStateFlow
+        every { authRepository.observeUserProfile() } returns userProfileFlow
+        everySuspend { authRepository.signOut() } calls {
+            authStateFlow.value = AuthState.UNAUTHENTICATED
+            userProfileFlow.value = null
+        }
+        viewModel = AppViewModel(authRepository)
     }
 
     @AfterTest
@@ -61,7 +76,7 @@ class AppViewModelTest {
 
     @Test
     fun `auth state UNAUTHENTICATED sets screen to Login`() = runTest {
-        fakeAuthRepository.authStateFlow.value = AuthState.UNAUTHENTICATED
+        authStateFlow.value = AuthState.UNAUTHENTICATED
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.currentScreen.value shouldBe ScreenState.Login
@@ -69,24 +84,24 @@ class AppViewModelTest {
 
     @Test
     fun `auth state AUTHENTICATED switches from Login to Generator`() = runTest {
-        fakeAuthRepository.authStateFlow.value = AuthState.UNAUTHENTICATED
+        authStateFlow.value = AuthState.UNAUTHENTICATED
         testDispatcher.scheduler.advanceUntilIdle()
         viewModel.currentScreen.value shouldBe ScreenState.Login
 
-        fakeAuthRepository.authStateFlow.value = AuthState.AUTHENTICATED
+        authStateFlow.value = AuthState.AUTHENTICATED
         testDispatcher.scheduler.advanceUntilIdle()
         viewModel.currentScreen.value shouldBe ScreenState.Generator
     }
 
     @Test
     fun `auth state AUTHENTICATED does not override Search screen`() = runTest {
-        fakeAuthRepository.authStateFlow.value = AuthState.UNAUTHENTICATED
+        authStateFlow.value = AuthState.UNAUTHENTICATED
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.navigateToSearch()
         viewModel.currentScreen.value shouldBe ScreenState.Search
 
-        fakeAuthRepository.authStateFlow.value = AuthState.AUTHENTICATED
+        authStateFlow.value = AuthState.AUTHENTICATED
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Should remain on Search, not forced to Generator
@@ -95,7 +110,7 @@ class AppViewModelTest {
 
     @Test
     fun `auth state LOADING sets screen to Loading`() = runTest {
-        fakeAuthRepository.authStateFlow.value = AuthState.LOADING
+        authStateFlow.value = AuthState.LOADING
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.currentScreen.value shouldBe ScreenState.Loading
@@ -105,13 +120,13 @@ class AppViewModelTest {
     fun `userProfile updates when repository emits profile`() = runTest {
         viewModel.userProfile.value shouldBe null
 
-        val testProfile = com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile(
+        val testProfile = UserProfile(
             id = "test_user_1",
             email = "test@example.com",
             displayName = "Test User",
             avatarUrl = "https://example.com/avatar.png"
         )
-        fakeAuthRepository.userProfileFlow.value = testProfile
+        userProfileFlow.value = testProfile
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.userProfile.value shouldBe testProfile
@@ -119,14 +134,14 @@ class AppViewModelTest {
 
     @Test
     fun `signOut invokes repository signOut`() = runTest {
-        val testProfile = com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile(
+        val testProfile = UserProfile(
             id = "test_user_1",
             email = "test@example.com",
             displayName = "Test User",
             avatarUrl = null
         )
-        fakeAuthRepository.authStateFlow.value = AuthState.AUTHENTICATED
-        fakeAuthRepository.userProfileFlow.value = testProfile
+        authStateFlow.value = AuthState.AUTHENTICATED
+        userProfileFlow.value = testProfile
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.userProfile.value shouldBe testProfile
@@ -135,7 +150,7 @@ class AppViewModelTest {
         viewModel.signOut()
         testDispatcher.scheduler.advanceUntilIdle()
 
-        fakeAuthRepository.signOutCalled shouldBe true
+        verifySuspend { authRepository.signOut() }
         viewModel.userProfile.value shouldBe null
         viewModel.currentScreen.value shouldBe ScreenState.Login
     }

@@ -5,11 +5,17 @@ import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.auth_error_title
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.auth.FakeAuthRepository
+import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthRepository
+import dev.mokkery.answering.calls
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -21,16 +27,15 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var fakeAuthRepository: FakeAuthRepository
+    private val authRepository = mock<AuthRepository>()
     private lateinit var globalErrorManager: GlobalErrorManager
     private lateinit var viewModel: LoginViewModel
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        fakeAuthRepository = FakeAuthRepository()
         globalErrorManager = GlobalErrorManager()
-        viewModel = LoginViewModel(fakeAuthRepository, globalErrorManager)
+        viewModel = LoginViewModel(authRepository, globalErrorManager)
     }
 
     @AfterTest
@@ -40,7 +45,9 @@ class LoginViewModelTest {
 
     @Test
     fun `signInWithGoogle calls repository and updates loading state`() = runTest {
-        fakeAuthRepository.signInDelayMs = 100L
+        everySuspend { authRepository.signInWithGoogle() } calls {
+            delay(100L)
+        }
 
         viewModel.isLoading.test {
             awaitItem() shouldBe false
@@ -52,12 +59,12 @@ class LoginViewModelTest {
             awaitItem() shouldBe false
         }
 
-        fakeAuthRepository.signInCalled shouldBe true
+        verifySuspend { authRepository.signInWithGoogle() }
     }
 
     @Test
     fun `signInWithGoogle emits error to GlobalErrorManager on failure`() = runTest {
-        fakeAuthRepository.shouldThrowOnSignIn = true
+        everySuspend { authRepository.signInWithGoogle() } throws RuntimeException("Google Sign In Failed")
 
         globalErrorManager.currentError.test {
             awaitItem() shouldBe null // Initial state
