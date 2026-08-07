@@ -17,12 +17,8 @@ fun SessionStatus.toUserProfile(): UserProfile? = when (this) {
     is SessionStatus.Authenticated -> {
         val user = session.user ?: return null
         val metadata = user.userMetadata
-        val displayName = metadata?.get("full_name")?.jsonPrimitive?.contentOrNull
-            ?: metadata?.get("name")?.jsonPrimitive?.contentOrNull
-            ?: metadata?.get("preferred_username")?.jsonPrimitive?.contentOrNull
-            ?: user.email
-        val avatarUrl = metadata?.get("avatar_url")?.jsonPrimitive?.contentOrNull
-            ?: metadata?.get("picture")?.jsonPrimitive?.contentOrNull
+        val displayName = (metadata?.get("full_name") ?: metadata?.get("name") ?: metadata?.get("preferred_username"))?.jsonPrimitive?.contentOrNull ?: user.email
+        val avatarUrl = (metadata?.get("avatar_url") ?: metadata?.get("picture"))?.jsonPrimitive?.contentOrNull
 
         UserProfile(
             id = user.id,

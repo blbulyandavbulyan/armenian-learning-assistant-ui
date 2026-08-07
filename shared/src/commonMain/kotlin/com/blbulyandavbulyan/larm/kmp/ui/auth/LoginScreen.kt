@@ -84,26 +84,31 @@ fun LoginScreen(
                     modifier = Modifier.testTag("authWelcomeSubtitleText")
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = onSignInWithGoogle,
-                    enabled = !isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("signInWithGoogleButton")
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .testTag("signInLoadingIndicator"),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(text = stringResource(Res.string.auth_sign_in_with_google))
-                    }
-                }
+                SignInWithGoogleButton(isLoading, onSignInWithGoogle)
             }
+        }
+    }
+}
+
+@Composable
+private fun SignInWithGoogleButton(isLoading: Boolean, onSignInWithGoogle: () -> Unit) {
+    Button(
+        onClick = onSignInWithGoogle,
+        enabled = !isLoading,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("signInWithGoogleButton")
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(24.dp)
+                    .testTag("signInLoadingIndicator"),
+                color = MaterialTheme.colorScheme.onPrimary,
+                strokeWidth = 2.dp
+            )
+        } else {
+            Text(text = stringResource(Res.string.auth_sign_in_with_google))
         }
     }
 }

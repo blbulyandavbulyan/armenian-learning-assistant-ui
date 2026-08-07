@@ -75,29 +75,34 @@ fun AppDrawerContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Footer: Sign Out
-        NavigationDrawerItem(
-            icon = {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_logout_24px),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
-                )
-            },
-            label = {
-                Text(
-                    text = stringResource(Res.string.action_sign_out),
-                    color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.SemiBold
-                )
-            },
-            selected = false,
-            onClick = onSignOut,
-            modifier = Modifier
-                .padding(NavigationDrawerItemDefaults.ItemPadding)
-                .testTag("drawer_sign_out_item")
-        )
+        SignOutDrawerItem(onSignOut)
         Spacer(modifier = Modifier.height(12.dp))
     }
+}
+
+@Composable
+private fun SignOutDrawerItem(onSignOut: () -> Unit) {
+    NavigationDrawerItem(
+        icon = {
+            Icon(
+                painter = painterResource(Res.drawable.ic_logout_24px),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error
+            )
+        },
+        label = {
+            Text(
+                text = stringResource(Res.string.action_sign_out),
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        selected = false,
+        onClick = onSignOut,
+        modifier = Modifier
+            .padding(NavigationDrawerItemDefaults.ItemPadding)
+            .testTag("drawer_sign_out_item")
+    )
 }
 
 @Composable
