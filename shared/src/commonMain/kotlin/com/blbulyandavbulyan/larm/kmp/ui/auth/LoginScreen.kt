@@ -1,34 +1,48 @@
 package com.blbulyandavbulyan.larm.kmp.ui.auth
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.auth_app_title
 import armenianlearningassistant_kmp.shared.generated.resources.auth_sign_in_with_google
 import armenianlearningassistant_kmp.shared.generated.resources.auth_welcome_subtitle
+import armenianlearningassistant_kmp.shared.generated.resources.google_g_logo
+import armenianlearningassistant_kmp.shared.generated.resources.google_sans
 import com.blbulyandavbulyan.larm.kmp.presentation.auth.LoginViewModel
+import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -84,31 +98,77 @@ fun LoginScreen(
                     modifier = Modifier.testTag("authWelcomeSubtitleText")
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                SignInWithGoogleButton(isLoading, onSignInWithGoogle)
+                GoogleSignInButton(isLoading = isLoading, onSignInWithGoogle)
             }
         }
     }
 }
 
 @Composable
-private fun SignInWithGoogleButton(isLoading: Boolean, onSignInWithGoogle: () -> Unit) {
-    Button(
-        onClick = onSignInWithGoogle,
+fun GoogleSignInButton(
+    isLoading: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isDarkTheme: Boolean = isSystemInDarkTheme()
+) {
+    // Official Google Brand Colors
+    val backgroundColor = if (isDarkTheme) Color(color = 0xFF131314) else Color(color = 0xFFFFFFFF)
+    val textColor = if (isDarkTheme) Color(color = 0xFFE3E3E3) else Color(color = 0xFF1F1F1F)
+    val borderColor = if (isDarkTheme) Color(color = 0xFF8E918F) else Color(color = 0xFF747775)
+    val spinnerColor = if (isDarkTheme) Color(color = 0xFF8AB4F8) else Color(color = 0xFF1A73E8) // Google Blue
+    val googleSansFamily = FontFamily(
+        Font(Res.font.google_sans, FontWeight.Medium)
+    )
+
+    Surface(
+        onClick = onClick,
         enabled = !isLoading,
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("signInWithGoogleButton")
+        modifier = modifier.height(40.dp).testTag("signInWithGoogleButton"),
+        shape = RoundedCornerShape(20.dp), // Use 4.dp for a rectangular button
+        color = backgroundColor,
+        border = BorderStroke(1.dp, borderColor)
     ) {
         if (isLoading) {
-            CircularProgressIndicator(
+            Box(
                 modifier = Modifier
-                    .size(24.dp)
-                    .testTag("signInLoadingIndicator"),
-                color = MaterialTheme.colorScheme.onPrimary,
-                strokeWidth = 2.dp
-            )
+                    .padding(horizontal = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .testTag("signInLoadingIndicator"),
+                    color = spinnerColor,
+                    strokeWidth = 2.dp
+                )
+            }
         } else {
-            Text(text = stringResource(Res.string.auth_sign_in_with_google))
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                // 1. The standalone SVG Google "G" Icon
+                Icon(
+                    painter = painterResource(Res.drawable.google_g_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = Color.Unspecified // Extremely important: preserves the multi-color G logo
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // 2. Localized native text instead of SVG path text
+                Text(
+                    text = stringResource(Res.string.auth_sign_in_with_google),
+                    color = textColor,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = googleSansFamily,
+                    maxLines = 1
+                )
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
@@ -26,6 +27,7 @@ class LoginViewModel(
             _isLoading.value = true
             try {
                 authRepository.signInWithGoogle()
+                kotlinx.coroutines.delay(600.milliseconds)
             } catch (e: Exception) {
                 globalErrorManager.showError(
                     UiText.from(Res.string.auth_error_title),
