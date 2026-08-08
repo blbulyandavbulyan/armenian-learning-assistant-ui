@@ -125,6 +125,59 @@ class SessionStatusMappersTest {
     }
 
     @Test
+    fun sessionStatus_toUserProfile_fallsBackToPreferredUsername() {
+        val metadata = buildJsonObject {
+            put("preferred_username", "johndoe99")
+        }
+        val user = UserInfo(
+            id = "user_pref",
+            aud = "authenticated",
+            email = "john@example.com",
+            userMetadata = metadata
+        )
+        val session = UserSession(
+            accessToken = "token",
+            refreshToken = "refresh",
+            expiresIn = 3600L,
+            tokenType = "bearer",
+            user = user
+        )
+        val status = SessionStatus.Authenticated(session)
+
+        status.toUserProfile() shouldBe UserProfile(
+            id = "user_pref",
+            email = "john@example.com",
+            displayName = "johndoe99",
+            avatarUrl = null
+        )
+    }
+
+    @Test
+    fun sessionStatus_toUserProfile_handlesNullUserMetadata() {
+        val user = UserInfo(
+            id = "user_null_meta",
+            aud = "authenticated",
+            email = "nometa@example.com",
+            userMetadata = null
+        )
+        val session = UserSession(
+            accessToken = "token",
+            refreshToken = "refresh",
+            expiresIn = 3600L,
+            tokenType = "bearer",
+            user = user
+        )
+        val status = SessionStatus.Authenticated(session)
+
+        status.toUserProfile() shouldBe UserProfile(
+            id = "user_null_meta",
+            email = "nometa@example.com",
+            displayName = "nometa@example.com",
+            avatarUrl = null
+        )
+    }
+
+    @Test
     fun sessionStatus_toUserProfile_returnsNullForNonAuthenticatedOrNullUser() {
         val sessionWithoutUser = UserSession(
             accessToken = "token",
