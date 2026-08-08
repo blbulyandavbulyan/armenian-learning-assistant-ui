@@ -23,6 +23,7 @@ import com.blbulyandavbulyan.larm.kmp.infrastructure.appbackend.client.data.dial
 import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.drawer.DrawerViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -60,11 +61,14 @@ class AppTest {
     }
 
     private fun createAuthenticatedAppViewModel(): AppViewModel {
+        return AppViewModel(MutableStateFlow(AuthState.AUTHENTICATED))
+    }
+
+    private fun createAuthenticatedDrawerViewModel(): DrawerViewModel {
         val authRepository = mock<AuthRepository>()
-        every { authRepository.observeAuthState() } returns MutableStateFlow(AuthState.AUTHENTICATED)
         every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
         everySuspend { authRepository.signOut() } returns Unit
-        return AppViewModel(authRepository)
+        return DrawerViewModel(authRepository)
     }
 
     @Test
@@ -80,13 +84,19 @@ class AppTest {
             )
 
         val appViewModel = createAuthenticatedAppViewModel()
+        val drawerViewModel = createAuthenticatedDrawerViewModel()
         val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         // Set the state to Search before setting content to avoid animation/recomposition timing issues
         appViewModel.navigateToSearch()
 
         setContent {
-            App(appViewModel = appViewModel, searchViewModel = viewModel, chatViewModel = chatViewModel)
+            App(
+                appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
+                searchViewModel = viewModel,
+                chatViewModel = chatViewModel
+            )
         }
 
         // 1. Search something -> go to search screen
@@ -142,10 +152,16 @@ class AppTest {
             )
 
         val appViewModel = createAuthenticatedAppViewModel()
+        val drawerViewModel = createAuthenticatedDrawerViewModel()
         val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         setContent {
-            App(appViewModel = appViewModel, searchViewModel = viewModel, chatViewModel = chatViewModel)
+            App(
+                appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
+                searchViewModel = viewModel,
+                chatViewModel = chatViewModel
+            )
         }
 
         // App initial state is Generator Screen
@@ -190,10 +206,16 @@ class AppTest {
         )
 
         val appViewModel = createAuthenticatedAppViewModel()
+        val drawerViewModel = createAuthenticatedDrawerViewModel()
         val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         setContent {
-            App(appViewModel = appViewModel, searchViewModel = viewModel, chatViewModel = chatViewModel)
+            App(
+                appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
+                searchViewModel = viewModel,
+                chatViewModel = chatViewModel
+            )
         }
 
         // Initial state is Generator Screen
@@ -227,12 +249,18 @@ class AppTest {
             FakeAudioPlayer()
         )
         val appViewModel = createAuthenticatedAppViewModel()
+        val drawerViewModel = createAuthenticatedDrawerViewModel()
         val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         appViewModel.navigateToSearch()
 
         setContent {
-            App(appViewModel = appViewModel, searchViewModel = viewModel, chatViewModel = chatViewModel)
+            App(
+                appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
+                searchViewModel = viewModel,
+                chatViewModel = chatViewModel
+            )
         }
 
         onNodeWithTag("top_bar_back_button").assertIsDisplayed()
@@ -254,12 +282,18 @@ class AppTest {
             FakeAudioPlayer()
         )
         val appViewModel = createAuthenticatedAppViewModel()
+        val drawerViewModel = createAuthenticatedDrawerViewModel()
         val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         appViewModel.navigateToSearch()
 
         setContent {
-            App(appViewModel = appViewModel, searchViewModel = viewModel, chatViewModel = chatViewModel)
+            App(
+                appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
+                searchViewModel = viewModel,
+                chatViewModel = chatViewModel
+            )
         }
 
         onNodeWithTag("hamburger_button").performClick()
@@ -274,6 +308,7 @@ class AppTest {
     @Test
     fun app_showsLoadingIndicator_whenStateIsLoading() = runComposeUiTest {
         val appViewModel = createAuthenticatedAppViewModel()
+        val drawerViewModel = createAuthenticatedDrawerViewModel()
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
             FakeAssetRepository(),
@@ -288,6 +323,7 @@ class AppTest {
         setContent {
             App(
                 appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel,
                 chatViewModel = chatViewModel
             )
@@ -301,9 +337,9 @@ class AppTest {
     @Test
     fun app_showsLoginScreen_whenUnauthenticated() = runComposeUiTest {
         val authRepository = mock<AuthRepository>()
-        every { authRepository.observeAuthState() } returns MutableStateFlow(AuthState.UNAUTHENTICATED)
         every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
-        val appViewModel = AppViewModel(authRepository)
+        val appViewModel = AppViewModel(MutableStateFlow(AuthState.UNAUTHENTICATED))
+        val drawerViewModel = DrawerViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
             FakeAssetRepository(),
@@ -318,6 +354,7 @@ class AppTest {
         setContent {
             App(
                 appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel,
                 chatViewModel = chatViewModel
             )
@@ -344,7 +381,8 @@ class AppTest {
             authStateFlow.value = AuthState.UNAUTHENTICATED
             userProfileFlow.value = null
         }
-        val appViewModel = AppViewModel(authRepository)
+        val appViewModel = AppViewModel(authStateFlow)
+        val drawerViewModel = DrawerViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
             FakeAssetRepository(),
@@ -359,6 +397,7 @@ class AppTest {
         setContent {
             App(
                 appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel,
                 chatViewModel = chatViewModel
             )
@@ -391,9 +430,9 @@ class AppTest {
     @Test
     fun app_hidesTopBar_whenUnauthenticated() = runComposeUiTest {
         val authRepository = mock<AuthRepository>()
-        every { authRepository.observeAuthState() } returns MutableStateFlow(AuthState.UNAUTHENTICATED)
         every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
-        val appViewModel = AppViewModel(authRepository)
+        val appViewModel = AppViewModel(MutableStateFlow(AuthState.UNAUTHENTICATED))
+        val drawerViewModel = DrawerViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
             FakeAssetRepository(),
@@ -408,6 +447,7 @@ class AppTest {
         setContent {
             App(
                 appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel,
                 chatViewModel = chatViewModel
             )

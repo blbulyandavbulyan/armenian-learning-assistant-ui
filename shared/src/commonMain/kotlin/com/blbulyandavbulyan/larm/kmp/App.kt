@@ -28,6 +28,7 @@ import com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile
 import com.blbulyandavbulyan.larm.kmp.presentation.auth.LoginViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.drawer.DrawerViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.global.ScreenState
 import com.blbulyandavbulyan.larm.kmp.ui.auth.LoginScreen
@@ -48,6 +49,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun App(
     appViewModel: AppViewModel = remember { AppViewModel() },
+    drawerViewModel: DrawerViewModel = remember { DrawerViewModel(AppModule.authRepository) },
     searchViewModel: DialogueSearchViewModel = remember {
         DialogueSearchViewModel(
             AppModule.dialogueRepository,
@@ -71,7 +73,7 @@ fun App(
 ) {
     ArmenianLearningTheme {
         val currentScreen by appViewModel.currentScreen.collectAsStateWithLifecycle()
-        val userProfile by appViewModel.userProfile.collectAsStateWithLifecycle()
+        val userProfile by drawerViewModel.userProfile.collectAsStateWithLifecycle()
         val appError by AppModule.globalErrorManager.currentError.collectAsStateWithLifecycle()
 
         Content(
@@ -79,6 +81,7 @@ fun App(
             userProfile = userProfile,
             chatViewModel = chatViewModel,
             appViewModel = appViewModel,
+            drawerViewModel = drawerViewModel,
             searchViewModel = searchViewModel,
             loginViewModel = loginViewModel,
             appError = appError
@@ -92,6 +95,7 @@ private fun Content(
     userProfile: UserProfile?,
     chatViewModel: DialogueChatViewModel,
     appViewModel: AppViewModel,
+    drawerViewModel: DrawerViewModel,
     searchViewModel: DialogueSearchViewModel,
     loginViewModel: LoginViewModel,
     appError: AppError?,
@@ -111,6 +115,7 @@ private fun Content(
                 userProfile = userProfile,
                 chatViewModel = chatViewModel,
                 appViewModel = appViewModel,
+                drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel
             )
         }
@@ -125,6 +130,7 @@ private fun MainScaffold(
     userProfile: UserProfile?,
     chatViewModel: DialogueChatViewModel,
     appViewModel: AppViewModel,
+    drawerViewModel: DrawerViewModel,
     searchViewModel: DialogueSearchViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -143,7 +149,7 @@ private fun MainScaffold(
                 },
                 onSignOut = {
                     coroutineScope.launch { drawerState.close() }
-                    appViewModel.signOut()
+                    drawerViewModel.signOut()
                 }
             )
         },
