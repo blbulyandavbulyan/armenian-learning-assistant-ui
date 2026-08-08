@@ -108,8 +108,8 @@ class DialogueSearchScreenTest {
             audioPlayer
         )
 
-        //intentionally invoke it, since it is not invoked when Screen is created -> because initial invocation for searchMethod is performed outside of this screen
-        // only retries are invoked from here
+        // Intentionally invoke it, since it is not invoked when Screen is created -> because initial invocation
+        // for searchMethod is performed outside of this screen; only retries are invoked from here.
         viewModel.searchDialogues(query = "my query", onSuccess = {}, onError = {})
 
         setContent {
@@ -135,7 +135,6 @@ class DialogueSearchScreenTest {
                 transcriptionTestTag = "searchResultTranscription_${dialogue.id}"
             )
         }
-
     }
 
     @Test
@@ -209,7 +208,7 @@ class DialogueSearchScreenTest {
     @Test
     fun searchScreen_withViewModel_delegatesCorrectly() = runComposeUiTest {
         everySuspend { dialogueRepository.searchDialogues(any()) } returns
-                persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
+            persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
         everySuspend { assetRepository.getAsset(any()) } returns DomainMothers.assetDataForDialogue1()
         everySuspend { audioPlayer.play(any()) } returns Unit
 

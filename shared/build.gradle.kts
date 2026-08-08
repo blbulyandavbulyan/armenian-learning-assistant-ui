@@ -88,6 +88,8 @@ kotlin {
         jsMain.dependencies {
             implementation(libs.wrappers.browser)
             implementation(libs.ktor.client.js)
+            implementation(npm("os-browserify", "0.3.0"))
+            implementation(npm("path-browserify", "1.0.1"))
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
