@@ -73,7 +73,6 @@ fun AppDrawerContent(
         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Footer: Sign Out
         SignOutDrawerItem(onSignOut)
         Spacer(modifier = Modifier.height(12.dp))
     }

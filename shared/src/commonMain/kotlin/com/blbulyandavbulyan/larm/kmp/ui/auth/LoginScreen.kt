@@ -114,7 +114,7 @@ fun GoogleSignInButton(
     val backgroundColor = if (isDarkTheme) Color(color = 0xFF131314) else Color(color = 0xFFFFFFFF)
     val textColor = if (isDarkTheme) Color(color = 0xFFE3E3E3) else Color(color = 0xFF1F1F1F)
     val borderColor = if (isDarkTheme) Color(color = 0xFF8E918F) else Color(color = 0xFF747775)
-    val spinnerColor = if (isDarkTheme) Color(color = 0xFF8AB4F8) else Color(color = 0xFF1A73E8) // Google Blue
+    val spinnerColor = if (isDarkTheme) Color(color = 0xFF8AB4F8) else Color(color = 0xFF1A73E8)
     val googleSansFamily = FontFamily(
         Font(Res.font.google_sans, FontWeight.Medium)
     )
@@ -123,7 +123,7 @@ fun GoogleSignInButton(
         onClick = onClick,
         enabled = !isLoading,
         modifier = modifier.height(40.dp).testTag("signInWithGoogleButton"),
-        shape = RoundedCornerShape(20.dp), // Use 4.dp for a rectangular button
+        shape = RoundedCornerShape(20.dp),
         color = backgroundColor,
         border = BorderStroke(1.dp, borderColor)
     ) {

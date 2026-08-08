@@ -96,8 +96,7 @@ class DialogueSearchScreenTest {
             }
         }
 
-        onNodeWithTag("retryButton").assertIsDisplayed()
-        onNodeWithTag("retryButton").performClick()
+        onNodeWithTag("retryButton").assertIsDisplayed().performClick()
 
         searchTriggered shouldBe true
     }
@@ -174,7 +173,7 @@ class DialogueSearchScreenTest {
     fun searchScreen_withViewModel_delegatesCorrectly() = runComposeUiTest {
         val fakeRepo = object : FakeDialogueRepository() {
             override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
-                return persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1)
+                return persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
             }
         }
         val viewModel = DialogueSearchViewModel(
