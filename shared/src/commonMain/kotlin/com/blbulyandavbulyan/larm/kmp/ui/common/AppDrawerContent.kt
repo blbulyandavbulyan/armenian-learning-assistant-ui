@@ -128,6 +128,7 @@ private fun DrawerProfileHeader(
 
             Text(
                 text = name,
+                modifier = Modifier.testTag("drawer_profile_name"),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -136,6 +137,7 @@ private fun DrawerProfileHeader(
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = email,
+                modifier = Modifier.testTag("drawer_profile_email"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

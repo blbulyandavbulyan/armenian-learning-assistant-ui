@@ -1,8 +1,9 @@
 package com.blbulyandavbulyan.larm.kmp.ui.common
 
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile
@@ -31,8 +32,34 @@ class AppDrawerContentTest {
             )
         }
 
-        onNodeWithText("Armen Sarkisyan").assertExists()
-        onNodeWithText("tester@example.com").assertExists()
+
+        onNodeWithTag("drawer_profile_name").assertIsDisplayed()
+            .assertTextEquals("Armen Sarkisyan")
+        onNodeWithTag("drawer_profile_email").assertIsDisplayed()
+            .assertTextEquals("tester@example.com")
+    }
+
+    @Test
+    fun should_not_display_email_if_it_is_equal_to_display_name() = runComposeUiTest {
+        val testProfile = UserProfile(
+            id = "user-123",
+            email = "tester@example.com",
+            displayName = "tester@example.com",
+            avatarUrl = null
+        )
+
+        setContent {
+            AppDrawerContent(
+                userProfile = testProfile,
+                currentScreen = ScreenState.Generator,
+                onNavigateToGenerator = {},
+                onSignOut = {}
+            )
+        }
+
+        onNodeWithTag("drawer_profile_name").assertIsDisplayed()
+            .assertTextEquals("tester@example.com")
+        onNodeWithTag("drawer_profile_email").assertDoesNotExist()
     }
 
     @Test
