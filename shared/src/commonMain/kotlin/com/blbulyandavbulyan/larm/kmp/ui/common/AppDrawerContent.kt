@@ -27,7 +27,6 @@ import armenianlearningassistant_kmp.shared.generated.resources.action_sign_out
 import armenianlearningassistant_kmp.shared.generated.resources.ic_logout_24px
 import armenianlearningassistant_kmp.shared.generated.resources.nav_dialogue_generator
 import armenianlearningassistant_kmp.shared.generated.resources.profile_anonymous_user
-import armenianlearningassistant_kmp.shared.generated.resources.profile_no_email
 import com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile
 import com.blbulyandavbulyan.larm.kmp.presentation.global.ScreenState
 import org.jetbrains.compose.resources.painterResource
@@ -123,8 +122,6 @@ private fun DrawerProfileHeader(
         Column(modifier = Modifier.weight(1f)) {
             val name = userProfile?.displayName
                 ?: stringResource(Res.string.profile_anonymous_user)
-            val email = userProfile?.email
-                ?: stringResource(Res.string.profile_no_email)
 
             Text(
                 text = name,
@@ -134,6 +131,8 @@ private fun DrawerProfileHeader(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+
+            val email = userProfile?.displayEmail ?: return@Column
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = email,

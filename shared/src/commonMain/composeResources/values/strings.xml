@@ -31,7 +31,6 @@
     <string name="app_title">Armenian Learning Assistant</string>
     <string name="action_sign_out">Sign Out</string>
     <string name="profile_anonymous_user">User</string>
-    <string name="profile_no_email">No email</string>
     <string name="nav_dialogue_generator">Dialogue Generator</string>
     <string name="action_open_navigation_drawer">Open navigation drawer</string>
     <string name="auth_error_title">Authentication Error</string>

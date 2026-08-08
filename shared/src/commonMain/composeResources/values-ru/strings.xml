@@ -31,7 +31,6 @@
     <string name="app_title">Армянский помощник в обучении</string>
     <string name="action_sign_out">Выйти</string>
     <string name="profile_anonymous_user">Пользователь</string>
-    <string name="profile_no_email">Без email</string>
     <string name="nav_dialogue_generator">Генератор Диалогов</string>
     <string name="action_open_navigation_drawer">Открыть меню навигации</string>
     <string name="auth_error_title">Ошибка аутентификации</string>

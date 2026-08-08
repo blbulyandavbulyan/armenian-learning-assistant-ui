@@ -5,4 +5,6 @@ data class UserProfile(
     val email: String?,
     val displayName: String?,
     val avatarUrl: String?
-)
+) {
+    val displayEmail: String? = if (email != displayName) email else null
+}
