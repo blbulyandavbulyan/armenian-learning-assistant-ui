@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
-import com.blbulyandavbulyan.larm.kmp.core.error.AppError
 import com.blbulyandavbulyan.larm.kmp.di.AppModule
 import com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile
 import com.blbulyandavbulyan.larm.kmp.presentation.auth.LoginViewModel
@@ -72,35 +71,28 @@ fun App(
     }
 ) {
     ArmenianLearningTheme {
-        val currentScreen by appViewModel.currentScreen.collectAsStateWithLifecycle()
-        val userProfile by drawerViewModel.userProfile.collectAsStateWithLifecycle()
-        val appError by AppModule.globalErrorManager.currentError.collectAsStateWithLifecycle()
-
         Content(
-            currentScreen = currentScreen,
-            userProfile = userProfile,
             chatViewModel = chatViewModel,
             appViewModel = appViewModel,
             drawerViewModel = drawerViewModel,
             searchViewModel = searchViewModel,
             loginViewModel = loginViewModel,
-            appError = appError
         )
     }
 }
 
 @Composable
 private fun Content(
-    currentScreen: ScreenState,
-    userProfile: UserProfile?,
     chatViewModel: DialogueChatViewModel,
     appViewModel: AppViewModel,
     drawerViewModel: DrawerViewModel,
     searchViewModel: DialogueSearchViewModel,
     loginViewModel: LoginViewModel,
-    appError: AppError?,
     modifier: Modifier = Modifier
 ) {
+    val currentScreen by appViewModel.currentScreen.collectAsStateWithLifecycle()
+    val appError by AppModule.globalErrorManager.currentError.collectAsStateWithLifecycle()
+    val userProfile by drawerViewModel.userProfile.collectAsStateWithLifecycle()
     val appColors = AppTheme.colors
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(appColors.gradientTop, appColors.gradientBottom)
@@ -188,13 +180,13 @@ private fun AppTopBarContainer(
         is ScreenState.Detail -> appViewModel::navigateToSearch
         else -> null
     }
-    val searchQuery by searchViewModel.searchQuery.collectAsStateWithLifecycle()
 
     AppTopBar(
         onOpenDrawer = onOpenDrawer,
         onBack = backAction,
         centerContent = {
             if (currentScreen is ScreenState.Generator || currentScreen is ScreenState.Search) {
+                val searchQuery by searchViewModel.searchQuery.collectAsStateWithLifecycle()
                 SearchField(
                     query = searchQuery,
                     onValueChange = searchViewModel::updateSearchQuery,
