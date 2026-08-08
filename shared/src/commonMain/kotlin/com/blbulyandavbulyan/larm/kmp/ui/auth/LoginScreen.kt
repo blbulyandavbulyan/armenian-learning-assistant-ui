@@ -111,7 +111,6 @@ fun GoogleSignInButton(
     modifier: Modifier = Modifier,
     isDarkTheme: Boolean = isSystemInDarkTheme()
 ) {
-    // Official Google Brand Colors
     val backgroundColor = if (isDarkTheme) Color(color = 0xFF131314) else Color(color = 0xFFFFFFFF)
     val textColor = if (isDarkTheme) Color(color = 0xFFE3E3E3) else Color(color = 0xFF1F1F1F)
     val borderColor = if (isDarkTheme) Color(color = 0xFF8E918F) else Color(color = 0xFF747775)
@@ -149,17 +148,15 @@ fun GoogleSignInButton(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                // 1. The standalone SVG Google "G" Icon
                 Icon(
                     painter = painterResource(Res.drawable.google_g_logo),
                     contentDescription = null,
                     modifier = Modifier.size(20.dp),
-                    tint = Color.Unspecified // Extremely important: preserves the multi-color G logo
+                    tint = Color.Unspecified
                 )
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                // 2. Localized native text instead of SVG path text
                 Text(
                     text = stringResource(Res.string.auth_sign_in_with_google),
                     color = textColor,
