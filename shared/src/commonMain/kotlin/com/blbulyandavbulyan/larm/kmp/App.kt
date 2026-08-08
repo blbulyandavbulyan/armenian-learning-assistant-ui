@@ -41,7 +41,6 @@ import com.blbulyandavbulyan.larm.kmp.ui.dialogue.detail.DialogueDetailScreen
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.search.DialogueSearchScreen
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -221,29 +220,13 @@ private fun ScreenNavigationContent(
 ) {
     Crossfade(targetState = currentScreen) { state ->
         when (state) {
-            is ScreenState.Generator -> {
-                val conversation by chatViewModel.conversation.collectAsStateWithLifecycle()
-                DialogueGeneratorScreen(
-                    conversation = conversation.toImmutableList(),
-                    onGenerateDialogue = chatViewModel::generateDialogue,
-                    onSaveDialogue = chatViewModel::saveDialogue
-                )
-            }
+            is ScreenState.Generator -> DialogueGeneratorScreen(viewModel = chatViewModel)
 
             is ScreenState.Loading -> LoadingIndicator()
 
             is ScreenState.Search -> {
-                val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-                val query by searchViewModel.searchQuery.collectAsStateWithLifecycle()
                 DialogueSearchScreen(
-                    searchState = searchState,
-                    onSearch = {
-                        searchViewModel.searchDialogues(
-                            query = query,
-                            onSuccess = {},
-                            onError = {}
-                        )
-                    },
+                    viewModel = searchViewModel,
                     onGetDialogueDetails = { id ->
                         appViewModel.navigateToLoading()
                         searchViewModel.displayDialogue(
@@ -251,8 +234,7 @@ private fun ScreenNavigationContent(
                             onDialogueReady = appViewModel::navigateToDetail,
                             onError = appViewModel::navigateToSearch
                         )
-                    },
-                    onPlayAudio = searchViewModel::playAudio
+                    }
                 )
             }
 
