@@ -32,11 +32,11 @@ class AppDrawerContentTest {
             )
         }
 
-
         onNodeWithTag("drawer_profile_name").assertIsDisplayed()
             .assertTextEquals("Armen Sarkisyan")
         onNodeWithTag("drawer_profile_email").assertIsDisplayed()
             .assertTextEquals("tester@example.com")
+        onNodeWithTag("drawer_profile_avatar").assertExists()
     }
 
     @Test
