@@ -80,7 +80,7 @@ private fun InitialsAvatar(
 ) {
     BoxWithConstraints(
         modifier = modifier
-            .semantics(mergeDescendants = true){ }
+            .semantics(mergeDescendants = true) { }
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
