@@ -14,7 +14,7 @@ import kotlin.test.Test
 class SessionStatusMappersTest {
 
     @Test
-    fun sessionStatus_toAuthState_mapsAllVariantsCorrectly() {
+    fun sessionStatus_toAuthState_forAuthenticated() {
         val dummySession = UserSession(
             accessToken = "token",
             refreshToken = "refresh",
@@ -23,18 +23,29 @@ class SessionStatusMappersTest {
             user = null
         )
         val authenticated: SessionStatus = SessionStatus.Authenticated(dummySession)
+        authenticated.toAuthState() shouldBe AuthState.AUTHENTICATED
+    }
+
+    @Test
+    fun sessionStatus_toAuthState_forNotAuthenticated() {
         val notAuthenticated: SessionStatus = SessionStatus.NotAuthenticated()
+        notAuthenticated.toAuthState() shouldBe AuthState.UNAUTHENTICATED
+    }
+
+    @Test
+    fun sessionStatus_toAuthState_forInitializing() {
         val initializing: SessionStatus = SessionStatus.Initializing
+        initializing.toAuthState() shouldBe AuthState.LOADING
+    }
+
+    @Test
+    fun sessionStatus_toAuthState_forRefreshFailure() {
         val refreshFailure: SessionStatus = SessionStatus.RefreshFailure(
             RefreshFailureCause.NetworkError(
                 @Suppress("TooGenericExceptionThrown")
                 Exception("test")
             )
         )
-
-        authenticated.toAuthState() shouldBe AuthState.AUTHENTICATED
-        notAuthenticated.toAuthState() shouldBe AuthState.UNAUTHENTICATED
-        initializing.toAuthState() shouldBe AuthState.LOADING
         refreshFailure.toAuthState() shouldBe AuthState.UNAUTHENTICATED
     }
 
@@ -178,7 +189,7 @@ class SessionStatusMappersTest {
     }
 
     @Test
-    fun sessionStatus_toUserProfile_returnsNullForNonAuthenticatedOrNullUser() {
+    fun sessionStatus_toUserProfile_forAuthenticatedWithNullUser() {
         val sessionWithoutUser = UserSession(
             accessToken = "token",
             refreshToken = "refresh",
@@ -187,7 +198,16 @@ class SessionStatusMappersTest {
             user = null
         )
         SessionStatus.Authenticated(sessionWithoutUser).toUserProfile() shouldBe null
+    }
+
+    @Test
+    fun sessionStatus_toUserProfile_forNotAuthenticated() {
         SessionStatus.NotAuthenticated().toUserProfile() shouldBe null
+    }
+
+
+    @Test
+    fun sessionStatus_toUserProfile_forInitializing() {
         SessionStatus.Initializing.toUserProfile() shouldBe null
     }
 }

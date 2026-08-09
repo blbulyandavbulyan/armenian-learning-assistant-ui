@@ -7,13 +7,13 @@ import kotlin.test.Test
 class AudioTest {
 
     @Test
-    fun equals_sameInstance_returnsTrue() {
+    fun equals_sameInstance() {
         val audio = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
         (audio == audio) shouldBe true
     }
 
     @Test
-    fun equals_sameContentAndMimeType_returnsTrue() {
+    fun equals_sameContentAndMimeType() {
         val audio1 = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
         val audio2 = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
         (audio1 == audio2) shouldBe true
@@ -33,21 +33,21 @@ class AudioTest {
     }
 
     @Test
-    fun equals_differentData_returnsFalse() {
+    fun equals_differentData() {
         val audio1 = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
         val audio2 = Audio(byteArrayOf(4, 5, 6), "audio/mp3")
         (audio1 == audio2) shouldBe false
     }
 
     @Test
-    fun equals_differentMimeType_returnsFalse() {
+    fun equals_differentMimeType() {
         val audio1 = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
         val audio2 = Audio(byteArrayOf(1, 2, 3), "audio/wav")
         (audio1 == audio2) shouldBe false
     }
 
     @Test
-    fun hashCode_equalObjects_returnsSameHashCode() {
+    fun hashCode_equalObjects() {
         val audio1 = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
         val audio2 = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
         audio1.hashCode() shouldBe audio2.hashCode()
