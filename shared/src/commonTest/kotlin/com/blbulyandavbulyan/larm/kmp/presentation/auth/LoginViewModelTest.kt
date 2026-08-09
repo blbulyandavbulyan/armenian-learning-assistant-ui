@@ -13,9 +13,9 @@ import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -45,8 +45,9 @@ class LoginViewModelTest {
 
     @Test
     fun `signInWithGoogle calls repository and updates loading state`() = runTest {
+        val deferred = CompletableDeferred<Unit>()
         everySuspend { authRepository.signInWithGoogle() } calls {
-            delay(100L)
+            deferred.await()
         }
 
         viewModel.isLoading.test {
@@ -55,7 +56,7 @@ class LoginViewModelTest {
             viewModel.signInWithGoogle()
             awaitItem() shouldBe true
 
-            testDispatcher.scheduler.advanceUntilIdle()
+            deferred.complete(Unit)
             awaitItem() shouldBe false
         }
 
@@ -67,7 +68,7 @@ class LoginViewModelTest {
         everySuspend { authRepository.signInWithGoogle() } throws RuntimeException("Google Sign In Failed")
 
         globalErrorManager.currentError.test {
-            awaitItem() shouldBe null // Initial state
+            awaitItem() shouldBe null
 
             viewModel.signInWithGoogle()
             testDispatcher.scheduler.advanceUntilIdle()
@@ -75,6 +76,7 @@ class LoginViewModelTest {
             val error = awaitItem()
             error shouldNotBe null
             error?.title shouldBe UiText.from(Res.string.auth_error_title)
+            error?.message shouldBe UiText.from("Google Sign In Failed")
             viewModel.isLoading.value shouldBe false
         }
     }
