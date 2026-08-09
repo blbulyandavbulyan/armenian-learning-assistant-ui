@@ -23,7 +23,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import com.blbulyandavbulyan.larm.kmp.di.AppModule
-import com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile
 import com.blbulyandavbulyan.larm.kmp.presentation.auth.LoginViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
@@ -91,7 +90,6 @@ private fun Content(
 ) {
     val currentScreen by appViewModel.currentScreen.collectAsStateWithLifecycle()
     val appError by AppModule.globalErrorManager.currentError.collectAsStateWithLifecycle()
-    val userProfile by drawerViewModel.userProfile.collectAsStateWithLifecycle()
     val appColors = AppTheme.colors
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(appColors.gradientTop, appColors.gradientBottom)
@@ -103,7 +101,6 @@ private fun Content(
         } else {
             MainScaffold(
                 currentScreen = currentScreen,
-                userProfile = userProfile,
                 chatViewModel = chatViewModel,
                 appViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
@@ -118,7 +115,6 @@ private fun Content(
 @Composable
 private fun MainScaffold(
     currentScreen: ScreenState,
-    userProfile: UserProfile?,
     chatViewModel: DialogueChatViewModel,
     appViewModel: AppViewModel,
     drawerViewModel: DrawerViewModel,
@@ -127,6 +123,7 @@ private fun MainScaffold(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+    val userProfile by drawerViewModel.userProfile.collectAsStateWithLifecycle()
 
     ModalNavigationDrawer(
         drawerState = drawerState,

@@ -3,6 +3,7 @@ package com.blbulyandavbulyan.larm.kmp.infrastructure.audio
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
+@Suppress("SENSELESS_COMPARISON")
 class AudioTest {
 
     @Test
@@ -19,9 +20,15 @@ class AudioTest {
     }
 
     @Test
-    fun equals_nullOrDifferentClass_returnsFalse() {
+    fun equals_null() {
         val audio = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
-        audio.equals(null) shouldBe false
+        val other = null
+        (audio == other) shouldBe false
+    }
+
+    @Test
+    fun equals_differentClass() {
+        val audio = Audio(byteArrayOf(1, 2, 3), "audio/mp3")
         audio.equals("not an audio") shouldBe false
     }
 
