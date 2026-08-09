@@ -14,36 +14,35 @@ class AppTopBarTest {
 
     @Test
     fun should_always_show_hamburger_button_and_trigger_callback() = runComposeUiTest {
-        var drawerOpened = false
+        var drawerOpenClickCount = 0
 
         setContent {
             AppTopBar(
-                onOpenDrawer = { drawerOpened = true },
+                onOpenDrawer = { drawerOpenClickCount++ },
                 onBack = null
             )
         }
+        drawerOpenClickCount shouldBe 0
 
-        onNodeWithTag("hamburger_button").assertExists()
-        onNodeWithTag("hamburger_button").performClick()
-        drawerOpened shouldBe true
+        onNodeWithTag("hamburger_button").assertExists().performClick()
+        drawerOpenClickCount shouldBe 1
         onNodeWithTag("top_bar_back_button").assertDoesNotExist()
     }
 
     @Test
     fun should_show_back_button_when_on_back_is_provided() = runComposeUiTest {
-        var backClicked = false
+        var backClickCount = 0
 
         setContent {
             AppTopBar(
                 onOpenDrawer = {},
-                onBack = { backClicked = true }
+                onBack = { backClickCount++ }
             )
         }
-
+        backClickCount shouldBe 0
         onNodeWithTag("hamburger_button").assertExists()
-        onNodeWithTag("top_bar_back_button").assertExists()
-        onNodeWithTag("top_bar_back_button").performClick()
-        backClicked shouldBe true
+        onNodeWithTag("top_bar_back_button").assertExists().performClick()
+        backClickCount shouldBe 1
     }
 
     @Test

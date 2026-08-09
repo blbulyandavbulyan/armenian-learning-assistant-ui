@@ -64,35 +64,37 @@ class AppDrawerContentTest {
 
     @Test
     fun should_invoke_sign_out_when_sign_out_clicked() = runComposeUiTest {
-        var signOutClicked = false
+        var signOutClickCount = 0
 
         setContent {
             AppDrawerContent(
                 userProfile = null,
                 currentScreen = ScreenState.Generator,
                 onNavigateToGenerator = {},
-                onSignOut = { signOutClicked = true }
+                onSignOut = { signOutClickCount++ }
             )
         }
 
+        signOutClickCount shouldBe 0
         onNodeWithTag("drawer_sign_out_item").performClick()
-        signOutClicked shouldBe true
+        signOutClickCount shouldBe 1
     }
 
     @Test
     fun should_invoke_navigate_generator_when_generator_item_clicked() = runComposeUiTest {
-        var navClicked = false
+        var navClickCount = 0
 
         setContent {
             AppDrawerContent(
                 userProfile = null,
                 currentScreen = ScreenState.Search,
-                onNavigateToGenerator = { navClicked = true },
+                onNavigateToGenerator = { navClickCount++ },
                 onSignOut = {}
             )
         }
 
+        navClickCount shouldBe 0
         onNodeWithTag("drawer_nav_generator").performClick()
-        navClicked shouldBe true
+        navClickCount shouldBe 1
     }
 }

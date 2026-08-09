@@ -15,12 +15,12 @@ import kotlin.test.Test
 class LoginScreenTest {
     @Test
     fun loginScreen_displaysElementsAndTriggersSignIn() = runComposeUiTest {
-        var signInClicked = false
+        var signInClickCount = 0
 
         setContent {
             ArmenianLearningTheme {
                 LoginScreen(
-                    onSignInWithGoogle = { signInClicked = true }
+                    onSignInWithGoogle = { signInClickCount++ }
                 )
             }
         }
@@ -36,9 +36,10 @@ class LoginScreenTest {
         onNodeWithTag("loginCard").assertIsDisplayed()
         onNodeWithTag("authAppTitleText").assertExists()
         onNodeWithTag("authWelcomeSubtitleText").assertExists()
+        signInClickCount shouldBe 0
         onNodeWithTag("signInWithGoogleButton").assertIsDisplayed().performClick()
 
-        signInClicked shouldBe true
+        signInClickCount shouldBe 1
     }
 
     @Test

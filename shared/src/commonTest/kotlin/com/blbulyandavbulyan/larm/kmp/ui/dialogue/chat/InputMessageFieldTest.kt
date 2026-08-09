@@ -21,7 +21,7 @@ class InputMessageFieldTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun typingAndPressingEnter() = runComposeUiTest {
-        var sendTriggered = false
+        var sendTriggerCount = 0
         var currentPrompt by mutableStateOf("")
 
         setContent {
@@ -30,25 +30,26 @@ class InputMessageFieldTest {
                     value = currentPrompt,
                     fontFamily = FontFamily.Default,
                     onValueChange = { currentPrompt = it },
-                    onSend = { sendTriggered = true }
+                    onSend = { sendTriggerCount++ }
                 )
             }
         }
 
+        sendTriggerCount shouldBe 0
         onNodeWithTag("inputMessageField").performTextInput("Barev!")
 
         onNodeWithTag("inputMessageField").performKeyInput {
             pressKey(Key.Enter)
         }
 
-        sendTriggered shouldBe true
+        sendTriggerCount shouldBe 1
         currentPrompt shouldBe "Barev!"
     }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun typingAndPressingNumpadEnter() = runComposeUiTest {
-        var sendTriggered = false
+        var sendTriggerCount = 0
         var currentPrompt by mutableStateOf("")
 
         setContent {
@@ -57,25 +58,26 @@ class InputMessageFieldTest {
                     value = currentPrompt,
                     fontFamily = FontFamily.Default,
                     onValueChange = { currentPrompt = it },
-                    onSend = { sendTriggered = true }
+                    onSend = { sendTriggerCount++ }
                 )
             }
         }
 
+        sendTriggerCount shouldBe 0
         onNodeWithTag("inputMessageField").performTextInput("Barev!")
 
         onNodeWithTag("inputMessageField").performKeyInput {
             pressKey(Key.NumPadEnter)
         }
 
-        sendTriggered shouldBe true
+        sendTriggerCount shouldBe 1
         currentPrompt shouldBe "Barev!"
     }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun typingAndPressingShiftEnter() = runComposeUiTest {
-        var sendTriggered = false
+        var sendTriggerCount = 0
         var currentPrompt by mutableStateOf("")
 
         setContent {
@@ -84,11 +86,12 @@ class InputMessageFieldTest {
                     value = currentPrompt,
                     fontFamily = FontFamily.Default,
                     onValueChange = { currentPrompt = it },
-                    onSend = { sendTriggered = true }
+                    onSend = { sendTriggerCount++ }
                 )
             }
         }
 
+        sendTriggerCount shouldBe 0
         onNodeWithTag("inputMessageField").performTextInput("Barev!")
 
         onNodeWithTag("inputMessageField").performKeyInput {
@@ -97,14 +100,14 @@ class InputMessageFieldTest {
             }
         }
 
-        sendTriggered shouldBe false
+        sendTriggerCount shouldBe 0
         currentPrompt shouldBe "Barev!\n"
     }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun typingAndPressingShiftNumpadEnter() = runComposeUiTest {
-        var sendTriggered = false
+        var sendTriggerCount = 0
         var currentPrompt by mutableStateOf("")
 
         setContent {
@@ -113,11 +116,12 @@ class InputMessageFieldTest {
                     value = currentPrompt,
                     fontFamily = FontFamily.Default,
                     onValueChange = { currentPrompt = it },
-                    onSend = { sendTriggered = true }
+                    onSend = { sendTriggerCount++ }
                 )
             }
         }
 
+        sendTriggerCount shouldBe 0
         onNodeWithTag("inputMessageField").performTextInput("Barev!")
 
         onNodeWithTag("inputMessageField").performKeyInput {
@@ -126,7 +130,7 @@ class InputMessageFieldTest {
             }
         }
 
-        sendTriggered shouldBe false
+        sendTriggerCount shouldBe 0
         currentPrompt shouldBe "Barev!\n"
     }
 }

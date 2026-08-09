@@ -205,7 +205,6 @@ class SessionStatusMappersTest {
         SessionStatus.NotAuthenticated().toUserProfile() shouldBe null
     }
 
-
     @Test
     fun sessionStatus_toUserProfile_forInitializing() {
         SessionStatus.Initializing.toUserProfile() shouldBe null

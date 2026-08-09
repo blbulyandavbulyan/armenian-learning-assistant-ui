@@ -76,23 +76,24 @@ class DialogueGeneratorScreenTest {
 
     @Test
     fun clickingSendWithEmptyText_doesNotTriggerOnGenerateDialogue() = runComposeUiTest {
-        var callbackTriggered = false
+        var callbackTriggerCount = 0
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
-                    onGenerateDialogue = { callbackTriggered = true },
+                    onGenerateDialogue = { callbackTriggerCount++ },
                     onSaveDialogue = {}
                 )
             }
         }
 
+        callbackTriggerCount shouldBe 0
         // Click the send button without typing anything
         onNodeWithTag("sendButton").performClick()
 
         // Assert that the callback was NOT triggered
-        callbackTriggered shouldBe false
+        callbackTriggerCount shouldBe 0
     }
 
     @Test
