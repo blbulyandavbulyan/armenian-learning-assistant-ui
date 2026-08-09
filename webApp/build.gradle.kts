@@ -24,5 +24,9 @@ kotlin {
 
             implementation(libs.compose.ui)
         }
+        jsMain.dependencies {
+            implementation(npm("os-browserify", "0.3.0"))
+            implementation(npm("path-browserify", "1.0.1"))
+        }
     }
 }

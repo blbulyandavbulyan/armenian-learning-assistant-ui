@@ -27,7 +27,6 @@ class DialogueDetailScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueDetailScreen(
                     dialogue = dialogueDomain,
-                    onBack = { },
                     onPlayAudio = { playedUrls.add(it) }
                 )
             }
@@ -57,7 +56,6 @@ class DialogueDetailScreenTest {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueDetailScreen(
                     dialogue = dialogueDomain,
-                    onBack = { },
                     onPlayAudio = { }
                 )
             }

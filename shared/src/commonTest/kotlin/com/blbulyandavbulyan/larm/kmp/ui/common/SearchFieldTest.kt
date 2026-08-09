@@ -20,41 +20,43 @@ class SearchFieldTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun clickingSearchButtonWithEmptyQueryDoesNotTriggerSearch() = runComposeUiTest {
-        var searchTriggered = false
+        var searchTriggerCount = 0
         setContent {
             ArmenianLearningTheme {
                 SearchField(
                     query = "",
                     textFieldModifier = Modifier.testTag("searchField"),
-                    onSearch = { searchTriggered = true },
+                    onSearch = { searchTriggerCount++ },
                     onValueChange = {},
                     placeholder = {}
                 )
             }
         }
 
+        searchTriggerCount shouldBe 0
         onNodeWithTag("searchSubmitButton").performClick()
-        searchTriggered shouldBe false
+        searchTriggerCount shouldBe 0
     }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun clickingSearchButtonWithValidQueryTriggersSearch() = runComposeUiTest {
-        var searchTriggered = false
+        var searchTriggerCount = 0
         setContent {
             ArmenianLearningTheme {
                 SearchField(
                     query = "Barev",
                     textFieldModifier = Modifier.testTag("searchField"),
-                    onSearch = { searchTriggered = true },
+                    onSearch = { searchTriggerCount++ },
                     onValueChange = {},
                     placeholder = {}
                 )
             }
         }
 
+        searchTriggerCount shouldBe 0
         onNodeWithTag("searchSubmitButton").performClick()
-        searchTriggered shouldBe true
+        searchTriggerCount shouldBe 1
     }
 
     @OptIn(ExperimentalTestApi::class)
@@ -80,40 +82,42 @@ class SearchFieldTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun imeActionSearchWithEmptyQueryDoesNotTriggerSearch() = runComposeUiTest {
-        var searchTriggered = false
+        var searchTriggerCount = 0
         setContent {
             ArmenianLearningTheme {
                 SearchField(
                     query = "",
                     textFieldModifier = Modifier.testTag("searchField"),
-                    onSearch = { searchTriggered = true },
+                    onSearch = { searchTriggerCount++ },
                     onValueChange = {},
                     placeholder = {}
                 )
             }
         }
 
+        searchTriggerCount shouldBe 0
         onNodeWithTag("searchField").performImeAction()
-        searchTriggered shouldBe false
+        searchTriggerCount shouldBe 0
     }
 
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun imeActionSearchWithValidQueryTriggersSearch() = runComposeUiTest {
-        var searchTriggered = false
+        var searchTriggerCount = 0
         setContent {
             ArmenianLearningTheme {
                 SearchField(
                     query = "Barev",
                     textFieldModifier = Modifier.testTag("searchField"),
-                    onSearch = { searchTriggered = true },
+                    onSearch = { searchTriggerCount++ },
                     onValueChange = {},
                     placeholder = {}
                 )
             }
         }
 
+        searchTriggerCount shouldBe 0
         onNodeWithTag("searchField").performImeAction()
-        searchTriggered shouldBe true
+        searchTriggerCount shouldBe 1
     }
 }

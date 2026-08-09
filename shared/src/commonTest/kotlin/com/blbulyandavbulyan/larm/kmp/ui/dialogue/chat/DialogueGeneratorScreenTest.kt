@@ -59,8 +59,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
                     onGenerateDialogue = { generatedPrompt = it },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -77,24 +76,24 @@ class DialogueGeneratorScreenTest {
 
     @Test
     fun clickingSendWithEmptyText_doesNotTriggerOnGenerateDialogue() = runComposeUiTest {
-        var callbackTriggered = false
+        var callbackTriggerCount = 0
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
-                    onGenerateDialogue = { callbackTriggered = true },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onGenerateDialogue = { callbackTriggerCount++ },
+                    onSaveDialogue = {}
                 )
             }
         }
 
+        callbackTriggerCount shouldBe 0
         // Click the send button without typing anything
         onNodeWithTag("sendButton").performClick()
 
         // Assert that the callback was NOT triggered
-        callbackTriggered shouldBe false
+        callbackTriggerCount shouldBe 0
     }
 
     @Test
@@ -105,8 +104,7 @@ class DialogueGeneratorScreenTest {
                     conversation = emptyList(),
                     emptyMessage = "No conversation yet",
                     onGenerateDialogue = { },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -123,8 +121,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
                     onGenerateDialogue = { generatedPrompt = it },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -143,8 +140,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = emptyList(),
                     onGenerateDialogue = { generatedPrompt = it },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -166,8 +162,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.UserMessage("Hello user message")),
                     onGenerateDialogue = { },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -183,8 +178,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.Loading),
                     onGenerateDialogue = { },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -201,8 +195,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = listOf(ConversationItem.AiResponse(mockAiResponse)),
                     onGenerateDialogue = { },
-                    onSaveDialogue = {},
-                    onNavigateToSearch = {}
+                    onSaveDialogue = {}
                 )
             }
         }
@@ -242,8 +235,7 @@ class DialogueGeneratorScreenTest {
                 DialogueGeneratorScreen(
                     conversation = conversation,
                     onGenerateDialogue = {},
-                    onSaveDialogue = { savedDialogues.add(it) },
-                    onNavigateToSearch = {}
+                    onSaveDialogue = { savedDialogues.add(it) }
                 )
             }
         }
@@ -273,8 +265,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    viewModel = viewModel,
-                    onNavigateToSearch = {}
+                    viewModel = viewModel
                 )
             }
         }
