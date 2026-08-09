@@ -84,6 +84,7 @@ kotlin {
             implementation(libs.turbine)
             implementation(libs.compose.uiTest)
             implementation(libs.ktor.client.mock)
+            implementation(libs.coil.test)
         }
         jsMain.dependencies {
             implementation(libs.wrappers.browser)

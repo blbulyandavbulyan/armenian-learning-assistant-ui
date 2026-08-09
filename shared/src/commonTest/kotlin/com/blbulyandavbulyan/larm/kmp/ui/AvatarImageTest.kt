@@ -4,36 +4,57 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.dp
+import coil3.ColorImage
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import coil3.annotation.DelicateCoilApi
+import coil3.test.FakeImageLoaderEngine
 import com.blbulyandavbulyan.larm.kmp.ui.common.AvatarImage
 import com.blbulyandavbulyan.larm.kmp.ui.common.extractInitials
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
 import io.kotest.matchers.shouldBe
+import kotlin.test.AfterTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
 class AvatarImageTest {
 
+    @OptIn(DelicateCoilApi::class)
+    @AfterTest
+    fun tearDown() {
+        SingletonImageLoader.reset()
+    }
+
     @Test
-    fun extractInitials_handlesMultipleWords() {
-        extractInitials("David Bul") shouldBe "DB"
+    fun extractInitials_handlesTwoWords() {
+        extractInitials("david bul") shouldBe "DB"
+    }
+
+    @Test
+    fun extractInitials_handlesThreeWords() {
         extractInitials("John Robert Doe") shouldBe "JR"
     }
 
     @Test
     fun extractInitials_handlesSingleWord() {
         extractInitials("David") shouldBe "D"
-        extractInitials("alice") shouldBe "A"
     }
 
     @Test
-    fun extractInitials_handlesNullAndEmpty() {
-        extractInitials(null) shouldBe "U"
+    fun extractInitials_handlesEmpty() {
         extractInitials("") shouldBe "U"
         extractInitials("   ") shouldBe "U"
+    }
+
+    @Test
+    fun extractInitials_handlesNull() {
+        extractInitials(null) shouldBe "U"
     }
 
     @Test
@@ -43,13 +64,14 @@ class AvatarImageTest {
                 AvatarImage(
                     avatarUrl = null,
                     displayName = "David Bul",
-                    modifier = Modifier.testTag("avatar")
                 )
             }
         }
 
-        onNodeWithTag("avatar").assertIsDisplayed()
-        onNodeWithText("DB").assertIsDisplayed()
+        onNodeWithTag("avatar_fallback_initials").assertIsDisplayed().assertTextEquals("DB")
+        onNodeWithTag("avatar_loading_initials").assertDoesNotExist()
+        onNodeWithTag("avatar_error_initials").assertDoesNotExist()
+        onNodeWithTag("avatar_coil_image").assertDoesNotExist()
     }
 
     @Test
@@ -69,45 +91,33 @@ class AvatarImageTest {
         onNodeWithText("AW").assertIsDisplayed()
     }
 
+    @OptIn(DelicateCoilApi::class)
     @Test
     fun avatarImage_withAvatarUrl_rendersSubcomposeAsyncImage() = runComposeUiTest {
+        val engine = FakeImageLoaderEngine.Builder()
+            .default(ColorImage(0xFF0000FF.toInt()))
+            .build()
+
+        SingletonImageLoader.setUnsafe(
+            ImageLoader.Builder(PlatformContext.INSTANCE)
+                .components { add(engine) }
+                .build()
+        )
+
         setContent {
             ArmenianLearningTheme {
                 AvatarImage(
                     avatarUrl = "https://example.com/avatar.png",
                     displayName = "David Bul",
-                    modifier = Modifier.testTag("avatar")
                 )
             }
         }
 
-        onNodeWithTag("avatar").assertIsDisplayed()
-    }
-
-    @Test
-    fun avatarImage_withDifferentSizes_rendersCorrectly() = runComposeUiTest {
-        // TODO this is probably ONLY for 'coverage', this test looks dumb, we set different size, but we don't really assert anything
-        //  only that they are 'displayed', but 'how' they displayed??? That's the real point of that 'if check' there
-        setContent {
-            ArmenianLearningTheme {
-                AvatarImage(
-                    avatarUrl = null,
-                    displayName = "Small Avatar",
-                    size = 32.dp,
-                    modifier = Modifier.testTag("smallAvatar")
-                )
-                AvatarImage(
-                    avatarUrl = null,
-                    displayName = "Large Avatar",
-                    size = 48.dp,
-                    modifier = Modifier.testTag("largeAvatar")
-                )
-            }
-        }
-
-        onNodeWithTag("smallAvatar").assertIsDisplayed()
-        onNodeWithText("SA").assertIsDisplayed()
-        onNodeWithTag("largeAvatar").assertIsDisplayed()
-        onNodeWithText("LA").assertIsDisplayed()
+        waitForIdle()
+        onNodeWithText("DB").assertDoesNotExist()
+        onNodeWithTag("avatar_coil_image").assertIsDisplayed()
+        onNodeWithTag("avatar_fallback_initials").assertDoesNotExist()
+        onNodeWithTag("avatar_loading_initials").assertDoesNotExist()
+        onNodeWithTag("avatar_error_initials").assertDoesNotExist()
     }
 }

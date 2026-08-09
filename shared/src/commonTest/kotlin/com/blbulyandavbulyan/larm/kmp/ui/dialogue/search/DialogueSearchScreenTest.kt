@@ -94,7 +94,7 @@ class DialogueSearchScreenTest {
     }
 
     @Test
-    fun searchScreen_error_showsRetryButtonAndTriggersRetry() = runComposeUiTest {
+    fun searchScreen_retryAfterError_showsResults() = runComposeUiTest {
         val results = persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
         everySuspend { dialogueRepository.searchDialogues(any()) } sequentially {
             throws(RuntimeException("Network Error"))

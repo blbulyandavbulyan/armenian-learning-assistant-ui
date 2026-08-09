@@ -115,7 +115,6 @@ private fun DrawerProfileHeader(
         AvatarImage(
             avatarUrl = userProfile?.avatarUrl,
             displayName = userProfile?.displayName,
-            size = 48.dp,
             modifier = Modifier.testTag("drawer_profile_avatar")
         )
         Spacer(modifier = Modifier.width(16.dp))

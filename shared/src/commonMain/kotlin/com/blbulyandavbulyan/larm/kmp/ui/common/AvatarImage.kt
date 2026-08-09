@@ -12,9 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 
 fun extractInitials(displayName: String?): String {
@@ -32,27 +35,42 @@ fun AvatarImage(
     avatarUrl: String?,
     displayName: String?,
     modifier: Modifier = Modifier,
-    size: Dp = 36.dp
+    size: Dp = 48.dp
 ) {
     val initials = remember(displayName) { extractInitials(displayName) }
 
-    if (avatarUrl.isNullOrBlank()) {
-        InitialsAvatar(initials = initials, size = size, modifier = modifier)
-    } else {
-        SubcomposeAsyncImage(
-            model = avatarUrl,
-            contentDescription = displayName,
-            modifier = modifier
-                .size(size)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop,
-            loading = {
-                InitialsAvatar(initials = initials, size = size)
-            },
-            error = {
-                InitialsAvatar(initials = initials, size = size)
-            }
-        )
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        if (avatarUrl.isNullOrBlank()) {
+            InitialsAvatar(
+                initials = initials,
+                size = size,
+                modifier = Modifier.testTag("avatar_fallback_initials")
+            )
+        } else {
+            SubcomposeAsyncImage(
+                model = avatarUrl,
+                contentDescription = displayName,
+                modifier = Modifier
+                    .size(size)
+                    .clip(CircleShape)
+                    .testTag("avatar_coil_image"),
+                contentScale = ContentScale.Crop,
+                loading = {
+                    InitialsAvatar(
+                        initials = initials,
+                        size = size,
+                        modifier = Modifier.testTag("avatar_loading_initials")
+                    )
+                },
+                error = {
+                    InitialsAvatar(
+                        initials = initials,
+                        size = size,
+                        modifier = Modifier.testTag("avatar_error_initials")
+                    )
+                }
+            )
+        }
     }
 }
 
@@ -65,13 +83,14 @@ private fun InitialsAvatar(
     Box(
         modifier = modifier
             .size(size)
+            .semantics(mergeDescendants = true) { }
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = initials,
-            style = if (size < 40.dp) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
+            fontSize = (size.value * 0.4).sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )

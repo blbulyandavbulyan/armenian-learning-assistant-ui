@@ -91,7 +91,7 @@ If you face any issues, please report them on [YouTrack](https://youtrack.jetbra
 # update lock files
 ./gradlew :dependencies :shared:dependencies :webApp:dependencies desktopApp:dependencies --write-locks -Dorg.gradle.dependency.verification=off
 # update dependency verification xml
-./gradlew --write-verification-metadata sha256,pgp --export-keys --refresh-dependencies build
+./gradlew --write-verification-metadata sha256,pgp --export-keys --refresh-dependencies build :shared:compileTestKotlinJvm
 ```
 
 ### MCP servers
