@@ -2,17 +2,17 @@
 
 ## Overview
 
-Refactor `AppViewModel` to adhere strictly to the Single Responsibility Principle (SRP) by scoping it purely to root route navigation (`ScreenState`). Extract user profile state and drawer/account operations (such as sign out) into a dedicated `DrawerViewModel` in the `presentation.drawer` package.
+Refactor `AppRouterViewModel` to adhere strictly to the Single Responsibility Principle (SRP) by scoping it purely to root route navigation (`ScreenState`). Extract user profile state and drawer/account operations (such as sign out) into a dedicated `DrawerViewModel` in the `presentation.drawer` package.
 
 ---
 
 ## 1. Architectural Goals & Motivations
 
-- **Single Responsibility for `AppViewModel`**: `AppViewModel` is solely responsible for application-level navigation (`currentScreen: StateFlow<ScreenState>`) and reacting to authentication state changes to switch screens.
-- **Decoupling from `AuthRepository`**: `AppViewModel` no longer depends on the full `AuthRepository` (which contains mutating auth actions like `signInWithGoogle` and `signOut`), but instead receives a lightweight `Flow<AuthState>`.
+- **Single Responsibility for `AppRouterViewModel`**: `AppRouterViewModel` is solely responsible for application-level navigation (`currentScreen: StateFlow<ScreenState>`) and reacting to authentication state changes to switch screens.
+- **Decoupling from `AuthRepository`**: `AppRouterViewModel` no longer depends on the full `AuthRepository` (which contains mutating auth actions like `signInWithGoogle` and `signOut`), but instead receives a lightweight `Flow<AuthState>`.
 - **Dedicated Drawer & Account State Holder**: `DrawerViewModel` manages the user profile state (`userProfile: StateFlow<UserProfile?>`) and account actions (`signOut()`, and in the future, account deletion).
 - **Strict Unidirectional Data Flow (UDF)**:
-  - `App.kt` remains the route orchestrator collecting states from both `AppViewModel` and `DrawerViewModel`.
+  - `App.kt` remains the route orchestrator collecting states from both `AppRouterViewModel` and `DrawerViewModel`.
   - `AppDrawerContent` remains a pure UI composable that receives immutable state and callback lambdas without direct ViewModel dependencies.
 - **Testing Standard**: New tests will use Mokkery for mocking, while existing tests maintain their existing structure.
 
@@ -20,7 +20,7 @@ Refactor `AppViewModel` to adhere strictly to the Single Responsibility Principl
 
 ## 2. Component Specifications
 
-### 2.1 `AppViewModel` (`com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel.kt`)
+### 2.1 `AppRouterViewModel` (`com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel.kt`)
 
 - **Constructor**:
   ```kotlin
@@ -91,8 +91,8 @@ Refactor `AppViewModel` to adhere strictly to the Single Responsibility Principl
 
 ## 3. Testing Plan
 
-### 3.1 `AppViewModelTest` (`com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModelTest.kt`)
-- Updated to pass `MutableStateFlow<AuthState>` into `AppViewModel`.
+### 3.1 `AppRouterViewModelTest` (`com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModelTest.kt`)
+- Updated to pass `MutableStateFlow<AuthState>` into `AppRouterViewModel`.
 - Tests:
   1. `navigation state defaults and updates correctly via manual methods`
   2. `auth state UNAUTHENTICATED sets screen to Login`

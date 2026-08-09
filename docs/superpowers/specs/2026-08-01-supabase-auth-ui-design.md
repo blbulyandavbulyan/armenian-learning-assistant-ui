@@ -20,7 +20,7 @@ Integrate a dedicated Login UI screen to handle Supabase Google Authentication f
 - **`LoginViewModel`**: 
   - Holds localized UI states like loading and error handling specific to the login form.
   - Exposes an action `signInWithGoogle()`.
-- **`AppViewModel`**: 
+- **`AppRouterViewModel`**: 
   - Observes the global authentication state via the `AuthRepository`.
   - Maps an unauthenticated state to `ScreenState.Login`.
   - Automatically transitions to `ScreenState.Generator` once a session is established.

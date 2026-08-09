@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthState
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,15 +18,15 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppViewModelTest {
+class AppRouterViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val authStateFlow = MutableStateFlow(AuthState.UNAUTHENTICATED)
-    private lateinit var viewModel: AppViewModel
+    private lateinit var viewModel: AppRouterViewModel
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = AppViewModel(authStateFlow)
+        viewModel = AppRouterViewModel(authStateFlow)
     }
 
     @AfterTest
@@ -59,6 +60,9 @@ class AppViewModelTest {
 
     @Test
     fun `auth state UNAUTHENTICATED sets screen to Login`() = runTest {
+        authStateFlow.value = AuthState.AUTHENTICATED
+        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.currentScreen.value shouldNotBe ScreenState.Login
         authStateFlow.value = AuthState.UNAUTHENTICATED
         testDispatcher.scheduler.advanceUntilIdle()
 

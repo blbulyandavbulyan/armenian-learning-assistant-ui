@@ -104,7 +104,7 @@ In `com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel`:
 1. **Repository Unit Tests (`SessionStatusMappersTest.kt`)**:
    - Verify `observeUserProfile` extracts standard Supabase `UserInfo` and metadata fields correctly.
    - Verify fallback logic when name/avatar are null or missing.
-2. **ViewModel Unit Tests (`AppViewModelTest.kt`)**:
+2. **ViewModel Unit Tests (`AppRouterViewModelTest.kt`)**:
    - Verify `userProfile` StateFlow updates when auth state / session changes.
    - Verify `signOut()` invokes repository signOut and navigates to `ScreenState.Login`.
 3. **UI Compose Tests (`UserProfileMenuTest.kt`, `AppTopBarTest.kt`)**:

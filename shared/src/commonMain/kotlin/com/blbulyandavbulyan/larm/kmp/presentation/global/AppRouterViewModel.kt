@@ -11,7 +11,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AppViewModel(
+/**
+ * This class is responsible for global app navigation, it dictates which screen app should show.
+ * It also observes AuthState, just because from it also depends on which screen is going to be shown.
+ */
+class AppRouterViewModel(
     private val authStateFlow: Flow<AuthState> = AppModule.authRepository.observeAuthState()
 ) : ViewModel() {
     private val _currentScreen = MutableStateFlow<ScreenState>(ScreenState.Generator)

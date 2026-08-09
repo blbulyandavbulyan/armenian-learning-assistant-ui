@@ -24,7 +24,7 @@ import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.drawer.DrawerViewModel
-import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.global.AppRouterViewModel
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -60,8 +60,8 @@ class AppTest {
         Dispatchers.resetMain()
     }
 
-    private fun createAuthenticatedAppViewModel(): AppViewModel {
-        return AppViewModel(MutableStateFlow(AuthState.AUTHENTICATED))
+    private fun createAuthenticatedAppViewModel(): AppRouterViewModel {
+        return AppRouterViewModel(MutableStateFlow(AuthState.AUTHENTICATED))
     }
 
     private fun createAuthenticatedDrawerViewModel(): DrawerViewModel {
@@ -92,7 +92,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = viewModel,
                 chatViewModel = chatViewModel
@@ -157,7 +157,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = viewModel,
                 chatViewModel = chatViewModel
@@ -211,7 +211,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = viewModel,
                 chatViewModel = chatViewModel
@@ -256,7 +256,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = viewModel,
                 chatViewModel = chatViewModel
@@ -289,7 +289,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = viewModel,
                 chatViewModel = chatViewModel
@@ -322,7 +322,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel,
                 chatViewModel = chatViewModel
@@ -338,7 +338,7 @@ class AppTest {
     fun app_showsLoginScreen_whenUnauthenticated() = runComposeUiTest {
         val authRepository = mock<AuthRepository>()
         every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
-        val appViewModel = AppViewModel(MutableStateFlow(AuthState.UNAUTHENTICATED))
+        val appRouterViewModel = AppRouterViewModel(MutableStateFlow(AuthState.UNAUTHENTICATED))
         val drawerViewModel = DrawerViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
@@ -353,7 +353,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appRouterViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel,
                 chatViewModel = chatViewModel
@@ -381,7 +381,7 @@ class AppTest {
             authStateFlow.value = AuthState.UNAUTHENTICATED
             userProfileFlow.value = null
         }
-        val appViewModel = AppViewModel(authStateFlow)
+        val appRouterViewModel = AppRouterViewModel(authStateFlow)
         val drawerViewModel = DrawerViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
@@ -396,7 +396,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appRouterViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel,
                 chatViewModel = chatViewModel
@@ -431,7 +431,7 @@ class AppTest {
     fun app_hidesTopBar_whenUnauthenticated() = runComposeUiTest {
         val authRepository = mock<AuthRepository>()
         every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
-        val appViewModel = AppViewModel(MutableStateFlow(AuthState.UNAUTHENTICATED))
+        val appRouterViewModel = AppRouterViewModel(MutableStateFlow(AuthState.UNAUTHENTICATED))
         val drawerViewModel = DrawerViewModel(authRepository)
         val searchViewModel = DialogueSearchViewModel(
             FakeDialogueRepository(),
@@ -446,7 +446,7 @@ class AppTest {
 
         setContent {
             App(
-                appViewModel = appViewModel,
+                appRouterViewModel = appRouterViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel,
                 chatViewModel = chatViewModel

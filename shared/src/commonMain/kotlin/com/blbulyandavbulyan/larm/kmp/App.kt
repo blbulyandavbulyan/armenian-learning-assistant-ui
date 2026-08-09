@@ -27,7 +27,7 @@ import com.blbulyandavbulyan.larm.kmp.presentation.auth.LoginViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.drawer.DrawerViewModel
-import com.blbulyandavbulyan.larm.kmp.presentation.global.AppViewModel
+import com.blbulyandavbulyan.larm.kmp.presentation.global.AppRouterViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.global.ScreenState
 import com.blbulyandavbulyan.larm.kmp.ui.auth.LoginScreen
 import com.blbulyandavbulyan.larm.kmp.ui.common.AppDrawerContent
@@ -45,7 +45,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun App(
-    appViewModel: AppViewModel = remember { AppViewModel() },
+    appRouterViewModel: AppRouterViewModel = remember { AppRouterViewModel() },
     drawerViewModel: DrawerViewModel = remember { DrawerViewModel(AppModule.authRepository) },
     searchViewModel: DialogueSearchViewModel = remember {
         DialogueSearchViewModel(
@@ -71,7 +71,7 @@ fun App(
     ArmenianLearningTheme {
         Content(
             chatViewModel = chatViewModel,
-            appViewModel = appViewModel,
+            appRouterViewModel = appRouterViewModel,
             drawerViewModel = drawerViewModel,
             searchViewModel = searchViewModel,
             loginViewModel = loginViewModel,
@@ -82,13 +82,13 @@ fun App(
 @Composable
 private fun Content(
     chatViewModel: DialogueChatViewModel,
-    appViewModel: AppViewModel,
+    appRouterViewModel: AppRouterViewModel,
     drawerViewModel: DrawerViewModel,
     searchViewModel: DialogueSearchViewModel,
     loginViewModel: LoginViewModel,
     modifier: Modifier = Modifier
 ) {
-    val currentScreen by appViewModel.currentScreen.collectAsStateWithLifecycle()
+    val currentScreen by appRouterViewModel.currentScreen.collectAsStateWithLifecycle()
     val appError by AppModule.globalErrorManager.currentError.collectAsStateWithLifecycle()
     val appColors = AppTheme.colors
     val gradientBackground = Brush.verticalGradient(
@@ -102,7 +102,7 @@ private fun Content(
             MainScaffold(
                 currentScreen = currentScreen,
                 chatViewModel = chatViewModel,
-                appViewModel = appViewModel,
+                appRouterViewModel = appRouterViewModel,
                 drawerViewModel = drawerViewModel,
                 searchViewModel = searchViewModel
             )
@@ -116,7 +116,7 @@ private fun Content(
 private fun MainScaffold(
     currentScreen: ScreenState,
     chatViewModel: DialogueChatViewModel,
-    appViewModel: AppViewModel,
+    appRouterViewModel: AppRouterViewModel,
     drawerViewModel: DrawerViewModel,
     searchViewModel: DialogueSearchViewModel,
     modifier: Modifier = Modifier
@@ -133,7 +133,7 @@ private fun MainScaffold(
                 currentScreen = currentScreen,
                 onNavigateToGenerator = {
                     coroutineScope.launch { drawerState.close() }
-                    appViewModel.navigateToGenerator()
+                    appRouterViewModel.navigateToGenerator()
                 },
                 onSignOut = {
                     coroutineScope.launch { drawerState.close() }
@@ -147,7 +147,7 @@ private fun MainScaffold(
             AppTopBarContainer(
                 currentScreen = currentScreen,
                 searchViewModel = searchViewModel,
-                appViewModel = appViewModel,
+                appRouterViewModel = appRouterViewModel,
                 onOpenDrawer = { coroutineScope.launch { drawerState.open() } }
             )
 
@@ -155,7 +155,7 @@ private fun MainScaffold(
                 ScreenNavigationContent(
                     currentScreen = currentScreen,
                     chatViewModel = chatViewModel,
-                    appViewModel = appViewModel,
+                    appRouterViewModel = appRouterViewModel,
                     searchViewModel = searchViewModel
                 )
             }
@@ -167,13 +167,13 @@ private fun MainScaffold(
 private fun AppTopBarContainer(
     currentScreen: ScreenState,
     searchViewModel: DialogueSearchViewModel,
-    appViewModel: AppViewModel,
+    appRouterViewModel: AppRouterViewModel,
     onOpenDrawer: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val backAction: (() -> Unit)? = when (currentScreen) {
-        is ScreenState.Search -> appViewModel::navigateToGenerator
-        is ScreenState.Detail -> appViewModel::navigateToSearch
+        is ScreenState.Search -> appRouterViewModel::navigateToGenerator
+        is ScreenState.Detail -> appRouterViewModel::navigateToSearch
         else -> null
     }
 
@@ -187,11 +187,11 @@ private fun AppTopBarContainer(
                     query = searchQuery,
                     onValueChange = searchViewModel::updateSearchQuery,
                     onSearch = {
-                        appViewModel.navigateToLoading()
+                        appRouterViewModel.navigateToLoading()
                         searchViewModel.searchDialogues(
                             query = searchQuery,
-                            onSuccess = appViewModel::navigateToSearch,
-                            onError = appViewModel::navigateToSearch
+                            onSuccess = appRouterViewModel::navigateToSearch,
+                            onError = appRouterViewModel::navigateToSearch
                         )
                     },
                     placeholder = {
@@ -212,7 +212,7 @@ private fun AppTopBarContainer(
 private fun ScreenNavigationContent(
     currentScreen: ScreenState,
     chatViewModel: DialogueChatViewModel,
-    appViewModel: AppViewModel,
+    appRouterViewModel: AppRouterViewModel,
     searchViewModel: DialogueSearchViewModel
 ) {
     Crossfade(targetState = currentScreen) { state ->
@@ -225,11 +225,11 @@ private fun ScreenNavigationContent(
                 DialogueSearchScreen(
                     viewModel = searchViewModel,
                     onGetDialogueDetails = { id ->
-                        appViewModel.navigateToLoading()
+                        appRouterViewModel.navigateToLoading()
                         searchViewModel.displayDialogue(
                             id = id,
-                            onDialogueReady = appViewModel::navigateToDetail,
-                            onError = appViewModel::navigateToSearch
+                            onDialogueReady = appRouterViewModel::navigateToDetail,
+                            onError = appRouterViewModel::navigateToSearch
                         )
                     }
                 )

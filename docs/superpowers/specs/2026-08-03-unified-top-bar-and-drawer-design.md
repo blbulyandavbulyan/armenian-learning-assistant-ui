@@ -11,7 +11,7 @@ Refactor the application's top navigation layer by introducing a unified top bar
 - **Zero Top-Bar Duplication**: A single `AppTopBar` instance in `App.kt` handles top-level actions and search across screens.
 - **Strict Encapsulation**: Screen content (e.g. `DialogueDetailScreen`) manages its own internal titles, audio controls, and phrase views without top-bar bleed.
 - **Unidirectional Data Flow (UDF)**:
-  - Route state, screen navigation, and drawer state live at the `App.kt` / `AppViewModel` orchestration layer.
+  - Route state, screen navigation, and drawer state live at the `App.kt` / `AppRouterViewModel` orchestration layer.
   - Dumb UI components receive primitive state and invoke callback lambdas.
 - **Extensible Navigation Drawer**: A clean Material 3 side drawer containing user profile information, sign out, and a dedicated section for future navigation routes.
 

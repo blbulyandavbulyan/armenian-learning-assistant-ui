@@ -25,7 +25,7 @@ We follow a Clean Architecture / MVVM separation style. Code should be separated
 
 ## Strict Unidirectional Data Flow (UDF) & Two-Tier Screen Architecture
 - **CRITICAL: Never mutate pure UI components for asynchronous state**: Dumb, generic UI components (like a `SearchField`, custom buttons, etc.) must NEVER contain their own `isLoading` state or manage network feedback. They must remain pure inputs/outputs.
-- **Global Loading & Navigation State**: Global screen-level navigation events and app-wide loading (like waiting for a dialogue to fetch before navigating to Detail) are managed at the top-level route/navigation layer (`AppViewModel` and `App.kt`).
+- **Global Loading & Navigation State**: Global screen-level navigation events and app-wide loading (like waiting for a dialogue to fetch before navigating to Detail) are managed at the top-level route/navigation layer (`AppRouterViewModel` and `App.kt`).
 - **Two-Tier Screen Architecture (Stateful Wrapper vs Stateless Screen)**:
   - **Stateful Route/Screen Wrapper**: Each screen provides a stateful Composable taking its `ViewModel` (and route navigation lambdas) — e.g. `DialogueSearchScreen(viewModel, onGetDialogueDetails)`. It is responsible for collecting the ViewModel's state and wiring ViewModel callbacks, delegating directly to the stateless overload. The wiring between screen and ViewModel MUST be tested in that screen's test suite (e.g., `DialogueSearchScreenTest`).
   - **Stateless Screen (Pure UI)**: An overloaded Composable taking only immutable state models and callback lambdas — e.g. `DialogueSearchScreen(searchState, onSearch, ...)`. This is used for rendering previews and testing every UI state branch without ViewModels.
