@@ -35,7 +35,7 @@ class AppRouterViewModelTest {
     }
 
     @Test
-    fun `navigation state defaults and updates correctly via manual methods`() = runTest {
+    fun `navigation state updates correctly via manual methods`() = runTest {
         viewModel.currentScreen.test {
             testDispatcher.scheduler.advanceUntilIdle()
             awaitItem().shouldBeInstanceOf<ScreenState.Login>()
