@@ -2,6 +2,7 @@ package com.blbulyandavbulyan.larm.kmp.ui.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +18,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 
@@ -43,8 +45,7 @@ fun AvatarImage(
         if (avatarUrl.isNullOrBlank()) {
             InitialsAvatar(
                 initials = initials,
-                size = size,
-                modifier = Modifier.testTag("avatar_fallback_initials")
+                modifier = Modifier.size(size).testTag("avatar_fallback_initials")
             )
         } else {
             SubcomposeAsyncImage(
@@ -58,15 +59,13 @@ fun AvatarImage(
                 loading = {
                     InitialsAvatar(
                         initials = initials,
-                        size = size,
-                        modifier = Modifier.testTag("avatar_loading_initials")
+                        modifier = Modifier.size(size).testTag("avatar_loading_initials")
                     )
                 },
                 error = {
                     InitialsAvatar(
                         initials = initials,
-                        size = size,
-                        modifier = Modifier.testTag("avatar_error_initials")
+                        modifier = Modifier.size(size).testTag("avatar_error_initials")
                     )
                 }
             )
@@ -77,20 +76,19 @@ fun AvatarImage(
 @Composable
 private fun InitialsAvatar(
     initials: String,
-    size: Dp,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    BoxWithConstraints(
         modifier = modifier
-            .size(size)
-            .semantics(mergeDescendants = true) { }
+            .semantics(mergeDescendants = true){ }
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
+        val dimension = min(maxWidth, maxHeight)
         Text(
             text = initials,
-            fontSize = (size.value * 0.4).sp,
+            fontSize = (dimension.value * 0.4).sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
