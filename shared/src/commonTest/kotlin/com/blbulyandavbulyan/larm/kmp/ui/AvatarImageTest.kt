@@ -1,14 +1,11 @@
 package com.blbulyandavbulyan.larm.kmp.ui
 
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.v2.runComposeUiTest
-import androidx.compose.ui.unit.dp
 import coil3.ColorImage
 import coil3.ImageLoader
 import coil3.PlatformContext
@@ -81,14 +78,14 @@ class AvatarImageTest {
                 AvatarImage(
                     avatarUrl = "   ",
                     displayName = "Alice Wonderland",
-                    size = 48.dp,
-                    modifier = Modifier.testTag("avatar")
                 )
             }
         }
 
-        onNodeWithTag("avatar").assertIsDisplayed()
-        onNodeWithText("AW").assertIsDisplayed()
+        onNodeWithTag("avatar_fallback_initials").assertIsDisplayed().assertTextEquals("AW")
+        onNodeWithTag("avatar_loading_initials").assertDoesNotExist()
+        onNodeWithTag("avatar_error_initials").assertDoesNotExist()
+        onNodeWithTag("avatar_coil_image").assertDoesNotExist()
     }
 
     @OptIn(DelicateCoilApi::class)
