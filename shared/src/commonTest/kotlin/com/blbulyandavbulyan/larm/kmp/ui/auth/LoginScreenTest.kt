@@ -7,7 +7,14 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
+import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
+import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthRepository
+import com.blbulyandavbulyan.larm.kmp.presentation.auth.LoginViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -55,5 +62,27 @@ class LoginScreenTest {
 
         onNodeWithTag("signInWithGoogleButton").assertIsNotEnabled()
         onNodeWithTag("signInLoadingIndicator").assertIsDisplayed()
+    }
+
+    @Test
+    fun loginScreen_withViewModel_delegatesCorrectly() = runComposeUiTest {
+        val authRepository = mock<AuthRepository>()
+        everySuspend { authRepository.signInWithGoogle() } returns Unit
+
+        val viewModel = LoginViewModel(
+            authRepository = authRepository,
+            globalErrorManager = GlobalErrorManager()
+        )
+
+        setContent {
+            ArmenianLearningTheme {
+                LoginScreen(viewModel = viewModel)
+            }
+        }
+
+        onNodeWithTag("signInWithGoogleButton").assertIsDisplayed().performClick()
+
+        waitForIdle()
+        verifySuspend { authRepository.signInWithGoogle() }
     }
 }

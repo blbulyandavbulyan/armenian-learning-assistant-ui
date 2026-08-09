@@ -262,11 +262,20 @@ class AppTest {
         }
 
         onNodeWithTag("dialogueSearchScreen").assertIsDisplayed()
+
+        // Type into search bar to test that query updates and persists
+        onNodeWithTag("top_bar_search_field").performTextInput("Armenian Query")
+        dialogueSearchViewModel.searchQuery.value shouldBe "Armenian Query"
+
         onNodeWithTag("top_bar_back_button").assertIsDisplayed().performClick()
         waitForIdle()
 
         onNodeWithTag("dialogueGeneratorScreen").assertIsDisplayed()
         onNodeWithTag("top_bar_back_button").assertDoesNotExist()
+
+        // Verify query persists after navigating back
+        dialogueSearchViewModel.searchQuery.value shouldBe "Armenian Query"
+        onNodeWithTag("top_bar_search_field").assertTextEquals("Armenian Query")
     }
 
     @Test
