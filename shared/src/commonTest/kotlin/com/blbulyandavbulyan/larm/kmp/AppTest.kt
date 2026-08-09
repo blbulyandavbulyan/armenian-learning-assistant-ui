@@ -10,17 +10,15 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.FakeAssetRepository
+import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetRepository
 import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthRepository
 import com.blbulyandavbulyan.larm.kmp.domain.auth.AuthState
 import com.blbulyandavbulyan.larm.kmp.domain.auth.UserProfile
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.FakeDialogueChatRepository
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.FakeDialogueRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.DialogueChatRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.DialogueRepository
 import com.blbulyandavbulyan.larm.kmp.infrastructure.appbackend.client.data.dialogue.search.GetDialogueResponseMother
-import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.AudioPlayer
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.drawer.DrawerViewModel
@@ -29,8 +27,9 @@ import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
-import kotlinx.collections.immutable.ImmutableList
+import io.kotest.matchers.shouldBe
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -48,10 +47,26 @@ class AppTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
 
+    private val dialogueChatRepository = mock<DialogueChatRepository>()
+    private val assetRepository = mock<AssetRepository>()
+    private val dialogueRepository = mock<DialogueRepository>()
+    private val audioPlayer = mock<AudioPlayer>()
+    private lateinit var globalErrorManager: GlobalErrorManager
+    private lateinit var chatViewModel: DialogueChatViewModel
+    private lateinit var dialogueSearchViewModel: DialogueSearchViewModel
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        globalErrorManager = GlobalErrorManager()
+        chatViewModel = DialogueChatViewModel(dialogueChatRepository, globalErrorManager)
+        dialogueSearchViewModel = DialogueSearchViewModel(
+            dialogueRepository,
+            assetRepository,
+            globalErrorManager,
+            audioPlayer
+        )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -73,19 +88,18 @@ class AppTest {
 
     @Test
     fun navigationFlow_searchToDetailAndBack() = runComposeUiTest {
-        val fakeDialogueRepository = TestFakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
+        everySuspend { dialogueRepository.searchDialogues(any()) } returns
+            persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
+
+        val getDialogueCompletable = CompletableDeferred<Unit>()
+
+        everySuspend { dialogueRepository.getDialogue(any()) } calls {
+            getDialogueCompletable.await()
+            return@calls DomainMothers.DIALOGUE_1
+        }
 
         val appViewModel = createAuthenticatedAppViewModel()
         val drawerViewModel = createAuthenticatedDrawerViewModel()
-        val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         // Set the state to Search before setting content to avoid animation/recomposition timing issues
         appViewModel.navigateToSearch()
@@ -94,7 +108,7 @@ class AppTest {
             App(
                 appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = viewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
@@ -110,12 +124,11 @@ class AppTest {
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertIsDisplayed()
 
         // 2. Press 'view details' button on the search result screen -> go to the details
-        fakeDialogueRepository.getDialogueCompletable = CompletableDeferred()
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").performClick()
 
         onNodeWithTag("loadingIndicator").assertIsDisplayed()
 
-        fakeDialogueRepository.getDialogueCompletable?.complete(Unit)
+        getDialogueCompletable.complete(Unit)
 
         // Wait for detail screen to appear
         waitUntil(timeoutMillis = 5000) {
@@ -137,29 +150,29 @@ class AppTest {
 
         // Assert we are back on search screen
         onNodeWithTag("viewFullDialogueButton_$dialogueId1").assertIsDisplayed()
+        // assert that query persists
+        onNodeWithTag("top_bar_search_field").assertTextEquals("Hello")
+        dialogueSearchViewModel.searchQuery.value shouldBe "Hello"
     }
 
     @Test
     fun navigationFlow_generatorToSearch() = runComposeUiTest {
-        val fakeDialogueRepository = TestFakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel =
-            DialogueSearchViewModel(
-                fakeDialogueRepository,
-                fakeAssetRepository,
-                GlobalErrorManager(),
-                FakeAudioPlayer()
-            )
+        val searchCompletable = CompletableDeferred<Unit>()
+        everySuspend { dialogueRepository.searchDialogues(any()) } calls {
+            searchCompletable.await()
+            persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
+        }
+
+        everySuspend { dialogueRepository.getDialogue(any()) } returns DomainMothers.DIALOGUE_1
 
         val appViewModel = createAuthenticatedAppViewModel()
         val drawerViewModel = createAuthenticatedDrawerViewModel()
-        val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         setContent {
             App(
                 appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = viewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
@@ -171,12 +184,11 @@ class AppTest {
         onNodeWithTag("top_bar_search_field").performTextInput("Hello")
 
         // 2. Press search button
-        fakeDialogueRepository.searchCompletable = CompletableDeferred()
         onNodeWithTag("searchSubmitButton").performClick()
 
         onNodeWithTag("loadingIndicator").assertIsDisplayed()
 
-        fakeDialogueRepository.searchCompletable?.complete(Unit)
+        searchCompletable.complete(Unit)
         waitForIdle()
 
         // Wait for search screen to appear
@@ -190,30 +202,26 @@ class AppTest {
         onNodeWithTag("viewFullDialogueButton_${GetDialogueResponseMother.Dialogue1.RESPONSE.id}").assertIsDisplayed()
         onNodeWithTag("dialogueGeneratorScreen").assertDoesNotExist()
         onNodeWithTag("top_bar_search_field").assertTextEquals("Hello")
+        dialogueSearchViewModel.searchQuery.value shouldBe "Hello"
     }
 
     @Test
     fun navigationFlow_generatorToSearch_whenSearchFails_navigatesToSearchScreen() = runComposeUiTest {
-        val fakeDialogueRepository = TestFakeDialogueRepository().apply {
-            shouldFailSearch = true
+        val searchCompletable = CompletableDeferred<Unit>()
+        @Suppress("TooGenericExceptionThrown")
+        everySuspend { dialogueRepository.searchDialogues(any()) } calls {
+            searchCompletable.await()
+            throw RuntimeException("Search failed")
         }
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel = DialogueSearchViewModel(
-            fakeDialogueRepository,
-            fakeAssetRepository,
-            GlobalErrorManager(),
-            FakeAudioPlayer()
-        )
 
         val appViewModel = createAuthenticatedAppViewModel()
         val drawerViewModel = createAuthenticatedDrawerViewModel()
-        val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         setContent {
             App(
                 appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = viewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
@@ -225,13 +233,12 @@ class AppTest {
         onNodeWithTag("top_bar_search_field").performTextInput("Hello")
 
         // 2. Submit search
-        fakeDialogueRepository.searchCompletable = CompletableDeferred()
         onNodeWithTag("searchSubmitButton").performClick()
 
         onNodeWithTag("loadingIndicator").assertIsDisplayed()
 
         // Complete deferred to let the search repository throw the exception
-        fakeDialogueRepository.searchCompletable?.complete(Unit)
+        searchCompletable.complete(Unit)
         waitForIdle()
 
         onNodeWithTag("dialogueSearchScreen").assertIsDisplayed()
@@ -240,17 +247,8 @@ class AppTest {
 
     @Test
     fun navigationFlow_searchToGeneratorBack() = runComposeUiTest {
-        val fakeDialogueRepository = TestFakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel = DialogueSearchViewModel(
-            fakeDialogueRepository,
-            fakeAssetRepository,
-            GlobalErrorManager(),
-            FakeAudioPlayer()
-        )
         val appViewModel = createAuthenticatedAppViewModel()
         val drawerViewModel = createAuthenticatedDrawerViewModel()
-        val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         appViewModel.navigateToSearch()
 
@@ -258,13 +256,13 @@ class AppTest {
             App(
                 appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = viewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
 
-        onNodeWithTag("top_bar_back_button").assertIsDisplayed()
-        onNodeWithTag("top_bar_back_button").performClick()
+        onNodeWithTag("dialogueSearchScreen").assertIsDisplayed()
+        onNodeWithTag("top_bar_back_button").assertIsDisplayed().performClick()
         waitForIdle()
 
         onNodeWithTag("dialogueGeneratorScreen").assertIsDisplayed()
@@ -273,17 +271,8 @@ class AppTest {
 
     @Test
     fun navigationFlow_drawerNavigateToGenerator() = runComposeUiTest {
-        val fakeDialogueRepository = TestFakeDialogueRepository()
-        val fakeAssetRepository = FakeAssetRepository()
-        val viewModel = DialogueSearchViewModel(
-            fakeDialogueRepository,
-            fakeAssetRepository,
-            GlobalErrorManager(),
-            FakeAudioPlayer()
-        )
         val appViewModel = createAuthenticatedAppViewModel()
         val drawerViewModel = createAuthenticatedDrawerViewModel()
-        val chatViewModel = DialogueChatViewModel(FakeDialogueChatRepository(), GlobalErrorManager())
 
         appViewModel.navigateToSearch()
 
@@ -291,10 +280,12 @@ class AppTest {
             App(
                 appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = viewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
+
+        onNodeWithTag("dialogueGeneratorScreen").assertDoesNotExist()
 
         onNodeWithTag("hamburger_button").performClick()
         waitForIdle()
@@ -309,22 +300,12 @@ class AppTest {
     fun app_showsLoadingIndicator_whenStateIsLoading() = runComposeUiTest {
         val appViewModel = createAuthenticatedAppViewModel()
         val drawerViewModel = createAuthenticatedDrawerViewModel()
-        val searchViewModel = DialogueSearchViewModel(
-            FakeDialogueRepository(),
-            FakeAssetRepository(),
-            GlobalErrorManager(),
-            FakeAudioPlayer()
-        )
-        val chatViewModel = DialogueChatViewModel(
-            FakeDialogueChatRepository(),
-            GlobalErrorManager()
-        )
 
         setContent {
             App(
                 appRouterViewModel = appViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = searchViewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
@@ -340,22 +321,12 @@ class AppTest {
         every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
         val appRouterViewModel = AppRouterViewModel(MutableStateFlow(AuthState.UNAUTHENTICATED))
         val drawerViewModel = DrawerViewModel(authRepository)
-        val searchViewModel = DialogueSearchViewModel(
-            FakeDialogueRepository(),
-            FakeAssetRepository(),
-            GlobalErrorManager(),
-            FakeAudioPlayer()
-        )
-        val chatViewModel = DialogueChatViewModel(
-            FakeDialogueChatRepository(),
-            GlobalErrorManager()
-        )
 
         setContent {
             App(
                 appRouterViewModel = appRouterViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = searchViewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
@@ -383,22 +354,12 @@ class AppTest {
         }
         val appRouterViewModel = AppRouterViewModel(authStateFlow)
         val drawerViewModel = DrawerViewModel(authRepository)
-        val searchViewModel = DialogueSearchViewModel(
-            FakeDialogueRepository(),
-            FakeAssetRepository(),
-            GlobalErrorManager(),
-            FakeAudioPlayer()
-        )
-        val chatViewModel = DialogueChatViewModel(
-            FakeDialogueChatRepository(),
-            GlobalErrorManager()
-        )
 
         setContent {
             App(
                 appRouterViewModel = appRouterViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = searchViewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
@@ -433,46 +394,17 @@ class AppTest {
         every { authRepository.observeUserProfile() } returns MutableStateFlow(null)
         val appRouterViewModel = AppRouterViewModel(MutableStateFlow(AuthState.UNAUTHENTICATED))
         val drawerViewModel = DrawerViewModel(authRepository)
-        val searchViewModel = DialogueSearchViewModel(
-            FakeDialogueRepository(),
-            FakeAssetRepository(),
-            GlobalErrorManager(),
-            FakeAudioPlayer()
-        )
-        val chatViewModel = DialogueChatViewModel(
-            FakeDialogueChatRepository(),
-            GlobalErrorManager()
-        )
 
         setContent {
             App(
                 appRouterViewModel = appRouterViewModel,
                 drawerViewModel = drawerViewModel,
-                searchViewModel = searchViewModel,
+                searchViewModel = dialogueSearchViewModel,
                 chatViewModel = chatViewModel
             )
         }
 
         onNodeWithTag("loginScreen").assertIsDisplayed()
         onNodeWithTag("app_top_bar").assertDoesNotExist()
-    }
-
-    class TestFakeDialogueRepository : FakeDialogueRepository() {
-        var searchCompletable: CompletableDeferred<Unit>? = null
-        var getDialogueCompletable: CompletableDeferred<Unit>? = null
-        var shouldFailSearch: Boolean = false
-
-        override suspend fun searchDialogues(query: String): ImmutableList<DialogueSummary> {
-            searchCompletable?.await()
-            if (shouldFailSearch) {
-                error("Search failed")
-            }
-            return persistentListOf(DomainMothers.DIALOGUE_SUMMARY_1, DomainMothers.DIALOGUE_SUMMARY_2)
-        }
-
-        override suspend fun getDialogue(id: String): Dialogue {
-            getDialogueCompletable?.await()
-            return DomainMothers.DIALOGUE_1
-        }
     }
 }

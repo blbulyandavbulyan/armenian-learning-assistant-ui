@@ -6,7 +6,6 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save_dialogue
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.FakeAssetRepository
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.DialogueTitle
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogueMother
@@ -30,7 +29,6 @@ import kotlin.test.Test
 class DialogueChatViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var fakeRepository: FakeDialogueChatRepository
-    private lateinit var fakeAssetRepository: FakeAssetRepository
     private lateinit var globalErrorManager: GlobalErrorManager
     private lateinit var viewModel: DialogueChatViewModel
 
@@ -38,7 +36,6 @@ class DialogueChatViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeDialogueChatRepository()
-        fakeAssetRepository = FakeAssetRepository()
         globalErrorManager = GlobalErrorManager()
         viewModel = DialogueChatViewModel(fakeRepository, globalErrorManager)
     }
