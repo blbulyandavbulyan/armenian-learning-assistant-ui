@@ -7,11 +7,24 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.FakeAssetRepository
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.FakeDialogueRepository
-import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.FakeAudioPlayer
+import com.blbulyandavbulyan.larm.kmp.domain.asset.model.AssetData
+import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetFetchException
+import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.DialogueRepository
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.Audio
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.AudioPlayException
+import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.AudioPlayer
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -25,20 +38,17 @@ import kotlin.test.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class DialogueSearchViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var fakeRepository: FakeDialogueRepository
-    private lateinit var fakeAssetRepository: FakeAssetRepository
-    private lateinit var fakeAudioPlayer: FakeAudioPlayer
+    private val mockRepository = mock<DialogueRepository>()
+    private val mockAssetRepository = mock<AssetRepository>()
+    private val mockAudioPlayer = mock<AudioPlayer>()
     private lateinit var globalErrorManager: GlobalErrorManager
     private lateinit var viewModel: DialogueSearchViewModel
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        fakeRepository = FakeDialogueRepository()
-        fakeAssetRepository = FakeAssetRepository()
         globalErrorManager = GlobalErrorManager()
-        fakeAudioPlayer = FakeAudioPlayer()
-        viewModel = DialogueSearchViewModel(fakeRepository, fakeAssetRepository, globalErrorManager, fakeAudioPlayer)
+        viewModel = DialogueSearchViewModel(mockRepository, mockAssetRepository, globalErrorManager, mockAudioPlayer)
     }
 
     @AfterTest
@@ -48,6 +58,8 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `searchDialogues transitions to Loading and then Success`() = runTest {
+        everySuspend { mockRepository.searchDialogues("query") } returns persistentListOf()
+
         viewModel.searchState.test {
             var onErrorWasCalled = false
             var onSuccessWasCalled = false
@@ -65,11 +77,14 @@ class DialogueSearchViewModelTest {
             onErrorWasCalled shouldBe false
             onSuccessWasCalled shouldBe true
         }
+
+        verifySuspend { mockRepository.searchDialogues("query") }
     }
 
     @Test
     fun `searchDialogues transitions to search error state on failure, and reports error to globalErrorManager`() = runTest {
-        fakeRepository.shouldFail = true
+        everySuspend { mockRepository.searchDialogues(any()) } throws RuntimeException("Fake Network Error")
+
         viewModel.searchState.test {
             var onErrorWasCalled = false
             var onSuccessWasCalled = false
@@ -94,7 +109,8 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `playAudio transitions to Error on failure`() = runTest {
-        fakeAssetRepository.shouldFail = true
+        everySuspend { mockAssetRepository.getAsset("http://example.com") } throws AssetFetchException(message = "Fake Network Error")
+
         viewModel.playAudio("http://example.com")
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
@@ -105,7 +121,10 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun playAudio_whenAudioPlayExceptionThrown_updatesAudioErrorStateAndDoesNotChangeSearchState() = runTest {
-        fakeAudioPlayer.shouldFail = true
+        val fakeAsset = AssetData(ByteArray(0), "audio/wav")
+        everySuspend { mockAssetRepository.getAsset("url") } returns fakeAsset
+        everySuspend { mockAudioPlayer.play(Audio(fakeAsset.data, fakeAsset.mimeType)) } throws AudioPlayException(message = "Fake Audio Error")
+
         viewModel.playAudio("url")
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
@@ -117,6 +136,21 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `displayDialogue calls callback on success`() = runTest {
+        val expectedDialogue = Dialogue(
+            id = "123",
+            title = Phrase(
+                id = "1",
+                text = "Title",
+                isoLanguageCode = "en",
+                transcription = "Transcription",
+                translations = persistentListOf(),
+                assets = persistentListOf()
+            ),
+            speakers = persistentListOf(),
+            phrases = persistentListOf()
+        )
+        everySuspend { mockRepository.getDialogue("123") } returns expectedDialogue
+
         var onDialogueReadyCalled = false
         var onErrorCalled = false
         viewModel.displayDialogue(
@@ -127,11 +161,14 @@ class DialogueSearchViewModelTest {
         testScheduler.advanceUntilIdle()
         onDialogueReadyCalled shouldBe true
         onErrorCalled shouldBe false
+
+        verifySuspend { mockRepository.getDialogue("123") }
     }
 
     @Test
     fun `displayDialogue transitions to global Error on failure`() = runTest {
-        fakeRepository.shouldFail = true
+        everySuspend { mockRepository.getDialogue("123") } throws RuntimeException("Fake Network Error")
+
         var onErrorCalled = false
         var onDialogueReadyCalled = false
         viewModel.displayDialogue("123", { onDialogueReadyCalled = true }, { onErrorCalled = true })
@@ -155,6 +192,8 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `searchQuery updates when searchDialogues is called`() = runTest {
+        everySuspend { mockRepository.searchDialogues("another query") } returns persistentListOf()
+
         viewModel.searchQuery.test {
             awaitItem() shouldBe ""
             viewModel.searchDialogues(
@@ -166,3 +205,4 @@ class DialogueSearchViewModelTest {
         }
     }
 }
+
