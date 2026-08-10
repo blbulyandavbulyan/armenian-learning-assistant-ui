@@ -109,7 +109,9 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `playAudio transitions to Error on failure`() = runTest {
-        everySuspend { mockAssetRepository.getAsset("http://example.com") } throws AssetFetchException(message = "Fake Network Error")
+        everySuspend {
+            mockAssetRepository.getAsset("http://example.com")
+        } throws AssetFetchException(message = "Fake Network Error")
 
         viewModel.playAudio("http://example.com")
         testScheduler.advanceUntilIdle()
@@ -123,7 +125,9 @@ class DialogueSearchViewModelTest {
     fun playAudio_whenAudioPlayExceptionThrown_updatesAudioErrorStateAndDoesNotChangeSearchState() = runTest {
         val fakeAsset = AssetData(ByteArray(0), "audio/wav")
         everySuspend { mockAssetRepository.getAsset("url") } returns fakeAsset
-        everySuspend { mockAudioPlayer.play(Audio(fakeAsset.data, fakeAsset.mimeType)) } throws AudioPlayException(message = "Fake Audio Error")
+        everySuspend {
+            mockAudioPlayer.play(Audio(fakeAsset.data, fakeAsset.mimeType))
+        } throws AudioPlayException(message = "Fake Audio Error")
 
         viewModel.playAudio("url")
         testScheduler.advanceUntilIdle()
@@ -205,4 +209,3 @@ class DialogueSearchViewModelTest {
         }
     }
 }
-

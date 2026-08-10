@@ -298,4 +298,3 @@ class DialogueGeneratorScreenTest {
         verifySuspend { mockRepo.saveDialogue(GeneratedDialogueMother.FULL_DIALOGUE_1) }
     }
 }
-
