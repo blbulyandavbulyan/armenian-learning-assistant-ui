@@ -25,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,21 +32,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_search_dialogues
 import armenianlearningassistant_kmp.shared.generated.resources.no_results_found
 import armenianlearningassistant_kmp.shared.generated.resources.retry_button
-import armenianlearningassistant_kmp.shared.generated.resources.search_dialogues_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.search_results_title
 import armenianlearningassistant_kmp.shared.generated.resources.view_dialogue_details
 import armenianlearningassistant_kmp.shared.generated.resources.view_full_dialogue_button
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DialogueSummary
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.DialogueSearchViewModel
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.search.SearchState
-import com.blbulyandavbulyan.larm.kmp.ui.common.GoBackButton
 import com.blbulyandavbulyan.larm.kmp.ui.common.LoadingIndicator
 import com.blbulyandavbulyan.larm.kmp.ui.common.PrimaryVerticalScrollbar
-import com.blbulyandavbulyan.larm.kmp.ui.common.SearchField
 import com.blbulyandavbulyan.larm.kmp.ui.dialogue.common.DialogueTitle
 import com.blbulyandavbulyan.larm.kmp.ui.theme.AppTheme
 import org.jetbrains.compose.resources.painterResource
@@ -56,22 +53,18 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun DialogueSearchScreen(
     viewModel: DialogueSearchViewModel,
-    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
     onGetDialogueDetails: (String) -> Unit
 ) {
-    val searchState by viewModel.searchState.collectAsState()
-    val query by viewModel.searchQuery.collectAsState()
+    val searchState by viewModel.searchState.collectAsStateWithLifecycle()
+    val query by viewModel.searchQuery.collectAsStateWithLifecycle()
 
-    DialogueSearchContent(
-        query = query,
-        onBack = onBack,
+    DialogueSearchScreen(
         searchState = searchState,
-        onSearchQueryChange = {
-            viewModel.updateSearchQuery(it)
-        },
+        modifier = modifier,
         onSearch = {
             viewModel.searchDialogues(
-                query,
+                query = query,
                 onSuccess = {},
                 onError = {}
             )
@@ -82,11 +75,9 @@ fun DialogueSearchScreen(
 }
 
 @Composable
-private fun DialogueSearchContent(
-    query: String,
-    onBack: () -> Unit,
+fun DialogueSearchScreen(
     searchState: SearchState,
-    onSearchQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     onSearch: () -> Unit,
     onGetDialogueDetails: (String) -> Unit,
     onPlayAudio: (String) -> Unit
@@ -97,7 +88,7 @@ private fun DialogueSearchContent(
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier.testTag("dialogueSearchScreen")
             .fillMaxSize()
             .background(gradientBackground),
         contentAlignment = Alignment.TopCenter
@@ -108,16 +99,6 @@ private fun DialogueSearchContent(
                 .fillMaxHeight()
                 .padding(16.dp)
         ) {
-            // Search Bar with Back Button
-            SearchBarAndBackButton(
-                query = query,
-                onBack = onBack,
-                onValueChange = onSearchQueryChange,
-                onSearch = onSearch
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             SearchResultsContent(
                 searchState = searchState,
                 onGetDialogueDetails = onGetDialogueDetails,
@@ -276,27 +257,4 @@ private fun SearchResultsTitle() {
         style = MaterialTheme.typography.titleLarge,
         color = MaterialTheme.colorScheme.onBackground
     )
-}
-
-@Composable
-private fun SearchBarAndBackButton(
-    query: String,
-    onBack: () -> Unit,
-    onValueChange: (String) -> Unit,
-    onSearch: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        GoBackButton(width = 50.dp, height = 50.dp, onClick = onBack)
-        Spacer(modifier = Modifier.width(8.dp))
-        SearchField(
-            query = query,
-            textFieldModifier = Modifier.weight(1f).height(height = 60.dp).testTag("searchInputField"),
-            onSearch = onSearch,
-            onValueChange = onValueChange,
-            placeholder = { Text(stringResource(Res.string.search_dialogues_placeholder)) }
-        )
-    }
 }

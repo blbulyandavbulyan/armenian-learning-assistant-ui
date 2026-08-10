@@ -25,4 +25,13 @@
     <string name="error_failed_to_search_dialogues">Поиск диалогов не удался</string>
     <string name="error_failed_to_display_dialogue">Не удалось показать диалог</string>
     <string name="retry_button">Повторить</string>
+    <string name="auth_app_title">Армянский помощник в обучении</string>
+    <string name="auth_welcome_subtitle">Войдите, чтобы начать изучение и практику армянского языка</string>
+    <string name="auth_sign_in_with_google">Войти через Google</string>
+    <string name="app_title">Армянский помощник в обучении</string>
+    <string name="action_sign_out">Выйти</string>
+    <string name="profile_anonymous_user">Пользователь</string>
+    <string name="nav_dialogue_generator">Генератор Диалогов</string>
+    <string name="action_open_navigation_drawer">Открыть меню навигации</string>
+    <string name="auth_error_title">Ошибка аутентификации</string>
 </resources>

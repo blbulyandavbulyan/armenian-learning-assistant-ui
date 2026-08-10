@@ -1,8 +1,16 @@
 package com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search
 
+import com.blbulyandavbulyan.larm.kmp.domain.asset.model.AssetData
 import kotlinx.collections.immutable.persistentListOf
 
 object DomainMothers {
+    fun assetDataForDialogue1(): AssetData {
+        // essential to do this via method, because arrays are MUTABLE!
+        val byteArray = ByteArray(20)
+        byteArray[0] = 10
+        return AssetData(data = byteArray, mimeType = "audio/mpeg")
+    }
+
     val DIALOGUE_1 = Dialogue(
         id = "dialogue_id_123",
         title = Phrase(
