@@ -6,8 +6,6 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save_dialogue
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.DialogueTitle
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogueMother
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.DialogueChatRepository
 import dev.mokkery.answering.calls
@@ -16,11 +14,11 @@ import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,12 +51,7 @@ class DialogueChatViewModelTest {
 
     @Test
     fun `generateDialogue adds UserMessage, shows Loading, and ends with AiResponse`() = runTest {
-        val expectedDialogue = GeneratedDialogue(
-            message = "Here is your dialogue",
-            info = DialogueTitle("Title", "Transcription", persistentListOf()),
-            speakers = persistentListOf(),
-            phrases = persistentListOf()
-        )
+        val expectedDialogue = GeneratedDialogueMother.FULL_DIALOGUE_1
         everySuspend { mockRepository.generateDialogue(any(), any()) } returns expectedDialogue
 
         viewModel.conversation.test {
@@ -72,7 +65,7 @@ class DialogueChatViewModelTest {
             val finalState = awaitItem()
             finalState.size shouldBe 2
             finalState[0].shouldBeInstanceOf<ConversationItem.UserMessage>()
-            finalState[1].shouldBeInstanceOf<ConversationItem.AiResponse>().response.message shouldBe "Here is your dialogue"
+            finalState[1].shouldBeInstanceOf<ConversationItem.AiResponse>().response shouldBe expectedDialogue
             testScheduler.advanceUntilIdle()
             expectNoEvents()
         }
@@ -110,16 +103,12 @@ class DialogueChatViewModelTest {
             testScheduler.advanceUntilIdle()
             expectNoEvents()
         }
+        verifySuspend(mode = VerifyMode.exactly(0)) { mockRepository.generateDialogue(any(), any()) }
     }
 
     @Test
     fun `saveDialogue adds Error to global error on failure`() = runTest {
-        val dialogue = GeneratedDialogue(
-            message = "Test",
-            info = DialogueTitle("T", "T", persistentListOf()),
-            speakers = persistentListOf(),
-            phrases = persistentListOf()
-        )
+        val dialogue = GeneratedDialogueMother.FULL_DIALOGUE_1
         everySuspend { mockRepository.saveDialogue(dialogue) } throws RuntimeException("Fake Network Error")
 
         viewModel.conversation.test {

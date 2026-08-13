@@ -10,8 +10,7 @@ import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.domain.asset.model.AssetData
 import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetFetchException
 import com.blbulyandavbulyan.larm.kmp.domain.asset.repository.AssetRepository
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Dialogue
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.Phrase
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.search.DomainMothers
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.search.DialogueRepository
 import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.Audio
 import com.blbulyandavbulyan.larm.kmp.infrastructure.audio.AudioPlayException
@@ -140,20 +139,7 @@ class DialogueSearchViewModelTest {
 
     @Test
     fun `displayDialogue calls callback on success`() = runTest {
-        val expectedDialogue = Dialogue(
-            id = "123",
-            title = Phrase(
-                id = "1",
-                text = "Title",
-                isoLanguageCode = "en",
-                transcription = "Transcription",
-                translations = persistentListOf(),
-                assets = persistentListOf()
-            ),
-            speakers = persistentListOf(),
-            phrases = persistentListOf()
-        )
-        everySuspend { mockRepository.getDialogue("123") } returns expectedDialogue
+        everySuspend { mockRepository.getDialogue("123") } returns DomainMothers.DIALOGUE_1
 
         var onDialogueReadyCalled = false
         var onErrorCalled = false
