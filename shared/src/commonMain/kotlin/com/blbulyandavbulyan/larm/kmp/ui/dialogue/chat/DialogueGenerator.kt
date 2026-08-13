@@ -245,6 +245,8 @@ private fun ConversationScreen(
                                 onSaveClick = { onSaveDialogue(item.response) }
                             )
                         }
+
+                        is ConversationItem.Error -> {}
                     }
                 }
             }

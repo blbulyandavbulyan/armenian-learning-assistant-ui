@@ -6,6 +6,7 @@ import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_
 import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_save_dialogue
 import com.blbulyandavbulyan.larm.kmp.core.UiText
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogueMother
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.DialogueChatRepository
 import dev.mokkery.answering.calls
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
@@ -85,7 +87,10 @@ class DialogueChatViewModelTest {
             stateWithLoading.size shouldBe 2
             stateWithLoading[1].shouldBeInstanceOf<ConversationItem.Loading>()
             val finalState = awaitItem()
-            finalState.size shouldBe 1
+            finalState.size shouldBe 2
+            finalState[0].shouldBeInstanceOf<ConversationItem.UserMessage>()
+            val errorItem = finalState[1].shouldBeInstanceOf<ConversationItem.Error>()
+            errorItem.failedPrompt shouldBe prompt
             testScheduler.advanceUntilIdle()
             val error = globalErrorManager.currentError.value
             error.shouldNotBeNull()
@@ -93,6 +98,50 @@ class DialogueChatViewModelTest {
             error.title shouldBe UiText.from(Res.string.error_failed_to_generate_dialogue)
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun `generateDialogue - when repository throws exception - emits Error item instead of removing Loading`() = runTest {
+        // Arrange
+        val prompt = "test prompt"
+        val exception = RuntimeException("Network Error")
+        everySuspend { mockRepository.generateDialogue(any(), any()) } throws exception
+
+        // Act
+        viewModel.generateDialogue(prompt)
+        runCurrent()
+
+        // Assert
+        val items = viewModel.conversation.value
+        items.size shouldBe 2 // UserMessage and Error
+        items[0] shouldBe ConversationItem.UserMessage(prompt)
+        items[1].shouldBeInstanceOf<ConversationItem.Error>()
+        val errorItem = items[1] as ConversationItem.Error
+        errorItem.failedPrompt shouldBe prompt
+    }
+
+    @Test
+    fun `retryDialogue - when called with valid error id - replaces Error with Loading and retries`() = runTest {
+        // Arrange
+        val prompt = "test prompt"
+        val exception = RuntimeException("Network Error")
+        everySuspend { mockRepository.generateDialogue(any(), any()) } throws exception
+
+        viewModel.generateDialogue(prompt)
+        runCurrent()
+        
+        val errorItem = viewModel.conversation.value.last() as ConversationItem.Error
+        
+        val successfulResponse = GeneratedDialogueMother.FULL_DIALOGUE_1
+        everySuspend { mockRepository.generateDialogue(prompt, any()) } returns successfulResponse
+
+        // Act
+        viewModel.retryDialogue(errorItem.id)
+        runCurrent()
+
+        // Assert
+        val items = viewModel.conversation.value
+        items.last() shouldBe ConversationItem.AiResponse(successfulResponse)
     }
 
     @Test
