@@ -50,8 +50,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import armenianlearningassistant_kmp.shared.generated.resources.Res
 import armenianlearningassistant_kmp.shared.generated.resources.action_send
 import armenianlearningassistant_kmp.shared.generated.resources.empty_conversation_message
+import armenianlearningassistant_kmp.shared.generated.resources.error_failed_to_generate_dialogue
 import armenianlearningassistant_kmp.shared.generated.resources.input_placeholder
 import armenianlearningassistant_kmp.shared.generated.resources.noto_sans_armenian
+import armenianlearningassistant_kmp.shared.generated.resources.retry_button
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
@@ -70,7 +72,8 @@ fun DialogueGeneratorScreen(
         conversation = conversation,
         modifier = modifier,
         onGenerateDialogue = viewModel::generateDialogue,
-        onSaveDialogue = viewModel::saveDialogue
+        onSaveDialogue = viewModel::saveDialogue,
+        onRetryDialogue = viewModel::retryDialogue
     )
 }
 
@@ -80,7 +83,8 @@ fun DialogueGeneratorScreen(
     modifier: Modifier = Modifier,
     emptyMessage: String = stringResource(Res.string.empty_conversation_message),
     onGenerateDialogue: (String) -> Unit,
-    onSaveDialogue: (GeneratedDialogue) -> Unit
+    onSaveDialogue: (GeneratedDialogue) -> Unit,
+    onRetryDialogue: (String) -> Unit = {}
 ) {
     var prompt by remember { mutableStateOf("") }
 
@@ -120,7 +124,7 @@ fun DialogueGeneratorScreen(
             if (conversation.isEmpty()) {
                 EmptyConversationScreen(emptyMessage)
             } else {
-                ConversationScreen(conversation, notoArmenian, onSaveDialogue)
+                ConversationScreen(conversation, notoArmenian, onSaveDialogue, onRetryDialogue)
             }
         }
 
@@ -207,7 +211,8 @@ private fun BoxScope.EmptyConversationScreen(message: String) {
 private fun ConversationScreen(
     conversation: List<ConversationItem>,
     notoArmenian: FontFamily,
-    onSaveDialogue: (GeneratedDialogue) -> Unit
+    onSaveDialogue: (GeneratedDialogue) -> Unit,
+    onRetryDialogue: (String) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
 
@@ -246,7 +251,12 @@ private fun ConversationScreen(
                             )
                         }
 
-                        is ConversationItem.Error -> {}
+                        is ConversationItem.Error -> {
+                            ErrorItemView(
+                                errorItem = item,
+                                onRetry = { onRetryDialogue(item.id) }
+                            )
+                        }
                     }
                 }
             }
@@ -298,3 +308,50 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
         }
     }
 }
+
+@Composable
+fun ErrorItemView(
+    errorItem: ConversationItem.Error,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("errorItemView"),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Card(
+            shape = RoundedCornerShape(
+                topStart = 4.dp,
+                topEnd = 16.dp,
+                bottomEnd = 16.dp,
+                bottomStart = 16.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer
+            ),
+            modifier = Modifier.fillMaxWidth(fraction = 0.85f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = stringResource(Res.string.error_failed_to_generate_dialogue),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = onRetry,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                    modifier = Modifier.testTag("retryButton")
+                ) {
+                    Text(stringResource(Res.string.retry_button))
+                }
+            }
+        }
+    }
+}
+
