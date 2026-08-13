@@ -129,19 +129,92 @@ class DialogueChatViewModelTest {
 
         viewModel.generateDialogue(prompt)
         runCurrent()
-        
+
         val errorItem = viewModel.conversation.value.last() as ConversationItem.Error
-        
+
         val successfulResponse = GeneratedDialogueMother.FULL_DIALOGUE_1
-        everySuspend { mockRepository.generateDialogue(prompt, any()) } returns successfulResponse
+        val retryDeferred = CompletableDeferred<GeneratedDialogue>()
+        everySuspend { mockRepository.generateDialogue(prompt, any()) } calls { retryDeferred.await() }
 
         // Act
         viewModel.retryDialogue(errorItem.id)
         runCurrent()
 
-        // Assert
+        // Assert intermediate Loading state
+        viewModel.conversation.value.last() shouldBe ConversationItem.Loading
+
+        // Complete deferred and assert final state
+        retryDeferred.complete(successfulResponse)
+        runCurrent()
+
         val items = viewModel.conversation.value
         items.last() shouldBe ConversationItem.AiResponse(successfulResponse)
+    }
+
+    @Test
+    fun `retryDialogue - when generation fails again - restores Error state and notifies globalErrorManager`() = runTest {
+        // Arrange
+        val prompt = "test prompt"
+        val exception1 = RuntimeException("Network Error 1")
+        everySuspend { mockRepository.generateDialogue(any(), any()) } throws exception1
+
+        viewModel.generateDialogue(prompt)
+        runCurrent()
+
+        val initialErrorItem = viewModel.conversation.value.last() as ConversationItem.Error
+
+        val exception2 = RuntimeException("Network Error 2")
+        val retryDeferred = CompletableDeferred<Unit>()
+        everySuspend { mockRepository.generateDialogue(prompt, any()) } calls {
+            retryDeferred.await()
+            throw exception2
+        }
+
+        // Act
+        viewModel.retryDialogue(initialErrorItem.id)
+        runCurrent()
+
+        // Assert intermediate Loading state
+        viewModel.conversation.value.last() shouldBe ConversationItem.Loading
+
+        // Complete deferred to trigger failure
+        retryDeferred.complete(Unit)
+        runCurrent()
+
+        // Assert Error state restored
+        val items = viewModel.conversation.value
+        items.size shouldBe 2
+        items[0] shouldBe ConversationItem.UserMessage(prompt)
+        val restoredError = items[1].shouldBeInstanceOf<ConversationItem.Error>()
+        restoredError.id shouldBe initialErrorItem.id
+        restoredError.failedPrompt shouldBe prompt
+
+        // Assert global error manager notified
+        val error = globalErrorManager.currentError.value
+        error.shouldNotBeNull()
+        error.message shouldBe UiText.from("Network Error 2")
+        error.title shouldBe UiText.from(Res.string.error_failed_to_generate_dialogue)
+    }
+
+    @Test
+    fun `retryDialogue - when called with unknown id - leaves conversation state unaffected`() = runTest {
+        // Arrange
+        val prompt = "test prompt"
+        val exception = RuntimeException("Network Error")
+        everySuspend { mockRepository.generateDialogue(any(), any()) } throws exception
+
+        viewModel.generateDialogue(prompt)
+        runCurrent()
+
+        val initialState = viewModel.conversation.value
+
+        // Act
+        viewModel.retryDialogue("unknown-id-123")
+        runCurrent()
+
+        // Assert
+        viewModel.conversation.value shouldBe initialState
+        verifySuspend(mode = VerifyMode.exactly(1)) { mockRepository.generateDialogue(any(), any()) }
     }
 
     @Test

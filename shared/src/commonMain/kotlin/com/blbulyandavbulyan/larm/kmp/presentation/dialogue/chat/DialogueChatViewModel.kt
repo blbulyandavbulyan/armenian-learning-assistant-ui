@@ -39,17 +39,46 @@ class DialogueChatViewModel(
                 .adding(ConversationItem.Loading)
         }
 
+        executeDialogueGeneration(prompt)
+    }
+
+    fun retryDialogue(id: String) {
+        val errorItem = _conversation.value.filterIsInstance<ConversationItem.Error>().find { it.id == id } ?: return
+
+        _conversation.update { current ->
+            current.map {
+                if (it is ConversationItem.Error && it.id == id) {
+                    ConversationItem.Loading
+                } else it
+            }.toPersistentList()
+        }
+
+        executeDialogueGeneration(errorItem.failedPrompt, errorItem)
+    }
+
+    @Suppress("TooGenericExceptionCaught")
+    private fun executeDialogueGeneration(
+        prompt: String,
+        fallbackError: ConversationItem.Error? = null
+    ) {
         viewModelScope.launch {
             try {
                 val response = repository.generateDialogue(prompt, chatId)
                 _conversation.update { current ->
-                    current.removingAll { it is ConversationItem.Loading }
-                        .adding(ConversationItem.AiResponse(response))
+                    current.map {
+                        if (it is ConversationItem.Loading) {
+                            ConversationItem.AiResponse(response)
+                        } else it
+                    }.toPersistentList()
                 }
             } catch (e: Throwable) {
-                val errorItem = ConversationItem.Error(prompt)
+                val errorItem = fallbackError ?: ConversationItem.Error(prompt)
                 _conversation.update { current ->
-                    current.map { if (it is ConversationItem.Loading) errorItem else it }.toPersistentList()
+                    current.map {
+                        if (it is ConversationItem.Loading) {
+                            errorItem
+                        } else it
+                    }.toPersistentList()
                 }
                 println(e)
                 globalErrorManager.showError(
@@ -97,42 +126,6 @@ class DialogueChatViewModel(
                     it
                 }
             }.toPersistentList()
-        }
-    }
-
-    @Suppress("TooGenericExceptionCaught")
-    fun retryDialogue(id: String) {
-        val errorItem = _conversation.value.filterIsInstance<ConversationItem.Error>().find { it.id == id } ?: return
-
-        _conversation.update { current ->
-            current.map {
-                if (it is ConversationItem.Error && it.id == id) {
-                    ConversationItem.Loading
-                } else it
-            }.toPersistentList()
-        }
-
-        viewModelScope.launch {
-            try {
-                val response = repository.generateDialogue(errorItem.failedPrompt, chatId)
-                _conversation.update { current ->
-                    current.removingAll { it is ConversationItem.Loading }
-                        .adding(ConversationItem.AiResponse(response))
-                }
-            } catch (e: Throwable) {
-                _conversation.update { current ->
-                    current.map {
-                        if (it is ConversationItem.Loading) {
-                            errorItem
-                        } else it
-                    }.toPersistentList()
-                }
-                println(e)
-                globalErrorManager.showError(
-                    UiText.from(Res.string.error_failed_to_generate_dialogue),
-                    UiText.from(e.message, Res.string.error_unknown)
-                )
-            }
         }
     }
 }
