@@ -60,21 +60,21 @@ class DialogueSearchViewModelTest {
         everySuspend { mockRepository.searchDialogues("query") } returns persistentListOf()
 
         viewModel.searchState.test {
-            var onErrorWasCalled = false
-            var onSuccessWasCalled = false
+            var onErrorCallCount = 0
+            var onSuccessCallCount = 0
             awaitItem() shouldBe SearchState.Initial
             viewModel.searchDialogues(
-                "query",
-                onError = { onErrorWasCalled = true },
-                onSuccess = { onSuccessWasCalled = true }
+                query = "query",
+                onError = { onErrorCallCount++ },
+                onSuccess = { onSuccessCallCount++ }
             )
             awaitItem() shouldBe SearchState.Loading
             val successState = awaitItem() as SearchState.Success
             successState.results shouldBe emptyList()
             testScheduler.advanceUntilIdle()
             expectNoEvents()
-            onErrorWasCalled shouldBe false
-            onSuccessWasCalled shouldBe true
+            onErrorCallCount shouldBe 0
+            onSuccessCallCount shouldBe 1
         }
 
         verifySuspend { mockRepository.searchDialogues("query") }
@@ -85,13 +85,13 @@ class DialogueSearchViewModelTest {
         everySuspend { mockRepository.searchDialogues(any()) } throws RuntimeException("Fake Network Error")
 
         viewModel.searchState.test {
-            var onErrorWasCalled = false
-            var onSuccessWasCalled = false
+            var onErrorCallCount = 0
+            var onSuccessCallCount = 0
             awaitItem() shouldBe SearchState.Initial
             viewModel.searchDialogues(
-                "query",
-                onError = { onErrorWasCalled = true },
-                onSuccess = { onSuccessWasCalled = true }
+                query = "query",
+                onError = { onErrorCallCount++ },
+                onSuccess = { onSuccessCallCount++ }
             )
             awaitItem() shouldBe SearchState.Loading
             awaitItem() shouldBe SearchState.Error
@@ -101,8 +101,8 @@ class DialogueSearchViewModelTest {
             error.message shouldBe UiText.from("Fake Network Error")
             error.title shouldBe UiText.from(Res.string.error_failed_to_search_dialogues)
             expectNoEvents()
-            onErrorWasCalled shouldBe true
-            onSuccessWasCalled shouldBe false
+            onErrorCallCount shouldBe 1
+            onSuccessCallCount shouldBe 0
         }
     }
 
@@ -141,16 +141,16 @@ class DialogueSearchViewModelTest {
     fun `displayDialogue calls callback on success`() = runTest {
         everySuspend { mockRepository.getDialogue("123") } returns DomainMothers.DIALOGUE_1
 
-        var onDialogueReadyCalled = false
-        var onErrorCalled = false
+        var onDialogueReadyCallCount = 0
+        var onErrorCallCount = 0
         viewModel.displayDialogue(
-            "123",
-            onError = { onErrorCalled = true },
-            onDialogueReady = { onDialogueReadyCalled = true }
+            id = "123",
+            onError = { onErrorCallCount++ },
+            onDialogueReady = { onDialogueReadyCallCount++ }
         )
         testScheduler.advanceUntilIdle()
-        onDialogueReadyCalled shouldBe true
-        onErrorCalled shouldBe false
+        onDialogueReadyCallCount shouldBe 1
+        onErrorCallCount shouldBe 0
 
         verifySuspend { mockRepository.getDialogue("123") }
     }
@@ -159,16 +159,20 @@ class DialogueSearchViewModelTest {
     fun `displayDialogue transitions to global Error on failure`() = runTest {
         everySuspend { mockRepository.getDialogue("123") } throws RuntimeException("Fake Network Error")
 
-        var onErrorCalled = false
-        var onDialogueReadyCalled = false
-        viewModel.displayDialogue("123", { onDialogueReadyCalled = true }, { onErrorCalled = true })
+        var onErrorCallCount = 0
+        var onDialogueReadyCallCount = 0
+        viewModel.displayDialogue(
+            id = "123",
+            onDialogueReady = { onDialogueReadyCallCount++ },
+            onError = { onErrorCallCount++ }
+        )
         testScheduler.advanceUntilIdle()
         val error = globalErrorManager.currentError.value
         error.shouldNotBeNull()
         error.message shouldBe UiText.from("Fake Network Error")
         error.title shouldBe UiText.from(Res.string.error_failed_to_display_dialogue)
-        onErrorCalled shouldBe true
-        onDialogueReadyCalled shouldBe false
+        onErrorCallCount shouldBe 1
+        onDialogueReadyCallCount shouldBe 0
     }
 
     @Test
