@@ -34,31 +34,34 @@ class DialogueChatViewModel(
     fun generateDialogue(prompt: String) {
         if (prompt.isBlank()) return
 
+        val loadingItem = ConversationItem.Loading()
         _conversation.update { current ->
             current.adding(ConversationItem.UserMessage(prompt))
-                .adding(ConversationItem.Loading)
+                .adding(loadingItem)
         }
 
-        executeDialogueGeneration(prompt)
+        executeDialogueGeneration(prompt, loadingItem.id)
     }
 
     fun retryDialogue(id: String) {
         val errorItem = _conversation.value.filterIsInstance<ConversationItem.Error>().find { it.id == id } ?: return
+        val loadingItem = ConversationItem.Loading(id = errorItem.id)
 
         _conversation.update { current ->
             current.map {
                 if (it is ConversationItem.Error && it.id == id) {
-                    ConversationItem.Loading
+                    loadingItem
                 } else it
             }.toPersistentList()
         }
 
-        executeDialogueGeneration(errorItem.failedPrompt, errorItem)
+        executeDialogueGeneration(errorItem.failedPrompt, loadingItem.id, errorItem)
     }
 
     @Suppress("TooGenericExceptionCaught")
     private fun executeDialogueGeneration(
         prompt: String,
+        loadingId: String,
         fallbackError: ConversationItem.Error? = null
     ) {
         viewModelScope.launch {
@@ -66,16 +69,16 @@ class DialogueChatViewModel(
                 val response = repository.generateDialogue(prompt, chatId)
                 _conversation.update { current ->
                     current.map {
-                        if (it is ConversationItem.Loading) {
+                        if (it is ConversationItem.Loading && it.id == loadingId) {
                             ConversationItem.AiResponse(response)
                         } else it
                     }.toPersistentList()
                 }
             } catch (e: Throwable) {
-                val errorItem = fallbackError ?: ConversationItem.Error(prompt)
+                val errorItem = fallbackError ?: ConversationItem.Error(prompt, loadingId)
                 _conversation.update { current ->
                     current.map {
-                        if (it is ConversationItem.Loading) {
+                        if (it is ConversationItem.Loading && it.id == loadingId) {
                             errorItem
                         } else it
                     }.toPersistentList()

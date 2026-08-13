@@ -181,7 +181,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(ConversationItem.Loading),
+                    conversation = listOf(ConversationItem.Loading()),
                     onGenerateDialogue = { },
                     onSaveDialogue = {}
                 )

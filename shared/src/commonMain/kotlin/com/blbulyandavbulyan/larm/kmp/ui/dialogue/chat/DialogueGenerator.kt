@@ -29,6 +29,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -227,35 +228,37 @@ private fun ConversationScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 for (item in conversation) {
-                    when (item) {
-                        is ConversationItem.UserMessage -> {
-                            UserMessageView(item.text, notoArmenian)
-                        }
-
-                        is ConversationItem.Loading -> {
-                            Box(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("loadingIndicator"),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    key(item.id) {
+                        when (item) {
+                            is ConversationItem.UserMessage -> {
+                                UserMessageView(item.text, notoArmenian)
                             }
-                        }
 
-                        is ConversationItem.AiResponse -> {
-                            GeneratedDialogueView(
-                                dialogue = item.response,
-                                fontFamily = notoArmenian,
-                                isSaving = item.isSaving,
-                                isSaved = item.isSaved,
-                                onSaveClick = { onSaveDialogue(item.response) }
-                            )
-                        }
+                            is ConversationItem.Loading -> {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("loadingIndicator"),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                                }
+                            }
 
-                        is ConversationItem.Error -> {
-                            ErrorItemView(
-                                errorItem = item,
-                                onRetry = { onRetryDialogue(item.id) }
-                            )
+                            is ConversationItem.AiResponse -> {
+                                GeneratedDialogueView(
+                                    dialogue = item.response,
+                                    fontFamily = notoArmenian,
+                                    isSaving = item.isSaving,
+                                    isSaved = item.isSaved,
+                                    onSaveClick = { onSaveDialogue(item.response) }
+                                )
+                            }
+
+                            is ConversationItem.Error -> {
+                                ErrorItemView(
+                                    errorItem = item,
+                                    onRetry = { onRetryDialogue(item.id) }
+                                )
+                            }
                         }
                     }
                 }

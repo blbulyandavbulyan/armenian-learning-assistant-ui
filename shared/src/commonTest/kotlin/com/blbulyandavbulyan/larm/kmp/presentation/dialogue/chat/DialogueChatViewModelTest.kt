@@ -114,7 +114,7 @@ class DialogueChatViewModelTest {
         // Assert
         val items = viewModel.conversation.value
         items.size shouldBe 2 // UserMessage and Error
-        items[0] shouldBe ConversationItem.UserMessage(prompt)
+        items[0].shouldBeInstanceOf<ConversationItem.UserMessage>().text shouldBe prompt
         items[1].shouldBeInstanceOf<ConversationItem.Error>()
         val errorItem = items[1] as ConversationItem.Error
         errorItem.failedPrompt shouldBe prompt
@@ -141,14 +141,14 @@ class DialogueChatViewModelTest {
         runCurrent()
 
         // Assert intermediate Loading state
-        viewModel.conversation.value.last() shouldBe ConversationItem.Loading
+        viewModel.conversation.value.last().shouldBeInstanceOf<ConversationItem.Loading>()
 
         // Complete deferred and assert final state
         retryDeferred.complete(successfulResponse)
         runCurrent()
 
         val items = viewModel.conversation.value
-        items.last() shouldBe ConversationItem.AiResponse(successfulResponse)
+        items.last().shouldBeInstanceOf<ConversationItem.AiResponse>().response shouldBe successfulResponse
     }
 
     @Test
@@ -175,7 +175,7 @@ class DialogueChatViewModelTest {
         runCurrent()
 
         // Assert intermediate Loading state
-        viewModel.conversation.value.last() shouldBe ConversationItem.Loading
+        viewModel.conversation.value.last().shouldBeInstanceOf<ConversationItem.Loading>()
 
         // Complete deferred to trigger failure
         retryDeferred.complete(Unit)
@@ -184,7 +184,7 @@ class DialogueChatViewModelTest {
         // Assert Error state restored
         val items = viewModel.conversation.value
         items.size shouldBe 2
-        items[0] shouldBe ConversationItem.UserMessage(prompt)
+        items[0].shouldBeInstanceOf<ConversationItem.UserMessage>().text shouldBe prompt
         val restoredError = items[1].shouldBeInstanceOf<ConversationItem.Error>()
         restoredError.id shouldBe initialErrorItem.id
         restoredError.failedPrompt shouldBe prompt
