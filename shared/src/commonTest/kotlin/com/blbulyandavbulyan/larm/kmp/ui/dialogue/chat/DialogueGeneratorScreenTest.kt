@@ -19,10 +19,15 @@ import androidx.compose.ui.test.withKeyDown
 import com.blbulyandavbulyan.larm.kmp.core.error.GlobalErrorManager
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogue
 import com.blbulyandavbulyan.larm.kmp.domain.dialogue.model.chat.GeneratedDialogueMother
-import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.FakeDialogueChatRepository
+import com.blbulyandavbulyan.larm.kmp.domain.dialogue.repository.chat.DialogueChatRepository
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.ConversationItem
 import com.blbulyandavbulyan.larm.kmp.presentation.dialogue.chat.DialogueChatViewModel
 import com.blbulyandavbulyan.larm.kmp.ui.theme.ArmenianLearningTheme
+import dev.mokkery.answering.returns
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -257,10 +262,11 @@ class DialogueGeneratorScreenTest {
 
     @Test
     fun dialogueGeneratorScreen_withViewModel_delegatesToViewModel() = runComposeUiTest {
-        val fakeRepo = FakeDialogueChatRepository().apply {
-            dialoguesToReturn.add(GeneratedDialogueMother.FULL_DIALOGUE_1)
-        }
-        val viewModel = DialogueChatViewModel(fakeRepo, GlobalErrorManager())
+        val mockRepo = mock<DialogueChatRepository>()
+        everySuspend { mockRepo.generateDialogue(any(), any()) } returns GeneratedDialogueMother.FULL_DIALOGUE_1
+        everySuspend { mockRepo.saveDialogue(any()) } returns "saved-id"
+
+        val viewModel = DialogueChatViewModel(mockRepo, GlobalErrorManager())
 
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
@@ -279,7 +285,7 @@ class DialogueGeneratorScreenTest {
 
         // Verify that the viewModel received the prompt via its generateDialogue method
         // which calls the repository under the hood
-        fakeRepo.lastPrompt shouldBe testPrompt
+        verifySuspend { mockRepo.generateDialogue(testPrompt, any()) }
 
         // Wait for the generated dialogue to appear
         onAllNodesWithTag("saveButton")[0].assertIsDisplayed()
@@ -289,6 +295,6 @@ class DialogueGeneratorScreenTest {
         waitForIdle()
 
         // Verify that the viewModel delegated the save action to the repository
-        fakeRepo.lastSavedDialogue shouldBe GeneratedDialogueMother.FULL_DIALOGUE_1
+        verifySuspend { mockRepo.saveDialogue(GeneratedDialogueMother.FULL_DIALOGUE_1) }
     }
 }
