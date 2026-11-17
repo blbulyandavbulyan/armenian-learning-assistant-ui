@@ -49,9 +49,7 @@ class DialogueChatViewModel(
 
         _conversation.update { current ->
             current.map {
-                if (it is ConversationItem.Error && it.id == id) {
-                    loadingItem
-                } else it
+                if (it is ConversationItem.Error && it.id == id) loadingItem else it
             }.toPersistentList()
         }
 
@@ -71,7 +69,9 @@ class DialogueChatViewModel(
                     current.map {
                         if (it is ConversationItem.Loading && it.id == loadingId) {
                             ConversationItem.AiResponse(response)
-                        } else it
+                        } else {
+                            it
+                        }
                     }.toPersistentList()
                 }
             } catch (e: Throwable) {
@@ -80,7 +80,9 @@ class DialogueChatViewModel(
                     current.map {
                         if (it is ConversationItem.Loading && it.id == loadingId) {
                             errorItem
-                        } else it
+                        } else {
+                            it
+                        }
                     }.toPersistentList()
                 }
                 println(e)

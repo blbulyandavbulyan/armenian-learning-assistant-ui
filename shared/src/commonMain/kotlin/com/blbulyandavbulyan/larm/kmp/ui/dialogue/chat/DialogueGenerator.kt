@@ -255,7 +255,6 @@ private fun ConversationScreen(
 
                             is ConversationItem.Error -> {
                                 ErrorItemView(
-                                    errorItem = item,
                                     onRetry = { onRetryDialogue(item.id) }
                                 )
                             }
@@ -314,7 +313,6 @@ fun UserMessageView(text: String, fontFamily: FontFamily) {
 
 @Composable
 fun ErrorItemView(
-    errorItem: ConversationItem.Error,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -357,4 +355,3 @@ fun ErrorItemView(
         }
     }
 }
-
