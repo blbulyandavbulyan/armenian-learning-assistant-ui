@@ -181,7 +181,7 @@ class DialogueGeneratorScreenTest {
         setContent {
             ArmenianLearningTheme(darkTheme = true) {
                 DialogueGeneratorScreen(
-                    conversation = listOf(ConversationItem.Loading),
+                    conversation = listOf(ConversationItem.Loading()),
                     onGenerateDialogue = { },
                     onSaveDialogue = {}
                 )
@@ -296,5 +296,29 @@ class DialogueGeneratorScreenTest {
 
         // Verify that the viewModel delegated the save action to the repository
         verifySuspend { mockRepo.saveDialogue(GeneratedDialogueMother.FULL_DIALOGUE_1) }
+    }
+
+    @Test
+    fun shouldDisplayErrorStateAndRetryButton() = runComposeUiTest {
+        var retryId: String? = null
+        val errorItem = ConversationItem.Error("failed prompt", id = "error-123")
+
+        setContent {
+            ArmenianLearningTheme(darkTheme = true) {
+                DialogueGeneratorScreen(
+                    conversation = listOf(errorItem),
+                    onGenerateDialogue = {},
+                    onSaveDialogue = {},
+                    onRetryDialogue = { retryId = it }
+                )
+            }
+        }
+
+        retryId shouldBe null
+
+        onNodeWithTag("errorItemView").assertIsDisplayed()
+        onNodeWithTag("retryButton").assertIsDisplayed().performClick()
+
+        retryId shouldBe "error-123"
     }
 }
